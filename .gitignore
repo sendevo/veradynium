@@ -1,6 +1,7 @@
 solver/solver
-gui/node_modules/
+gui/node_modules
 gui/dist/
 gui/public/
 gui/package-lock.json
+python/venv/
 
