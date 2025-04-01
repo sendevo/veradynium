@@ -1,0 +1,6 @@
+solver/solver
+gui/node_modules/
+gui/dist/
+gui/public/
+gui/package-lock.json
+

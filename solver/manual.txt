@@ -1,0 +1,25 @@
+NAME
+   solver - LoRaWAN SOLVER
+
+SYNOPSIS
+   solver [OPTIONS]... -f [FILE]
+
+DESCRIPTION:
+   This program computes an optimal solution for the VirtualGateway Placement Problem (GPP). 
+
+OPTIONS:
+   -h, --help     Display this help message.
+
+EXAMPLES:
+   1. solver -f input.json
+      - Run the program using the default options.
+
+AUTHORS
+   Code was written by Dr. Matias J. Micheletto from IIDEPyS-GSJ (CONICET) and supervised by Dr. Rodrigo M. Santos from DIEC (UNS) - ICIC (CONICET) and Dr. Carlos De Marziani from UNPSJB - IIDEPyS (CONICET).
+
+REPORTING BUGS
+   Guidelines available at <https://github.com/sendevo/veradynium>.
+
+COPYRIGHT
+   Copyright   ©   2023   Free   Software   Foundation,  Inc.   License  GPLv3+:  GNU  GPL  version  3  or  later <https://gnu.org/licenses/gpl.html>.
+   This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the  extent  permitted by law.
