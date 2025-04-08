@@ -1,13 +1,12 @@
 import sys
 import os
 from util import load_json
-from device_metrics import get_device_params
+from network_metrics import get_device_params
 from device_charts import plot_device_params_time_series, plot_device_params_histograms
 
 
 DATA_PATH = '../data/ttn_data.json'
 CHARTS_DIR = 'charts'
-SAVE_CHARTS = True
 
 
 if len(sys.argv) < 2:
@@ -19,17 +18,11 @@ else:
     device_params = get_device_params(data, device_id)
     #print(device_params)
 
-    if SAVE_CHARTS:
-        if not os.path.exists(CHARTS_DIR):
-            os.makedirs(CHARTS_DIR)
-        
-        chart_path = ''
-        time_series_path = os.path.join(CHARTS_DIR, f'{device_id}_time_series.png')
-        histograms_path = os.path.join(CHARTS_DIR, f'{device_id}_histograms.png')
-
-        plot_device_params_time_series(device_params, time_series_path)
-        plot_device_params_histograms(device_params, histograms_path)
+    save_charts = sys.argv[2] if len(sys.argv) > 2 else None
+    if save_charts:
+        save_charts = save_charts.lower() == 'true'
     else:
-        plot_device_params_time_series(device_params)
-        plot_device_params_histograms(device_params)
-    
+        save_charts = False
+
+    plot_device_params_time_series(device_params, device_id, CHARTS_DIR if save_charts else None)
+    plot_device_params_histograms(device_params, device_id, CHARTS_DIR if save_charts else None)

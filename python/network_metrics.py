@@ -66,6 +66,21 @@ Data format:
 """
 
 def get_device_params(data, device_id):
+    """
+    Builds a dict with parameters of interest from the dataset. 
+    Arguments:
+        data (list): List of data entries.
+        device_id (str): Device ID.
+    Returns:
+        device_params (dict): Dictionary containing device parameters.
+            {
+                'rssi': [rssi_values],
+                'snr': [snr_values],
+                'sf': [sf_values],
+                'airtime': [airtime_values]
+            }
+    """
+
     device_params = {} # Format {rssi: [rssi_values], snr: [snr_values], sf: [sf_values], airtime: [airtime_values]}
     for entry in data:
         if entry['result']['end_device_ids']['device_id'] == device_id:
@@ -105,44 +120,16 @@ def get_device_params(data, device_id):
     return device_params
 
 
-def get_data_stats(data):
-    device_stats = {} # Format: {device_id: {"rssi": [], "spreading_factor": [], "airtime": [], "snr": []}}
-    for entry in data:
-        result = entry.get("result", {})
-        device_id = result.get("end_device_ids", {}).get("device_id", "Unknown")
-        rssi = result.get("uplink_message", {}).get("rx_metadata", [{}])[0].get("rssi")
-        sf = result.get("uplink_message", {}).get("settings", {}).get("data_rate", {}).get("lora", {}).get("spreading_factor")
-        airtime = result.get("uplink_message", {}).get("consumed_airtime")
-        snr = result.get("uplink_message", {}).get("rx_metadata", [{}])[0].get("snr")
-        
-        if device_id not in device_stats:
-            device_stats[device_id] = {"rssi": [], "spreading_factor": [], "airtime": []}
-        
-        if airtime is not None:
-            airtime = float(airtime.replace("s", ""))
-            device_stats[device_id]["airtime"].append(airtime)
-        
-        if rssi is not None:
-            device_stats[device_id]["rssi"].append(rssi)
-
-        if sf is not None:
-            device_stats[device_id]["spreading_factor"].append(sf)
-
-        if snr is not None:
-            snr = float(snr)
-    
-    return device_stats
 
 
 if __name__ == "__main__":
     data = load_json(DATA_PATH)
 
-    #messages_stats = get_data_stats(data)
-    #print(messages_stats)
-
     device_id = ''
     if len(sys.argv) < 2:
-        print("Please provide a device ID as a command line argument.")
+        print("Not device ID provided, printing data stats.")
+        #messages_stats = get_data_stats(data)
+        #print(messages_stats)
         sys.exit(1)
     else:
         device_id = sys.argv[1]

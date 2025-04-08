@@ -2,9 +2,35 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-CHARTS_DIR = 'charts'
 
-def plot_device_params_time_series(device_params, path=None):
+def save_fig(plt, file_name, dir):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+        print(f"Directory {dir} created.")
+    else:
+        print(f"Directory {dir} already exists.")
+    path = os.path.join(dir, file_name)
+    plt.savefig(path)
+    print(f"Saved chart to {path}")
+
+
+def plot_device_params_time_series(device_params, device_id, dir=None):
+    """
+    Plot time series of device parameters.
+    1. RSSI
+    2. Airtime
+    3. Spreading Factor
+    Parameters:
+    device_params (dict): Dictionary containing device parameters.
+        {
+            'rssi': [rssi_values],
+            'snr': [snr_values],
+            'sf': [sf_values],
+            'airtime': [airtime_values]
+        }
+        device_id (str): Device ID.
+        dir (str): Directory to save the plots. If None, show the plots.
+    """
     fig, axs = plt.subplots(3, 1, figsize=(10, 15))
     fig.suptitle('Device Parameters')
 
@@ -29,15 +55,29 @@ def plot_device_params_time_series(device_params, path=None):
     axs[2].set_ylabel('Spreading Factor')
     axs[2].legend()
 
+    plt.title('Time series ID=' + device_id)
     plt.tight_layout()
 
-    if path:
-        plt.savefig(path)
+    if dir:
+        save_fig(plt, f'{device_id}_time_series.png', dir)
     else:
         plt.show()
 
 
-def plot_device_params_histograms(device_params, path=None):
+def plot_device_params_histograms(device_params, device_id, dir=None):
+    """
+    Plot histograms of device parameters.
+    Parameters:
+    device_params (dict): Dictionary containing device parameters.
+        {
+            'rssi': [rssi_values],
+            'snr': [snr_values],
+            'sf': [sf_values],
+            'airtime': [airtime_values]
+        }
+        device_id (str): Device ID.
+        dir (str): Directory to save the plots. If None, show the plots.
+    """
     plt.figure(figsize=(12, 8))
 
     plt.subplot(2, 2, 1)
@@ -68,9 +108,10 @@ def plot_device_params_histograms(device_params, path=None):
     plt.ylabel('Frequency')
     plt.grid()
 
+    plt.title('Parameters Histograms ID=' + device_id)
     plt.tight_layout()
 
-    if path:
-        plt.savefig(path)
+    if dir:
+        save_fig(plt, f'{device_id}_histograms.png', dir)
     else:
         plt.show()
