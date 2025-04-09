@@ -119,7 +119,102 @@ def get_device_params(data, device_id):
 
     return device_params
 
+def get_data_stats(data, print_stats=False):
+    """
+    Get statistics from the dataset.
+    Arguments:
+        data (list): List of data entries.
+        print_stats (bool): Whether to print the statistics or not.
+    Returns:
+        stats (dict): Dictionary containing statistics.
+            {
+                'time_window': {
 
+                    'start_time': start_time,
+                    'end_time': end_time,
+                    'time_window_days': time_window_days
+                },
+                'num_devices': int,
+                'num_messages': int,
+                'num_gateways': int,
+                'messages_per_device': {device_id: num_messages},
+                'messages_per_gateway': {gateway_id: num_messages}
+            }
+    """
+    
+    # Get time window (YYYY-MM-DD format)
+    time_window = []
+    for entry in data:
+        time_window.append(entry['result']['uplink_message']['received_at'])
+    time_window.sort()
+    start_time = time_window[0][:10]
+    end_time = time_window[-1][:10]
+    time_window_days = (int(end_time[:4]) - int(start_time[:4])) * 365 + (int(end_time[5:7]) - int(start_time[5:7])) * 30 + (int(end_time[8:10]) - int(start_time[8:10]))
+    if print_stats:
+        print(f"Time window: {start_time} to {end_time} ({time_window_days} days)")
+
+    # Get number of messages
+    num_messages = len(data)
+    if print_stats:
+        print(f"Number of messages: {num_messages}")
+
+    # Get number of end devices
+    devices = set()
+    for entry in data:
+        devices.add(entry['result']['end_device_ids']['device_id'])
+    num_devices = len(devices)
+
+    if print_stats:
+        print(f"Number of devices: {num_devices}")
+
+    # Get number of gateways
+    gateways = set()
+    for entry in data:
+        metadata = entry['result']['uplink_message']['rx_metadata']
+        for gateway in metadata:
+            gateways.add(gateway['gateway_ids']['gateway_id'])
+    num_gateways = len(gateways)
+    if print_stats:
+        print(f"Number of gateways: {num_gateways}")
+
+    # Get number of messages per device
+    messages_per_device = {}
+    for entry in data:
+        device_id = entry['result']['end_device_ids']['device_id']
+        if device_id not in messages_per_device:
+            messages_per_device[device_id] = 0
+        messages_per_device[device_id] += 1
+    if print_stats:
+        print("\nNumber of messages per device:")
+        for device_id, num_messages in messages_per_device.items():
+            print(f"Device ID: {device_id}, Number of messages: {num_messages}")
+
+    # Get number of messages per gateway
+    messages_per_gateway = {}
+    for entry in data:
+        metadata = entry['result']['uplink_message']['rx_metadata']
+        for gateway in metadata:
+            gateway_id = gateway['gateway_ids']['gateway_id']
+            if gateway_id not in messages_per_gateway:
+                messages_per_gateway[gateway_id] = 0
+            messages_per_gateway[gateway_id] += 1
+    if print_stats:
+        print("\nNumber of messages per gateway:")
+        for gateway_id, num_messages in messages_per_gateway.items():
+            print(f"Gateway ID: {gateway_id}, Number of messages: {num_messages}")
+    
+    return {
+        'num_devices': num_devices,
+        'num_messages': num_messages,
+        'num_gateways': num_gateways,
+        'messages_per_device': messages_per_device,
+        'messages_per_gateway': messages_per_gateway,
+        'time_window': {
+            'start_time': start_time,
+            'end_time': end_time,
+            'time_window_days': time_window_days
+        }
+    }
 
 
 if __name__ == "__main__":
@@ -127,12 +222,10 @@ if __name__ == "__main__":
 
     device_id = ''
     if len(sys.argv) < 2:
-        print("Not device ID provided, printing data stats.")
-        #messages_stats = get_data_stats(data)
-        #print(messages_stats)
+        print("Not device ID provided, printing data stats...", end='\n\n')
+        get_data_stats(data, True)
         sys.exit(1)
     else:
         device_id = sys.argv[1]
         device_params = get_device_params(data, device_id)
         print(device_params)    
-
