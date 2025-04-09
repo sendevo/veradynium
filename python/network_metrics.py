@@ -1,8 +1,10 @@
 from util import load_json
 import sys
+from datetime import datetime
 
 
-DATA_PATH = '../data/ttn_data.json'
+#DATA_PATH = '../data/ttn_data.json'
+DATA_PATH = '../data/ttn_data_samples.json'
 """
 Data format:
 [
@@ -143,15 +145,20 @@ def get_data_stats(data, print_stats=False):
     """
     
     # Get time window (YYYY-MM-DD format)
+    # Get time window with full datetime (YYYY-MM-DD HH:MM:SS)
     time_window = []
     for entry in data:
-        time_window.append(entry['result']['uplink_message']['received_at'])
+        timestamp_str = entry['result']['uplink_message']['received_at']
+        timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))  # Handle 'Z' timezone
+        time_window.append(timestamp)
+
     time_window.sort()
-    start_time = time_window[0][:10]
-    end_time = time_window[-1][:10]
-    time_window_days = (int(end_time[:4]) - int(start_time[:4])) * 365 + (int(end_time[5:7]) - int(start_time[5:7])) * 30 + (int(end_time[8:10]) - int(start_time[8:10]))
+    start_time = time_window[0]
+    end_time = time_window[-1]
+    time_window_days = (end_time - start_time).days
+
     if print_stats:
-        print(f"Time window: {start_time} to {end_time} ({time_window_days} days)")
+        print(f"Time window: {start_time.strftime('%Y-%m-%d %H:%M')} to {end_time.strftime('%Y-%m-%d %H:%M')} ({time_window_days} days)")
 
     # Get number of messages
     num_messages = len(data)
@@ -217,9 +224,32 @@ def get_data_stats(data, print_stats=False):
     }
 
 
+def data_to_csv(data, device_id):
+    """
+    Convert data to CSV format.
+    Arguments:
+        data (list): List of data entries.
+        device_id (str): Device ID.
+    Returns:
+        csv_data (str): CSV formatted string.
+    """
+    csv_data = "timestamp,rssi,snr,sf,airtime\n"
+    for entry in data:
+        if entry['result']['end_device_ids']['device_id'] == device_id:
+            received_at = entry['result']['uplink_message']['received_at']
+            formatted_timestamp = datetime.fromisoformat(received_at.replace('Z', '+00:00'))
+            timestamp = formatted_timestamp.strftime('%Y-%m-%d %H:%M:%S')
+            metadata = entry['result']['uplink_message']['rx_metadata'][0]
+            rssi = metadata['rssi']
+            snr = metadata['snr']
+            sf = entry['result']['uplink_message']['settings']['data_rate']['lora']['spreading_factor']
+            airtime = entry['result']['uplink_message']['consumed_airtime']
+            csv_data += f"{timestamp},{rssi},{snr},{sf},{airtime}\n"
+    return csv_data
+
+
 if __name__ == "__main__":
     data = load_json(DATA_PATH)
-
     device_id = ''
     if len(sys.argv) < 2:
         print("Not device ID provided, printing data stats...", end='\n\n')
@@ -228,4 +258,8 @@ if __name__ == "__main__":
     else:
         device_id = sys.argv[1]
         device_params = get_device_params(data, device_id)
-        print(device_params)    
+        print(device_params)   
+
+        csv_data = data_to_csv(data, device_id)
+        print(f"\nMessages for device {device_id} in CSV format:\n")
+        print(csv_data) 

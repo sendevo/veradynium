@@ -13,8 +13,10 @@ response_file_name = sys.argv[1]
 print(f"Response will be saved in: {response_file_name}")
 
 load_dotenv() # Define variables in .env file
-ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
-API_ENDPOINT = os.environ.get("API_ENDPOINT")
+#ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
+#API_ENDPOINT = os.environ.get("API_ENDPOINT")
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN_TEST")
+API_ENDPOINT = os.environ.get("API_ENDPOINT_TEST")
 
 headers = {
     'Authorization': f'Bearer {ACCESS_TOKEN}',
