@@ -5,4 +5,5 @@ gui/dist/
 gui/public/
 gui/package-lock.json
 python/venv/
+python/__pycache__
 python/.env

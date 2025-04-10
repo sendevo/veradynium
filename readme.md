@@ -59,6 +59,17 @@ python3 location_analysis.py ed_1234
 This will print csv formatted data with the following columns:
 timestamp, rssi, snr, sf, airtime, lat, lng, distance
 
+8.- To visualize a relationship between the parameters generated in the previous step, run the ```location_analysis_charts.py``` script. 
+
+### TODO
+
+1.- In ```location_analysis.py```, the location of the gateways should be dfined in a csv file in the data folder. Then, when running the script, the gateway id should be passed as parameter:
+
+```bash
+python3 location_analysis.py ed_1234 gw_1234
+```
+
+
 ### Solver
 Work in progress...
 

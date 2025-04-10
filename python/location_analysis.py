@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta, timezone
 import csv
 import sys
-from util import load_json
-from math import radians, sin, cos, sqrt, atan2
+from util import load_json, haversine
 
 
 DATA_PATH = '../data/ttn_data_samples.json'
@@ -10,15 +9,6 @@ LOCATIONS_CSV_PATH = '../data/samples_locations.csv'
 GATEWAY_LAT = -45.76979
 GATEWAY_LNG = -67.48883
 
-def haversine(lat1, lon1, lat2, lon2):
-    R = 6371
-    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    return R * c
 
 
 def load_location_samples(csv_path):
@@ -96,6 +86,13 @@ def data_to_csv_with_location(data, device_id, location_samples):
     return csv_data
 
 
+def export_analysis_data(device_id):
+    data = load_json(DATA_PATH)
+    location_samples = load_location_samples(LOCATIONS_CSV_PATH)
+    csv_data = data_to_csv_with_location(data, device_id, location_samples)
+    return csv_data
+
+
 if __name__ == "__main__":
     device_id = ''
     if len(sys.argv) < 2:
@@ -103,7 +100,5 @@ if __name__ == "__main__":
         sys.exit(1)
     else:
         device_id = sys.argv[1]
-        data = load_json(DATA_PATH)
-        location_samples = load_location_samples(LOCATIONS_CSV_PATH)
-        csv_data = data_to_csv_with_location(data, device_id, location_samples)
+        csv_data = export_analysis_data(device_id)
         print(csv_data)
