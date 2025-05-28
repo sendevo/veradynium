@@ -4,7 +4,7 @@ import sys
 from util import load_json, haversine
 
 
-DATA_PATH = '../data/ttn_data_samples.json'
+DATA_PATH = '../data/ttn_data_samples_test_all.json'
 LOCATIONS_CSV_PATH = '../data/samples_locations.csv'
 GATEWAY_LAT = -45.76979
 GATEWAY_LNG = -67.48883
@@ -60,7 +60,7 @@ def data_to_csv_with_location(data, device_id, location_samples):
 
             # Find closest location within ±1 minute
             closest_location = ("", "")
-            min_diff = timedelta(minutes=1, seconds=0)  # 1-minute threshold
+            min_diff = timedelta(minutes=2, seconds=0)  # 2-minute threshold
 
             for loc_time, lat, lng in parsed_locations:
                 time_diff = abs(dt - loc_time)
