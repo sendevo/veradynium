@@ -1,78 +1,9 @@
 # Veradynium
 
+### LoRaWAN gateways placement problem solver
 
-### Data analysis workflow
-1.- Create a .env file in the python folder and define the following variables depending on the application (from TTN) to use:
+This project contains a set of programs and utilities to design a real-time LoRaWAN network with energy and area topography considerations. The [solver](solver) program can compute a set of optimal placement of the gateways based on end-devices locations and the terrain elevation map, allowing the user to choose between solutions that prioritizes energy consumption or number of gateways to deploy.
 
-```bash
-ACCESS_TOKEN
-API_ENDPOINT
-```
+The [python](python) folder contains scripts dedicated to the data analysis of the physical network to get insights about the real system.
 
-2.- Install the required libraries:
-
-```bash
-cd python
-source venv/bin/activate
-pip3 install -r requirements.txt
-```
-
-3.- Download data from TTN with ```api_call.py```, for example to ```ttn_data.json``` file:
-
-``` bash
-python3 api_call.py ttn_data.json
-```
-
-4.- Overview the content of the downloaded data. In ```network_metrics.py``` define the ```DATA_PATH``` variable with the path to the downloaded data file.  
-
-``` bash
-python3 network_metrics.py
-``` 
-
-5.- Overview specific information about and end-device. For example for ```ed_1234```:
-
-```bash
-python3 network_metrics.py ed_1234
-```
-
-6.- Plot parameters from specific end-device. Define the file path and a directory to save charts in the same script. Use ```--save``` to save data to a file. For example for ```ed_1234```:
-
-```bash
-python3 device_charts.py ed_1234 --save
-```
-
-7.- For the coverage analysis, moving an end-device over different locations, and when the end-device reports data, write the timestamp, lat and lng in a CSV file, for example:
-
-```bash
-time,lat,lng
-2023-10-01 12:00:00,40.7128,-74.0060
-2023-10-01 12:05:00,40.7138,-74.0070
-2023-10-01 12:10:00,40.7148,-74.0080
-```
-
-Then define the json file with the data reported by the end-device, the csv file with locations and define the gateway location in the ```location_analysis.py``` file. It is assumed that all data was reported to the same gateway. If not, add the corresponding filters. Run the script:
-
-```bash
-python3 location_analysis.py ed_1234
-```
-
-This will print csv formatted data with the following columns:
-timestamp, rssi, snr, sf, airtime, lat, lng, distance
-
-8.- To visualize a relationship between the parameters generated in the previous step, run the ```location_analysis_charts.py``` script. 
-
-### TODO
-
-1.- In ```location_analysis.py```, the location of the gateways should be dfined in a csv file in the data folder. Then, when running the script, the gateway id should be passed as parameter:
-
-```bash
-python3 location_analysis.py ed_1234 gw_1234
-```
-
-
-### Solver
-Work in progress...
-
-
-### Dashboard
-Work in progress...
+A React.js based [GUI](gui) is available to interact with the simulator.
