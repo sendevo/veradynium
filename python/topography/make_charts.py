@@ -20,8 +20,6 @@ lon_span=0.25
 lat, lng, alt = read_csv_data("data/topography_nasa.csv")
 
 # Convert to meshgrid for plotting
-lat_grid, lon_grid, elev_grid = create_meshgrid_interpolation(lat, lng, alt)
-#lat_grid, lon_grid, elev_grid = create_meshgrid_reshape(lat, lng, alt)
 
 # Plot 3D surface
 #plot_3d(lat_grid, lon_grid, elev_grid)
@@ -32,6 +30,7 @@ locations = [
     (-45.769812, -67.488767, "Km 17"),
     (-45.824869, -67.463616, "UNPSJB"),
     (-45.927944, -67.560873, "Rada Tilly"),
+    (-45.869743, -67.546032, "Moure"),
     (-45.856229, -67.479608, "Chenque"),
     (-45.789584, -67.431268, "Km 8"),
     (-45.778171, -67.364135, "Farallón"),
@@ -39,5 +38,14 @@ locations = [
     (-45.828837, -67.542404, "Laprida") 
 ]
 
-plot_2d(lat_grid, lon_grid, elev_grid, [], file_path="topography_2d_interpolation.png")
-#plot_2d(lat_grid, lon_grid, elev_grid, [], file_path="topography_2d_reshape.png")
+#lat_grid, lon_grid, elev_grid = create_meshgrid_interpolation(lat, lng, alt)
+#print(f"lat_grid shape: {lat_grid.shape}")
+#print(f"lon_grid shape: {lon_grid.shape}")
+#print(f"elev_grid shape: {elev_grid.shape}")
+#plot_2d(lat_grid, lon_grid, elev_grid, locations, file_path="topography_2d_interpolation.png")
+
+lat_grid, lon_grid, elev_grid = create_meshgrid_reshape(lat, lng, alt)
+print(f"lat_grid shape: {lat_grid.shape}")
+print(f"lon_grid shape: {lon_grid.shape}")
+print(f"elev_grid shape: {elev_grid.shape}")
+plot_2d(lat_grid, lon_grid, elev_grid, locations, file_path="topography_2d_reshape.png")

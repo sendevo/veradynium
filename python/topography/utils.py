@@ -87,11 +87,10 @@ def read_csv_data(csv_file):
 def create_meshgrid_interpolation(lat, lng, alt, resolution=300, method="cubic"):
     """
     Convert flat lat/lng/alt arrays into meshgrid suitable for plotting.
-    
     Parameters:
+        lat, lng, alt (1D arrays)
         resolution (int): Number of points along each axis for interpolation.
         method (str): Interpolation method: 'cubic', 'linear', 'nearest'.
-    
     Returns:
         lat_grid, lon_grid, elev_grid (2D arrays)
     """
@@ -111,12 +110,29 @@ def create_meshgrid_interpolation(lat, lng, alt, resolution=300, method="cubic")
 
 
 def create_meshgrid_reshape(lat, lng, alt):
+    """
+    Convert flat lat/lng/alt arrays into meshgrid by reshaping.
+    Assumes data is on a regular grid.
+    Parameters:
+        lat, lng, alt (1D arrays)
+    Returns:
+        lat_grid, lon_grid, elev_grid (2D arrays)
+    """
     lats = np.unique(lat)
-    lngs = np.unique(lng)
-    
-    elev_grid = alt.reshape(len(lats), len(lngs))
-    lat_grid, lon_grid = np.meshgrid(lats, lngs, indexing="ij")
-    
+    lons = np.unique(lng)
+
+    elev_grid = np.full((len(lats), len(lons)), np.nan)
+
+    lat_to_idx = {v: i for i, v in enumerate(lats)}
+    lon_to_idx = {v: j for j, v in enumerate(lons)}
+
+    for la, lo, al in zip(lat, lng, alt):
+        i = lat_to_idx[la]
+        j = lon_to_idx[lo]
+        elev_grid[i, j] = al
+
+    lon_grid, lat_grid = np.meshgrid(lons, lats)
+
     return lat_grid, lon_grid, elev_grid
 
 
@@ -131,7 +147,7 @@ def plot_3d(lat_grid, lon_grid, elev_grid, file_path=None):
     ax.view_init(elev=30, azim=-60)
     if file_path:
         plt.savefig(file_path, dpi=300)
-        print("Saved 3D plot as topography_3d.png")
+        print("Saved 3D plot as", file_path)
     plt.show()
 
 
@@ -149,5 +165,5 @@ def plot_2d(lat_grid, lon_grid, elev_grid, locations=[], file_path=None):
             plt.text(lon, lat, name, color="black", fontsize=9, ha="right")
     if file_path:
         plt.savefig(file_path, dpi=300)
-        print("Saved 2D plot as topography_2d.png")
+        print("Saved 2D plot as ", file_path)
     plt.show()
