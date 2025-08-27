@@ -1,6 +1,8 @@
-#include "constants.h"
+#include "../include/constants.hpp"
 
-void utils::printHelp(const char* file) { // Open readme file with manual and print on terminal   
+namespace utils {
+// ------------------- Print Help ------------------- //
+void printHelp(const char* file) { // Open readme file with manual and print on terminal   
     std::ifstream manualFile(file);
     if (manualFile.is_open()) {
         std::string line;
@@ -13,3 +15,4 @@ void utils::printHelp(const char* file) { // Open readme file with manual and pr
     }
     exit(1);
 }
+} // namespace utils

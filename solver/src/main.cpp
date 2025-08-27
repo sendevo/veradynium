@@ -2,9 +2,8 @@
 
 #include <iostream>
 #include <cstring>
-#include "constants.cpp"
-#include "los.cpp"
-
+#include "../include/constants.hpp"
+#include "../include/terrain.hpp"
 
 int main(int argc, char **argv) {
 
@@ -26,21 +25,17 @@ int main(int argc, char **argv) {
         }
     }
 
-    auto points = readCSV(filename);
+    auto grid = terrain::ElevationGrid::fromCSV(filename);
 
-    std::vector<double> unique_lats, unique_lngs;
-    std::vector<std::vector<double>> elev_grid;
-    buildGrid(points, unique_lats, unique_lngs, elev_grid);
+    double lat1=-45.825412, lon1=-67.458747; // Escollera
+    double lat2=-45.825497, lon2=-67.459707; // Playa km 4
+    double lat3=-45.829159, lon3=-67.543146; // Laprida
 
-    // Example: line of sight between two points
-    double lat1=-45.825412, lon1=-67.458747; // esollera
-    double lat2=-45.825497, lon2=-67.459707; // playa km 4
-    double h1=2.0, h2=2.0; // observer/target height
 
-    if(lineOfSight(lat1, lon1, lat2, lon2, h1, h2, unique_lats, unique_lngs, elev_grid)) {
-        std::cout << "Line of sight is clear.\n";
+    if (grid.lineOfSight(lat1, lon1, lat3, lon3)) {
+        std::cout << "Clear line of sight\n";
     } else {
-        std::cout << "Line of sight is blocked by terrain.\n";
+        std::cout << "Obstructed\n";
     }
 
     return 0;

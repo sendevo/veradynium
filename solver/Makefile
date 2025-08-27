@@ -1,20 +1,19 @@
 CPP      = g++
-CFLAGS   = -Wall -pthread 
+CFLAGS   = -Wall -pthread
 LDFLAGS  = -lgsl -lgslcblas -lm
+
 SRCDIR   = src
 OBJDIR   = obj
-LIBDIR   = $(SRCDIR)/lib
+INCDIR   = include
 
-TARGET         = solver
+TARGET   = solver
 
+SOURCES  = $(wildcard $(SRCDIR)/*.cpp)
+OBJECTS  = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SOURCES))
 
-SOLVER_SOURCES  = $(wildcard $(SRCDIR)/main.cpp) $(wildcard $(LIBDIR)/**/*.cpp)
+HEADERS  = $(wildcard $(INCDIR)/*.hpp)
 
-SOLVER_OBJECTS  = $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.o,$(SOLVER_SOURCES))
-
-HEADERS         = $(wildcard $(LIBDIR)/**/*.h)
-
-INCLUDES = -I$(LIBDIR) -I$(LIBDIR)/namespaces
+INCLUDES = -I$(INCDIR)
 
 ifdef VERBOSE
     CFLAGS += -DVERBOSE=true
@@ -22,18 +21,17 @@ endif
 
 all: $(TARGET)
 
-
-solver: $(SOLVER_OBJECTS)
-	@echo "Compiling solver..."
+$(TARGET): $(OBJECTS)
+	@echo "Linking $(TARGET)..."
 	$(CPP) $(CFLAGS) $(INCLUDES) $^ -o $@ $(LDFLAGS)
-	@echo "solver compiled"
+	@echo "$(TARGET) built successfully"
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	@mkdir -p $(@D)
 	@echo "Compiling $<..."
-	$(CPP) $(CFLAGS) $(INCLUDES) -c $< -o $@ $(LDFLAGS)
+	$(CPP) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
-	rm -rf $(OBJDIR) ./main
+	rm -rf $(OBJDIR) $(TARGET)
 
 .PHONY: all clean

@@ -1,0 +1,171 @@
+#include "../include/terrain.hpp"
+#include <algorithm>
+#include <cmath>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
+
+namespace terrain {
+
+static inline int clamp_index_for_cell(int n, int idx) {
+    // valid cell index range is [0, n-2] because we access [idx] and [idx+1]
+    if (n < 2) return -1;
+    if (idx < 0) return 0;
+    if (idx > n - 2) return n - 2;
+    return idx;
+}
+
+ElevationGrid::ElevationGrid(const std::vector<double>& lats_raw,
+                             const std::vector<double>& lngs_raw,
+                             const std::vector<double>& alts_raw)
+{
+    if (lats_raw.size() != lngs_raw.size() || lats_raw.size() != alts_raw.size()) {
+        throw std::invalid_argument("Latitude, Longitude, and Altitude vectors must be of the same size");
+    }
+    if (lats_raw.empty()) {
+        throw std::invalid_argument("Empty elevation dataset");
+    }
+
+    // Build sorted unique axes (copies, do NOT sort the raw arrays)
+    latitudes   = lats_raw;
+    longitudes  = lngs_raw;
+    std::sort(latitudes.begin(),  latitudes.end());
+    std::sort(longitudes.begin(), longitudes.end());
+    latitudes.erase( std::unique(latitudes.begin(),  latitudes.end()),  latitudes.end() );
+    longitudes.erase(std::unique(longitudes.begin(), longitudes.end()), longitudes.end());
+
+    if (latitudes.size() < 2 || longitudes.size() < 2) {
+        throw std::runtime_error("Grid must be at least 2x2 for bilinear interpolation");
+    }
+
+    // Initialize grid with NaNs (optional but useful when there are gaps)
+    elevationGrid.assign(latitudes.size(), std::vector<double>(longitudes.size(), std::numeric_limits<double>::quiet_NaN()));
+
+    // Fill grid: for each raw point, find its (i,j) on the unique axes
+    for (size_t k = 0; k < alts_raw.size(); ++k) {
+        const double la = lats_raw[k];
+        const double lo = lngs_raw[k];
+
+        auto it_i = std::lower_bound(latitudes.begin(),  latitudes.end(),  la);
+        auto it_j = std::lower_bound(longitudes.begin(), longitudes.end(), lo);
+
+        // If exact match not found and value is beyond last element, place at last cell
+        int i = int(it_i - latitudes.begin());
+        int j = int(it_j - longitudes.begin());
+        // We want indices of the *cell*, not the upper bound; shift back one step unless already 0
+        i = clamp_index_for_cell(int(latitudes.size()),  (i > 0 ? i - 1 : i));
+        j = clamp_index_for_cell(int(longitudes.size()), (j > 0 ? j - 1 : j));
+        if (i < 0 || j < 0) continue; // can't place (too small grid), but we checked earlier
+
+        elevationGrid[i][j] = alts_raw[k];
+    }
+
+    // Optional: if there are NaNs (holes), you could fill them (nearest neighbor) or leave as-is.
+}
+
+ElevationGrid ElevationGrid::fromCSV(const std::string& filepath) {
+    std::vector<double> lats, lngs, alts;
+    std::ifstream file(filepath);
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open CSV file: " + filepath);
+    }
+
+    std::string line;
+    // Try to skip header if present (simple heuristic)
+    if (std::getline(file, line)) {
+        if (line.find_first_not_of("0123456789-+., eE") != std::string::npos) {
+            // looks like a header; do nothing (we already consumed it)
+        } else {
+            // data line; process it
+            std::stringstream ss(line);
+            std::string tok;
+            if (std::getline(ss, tok, ',')) { lats.push_back(std::stod(tok)); }
+            if (std::getline(ss, tok, ',')) { lngs.push_back(std::stod(tok)); }
+            if (std::getline(ss, tok, ',')) { alts.push_back(std::stod(tok)); }
+        }
+    }
+
+    while (std::getline(file, line)) {
+        if (line.empty()){ continue; }
+        std::stringstream ss(line);
+        std::string tok;
+        double la, lo, al;
+        if (!std::getline(ss, tok, ',')){ continue; } la = std::stod(tok);
+        if (!std::getline(ss, tok, ',')){ continue; } lo = std::stod(tok);
+        if (!std::getline(ss, tok, ',')){ continue; } al = std::stod(tok);
+        lats.push_back(la);
+        lngs.push_back(lo);
+        alts.push_back(al);
+    }
+
+    return ElevationGrid(lats, lngs, alts);
+}
+
+int ElevationGrid::findIndex(const std::vector<double>& arr, double value) const {
+    // Returns index i such that arr[i] <= value <= arr[i+1], clamped to valid cell range.
+    auto it = std::lower_bound(arr.begin(), arr.end(), value);
+    int idx = int(it - arr.begin());
+    // Convert to cell index (left neighbor), then clamp
+    idx = (idx > 0 ? idx - 1 : idx);
+    return clamp_index_for_cell(int(arr.size()), idx);
+}
+
+double ElevationGrid::bilinearInterpolation(double lat, double lng) const {
+    int i = findIndex(latitudes,  lat);
+    int j = findIndex(longitudes, lng);
+    if (i < 0 || j < 0) throw std::runtime_error("Point out of bounds or grid too small");
+
+    // Neighboring axis values
+    const double y1 = latitudes[i],    y2 = latitudes[i+1];
+    const double x1 = longitudes[j],   x2 = longitudes[j+1];
+
+    // Grid cell values
+    const double Q11 = elevationGrid[i][j];
+    const double Q21 = elevationGrid[i][j+1];
+    const double Q12 = elevationGrid[i+1][j];
+    const double Q22 = elevationGrid[i+1][j+1];
+
+    // If any is NaN (hole), you could fallback to nearest neighbor:
+    auto isnan = [](double v){ return std::isnan(v); };
+    if (isnan(Q11) || isnan(Q21) || isnan(Q12) || isnan(Q22)) {
+        // nearest neighbor fallback
+        double wy = (std::fabs(lat - y1) <= std::fabs(y2 - lat)) ? y1 : y2;
+        double wx = (std::fabs(lng - x1) <= std::fabs(x2 - lng)) ? x1 : x2;
+        int ii = (wy == y1 ? i : i+1);
+        int jj = (wx == x1 ? j : j+1);
+        return elevationGrid[ii][jj];
+    }
+
+    // Bilinear
+    const double tx = (x2 == x1) ? 0.0 : (lng - x1) / (x2 - x1);
+    const double ty = (y2 == y1) ? 0.0 : (lat - y1) / (y2 - y1);
+
+    const double fxy1 = Q11 * (1 - tx) + Q21 * tx;
+    const double fxy2 = Q12 * (1 - tx) + Q22 * tx;
+    return fxy1 * (1 - ty) + fxy2 * ty;
+}
+
+bool ElevationGrid::lineOfSight(double lat1, double lon1,
+                                double lat2, double lon2,
+                                double observerHeight,
+                                double targetHeight) const
+{
+    const int steps = 100; // tune as needed
+
+    const double elev1 = bilinearInterpolation(lat1, lon1) + observerHeight;
+    const double elev2 = bilinearInterpolation(lat2, lon2) + targetHeight;
+
+    for (int k = 1; k < steps; ++k) {
+        const double t   = double(k) / steps;
+        const double lat = lat1 + t * (lat2 - lat1);
+        const double lon = lon1 + t * (lon2 - lon1);
+
+        const double terrain = bilinearInterpolation(lat, lon);
+        const double los     = elev1 + t * (elev2 - elev1);
+
+        if (terrain > los) return false; // blocked
+    }
+    return true; // clear
+}
+
+} // namespace terrain
