@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -7,6 +8,8 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+
+#include "utils.hpp"
 
 #define SAMPLES_STEPS 100 // Number of samples along the line of sight. Must be >= 2
 
@@ -17,6 +20,31 @@
  */
 
 namespace terrain {
+
+// WGS-84 constants
+constexpr double a  = 6378137.0;           // semi-major axis
+constexpr double f  = 1.0 / 298.257223563; // flattening
+constexpr double e2 = f * (2 - f);         // eccentricity^2
+
+struct Vec3 { double x, y, z; };
+
+// Convert geodetic coordinates to ECEF
+static inline Vec3 toECEF(double lat, double lon, double h) {
+    double phi = lat * M_PI / 180.0;
+    double lambda = lon * M_PI / 180.0;
+    double sinphi = std::sin(phi);
+    double cosphi = std::cos(phi);
+    double sinlambda = std::sin(lambda);
+    double coslambda = std::cos(lambda);
+
+    double N = a / sqrt(1 - e2 * sinphi * sinphi);
+
+    double x = (N + h) * cosphi * coslambda;
+    double y = (N + h) * cosphi * sinlambda;
+    double z = (N * (1 - e2) + h) * sinphi;
+
+    return {x, y, z};
+}
 
 class ElevationGrid {
 public:
@@ -37,6 +65,14 @@ public:
                      double lat2, double lng2,
                      double observerHeight = 2.0,
                      double targetHeight   = 2.0) const;
+
+    // Haversine distance between two lat/lon points in meters
+    double haversine(double lat1, double lon1, double lat2, double lon2) const;
+
+    // Compute straight line distance between two lat/lon/alt points in meters
+    double distance(double lat1, double lon1, 
+                     double lat2, double lon2,
+                     double h1, double h2) const; 
 
 private:
     std::vector<double> latitudes;

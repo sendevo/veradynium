@@ -1,5 +1,8 @@
+#pragma once
+
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 /**
  * 
@@ -8,5 +11,12 @@
  */
 
 namespace utils { // Utility functions
-    void printHelp(const char* file,  const char* message = "Error in command line arguments. See manual or documentation."); // Print help message from file
+
+    inline constexpr const char defaultMessage[] = "Error in command line arguments. See manual or documentation.";
+
+    // Print help message from file
+    void printHelp(const char* file, const char* message = defaultMessage); 
+
+    // Convert degrees to radians
+    inline double toRadians(double degree) { return degree * M_PI / 180.0; }
 }

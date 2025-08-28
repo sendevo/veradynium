@@ -35,7 +35,7 @@ ElevationGrid::ElevationGrid(const std::vector<double>& lats_raw,
     longitudes.erase(std::unique(longitudes.begin(), longitudes.end()), longitudes.end());
 
     if (latitudes.size() < 2 || longitudes.size() < 2) {
-        throw std::runtime_error("Grid must be at least 2x2 for bilinear interpolation");
+        std::cerr << "Grid must be at least 2x2 for bilinear interpolation" << std::endl;
         exit(1);
     }
 
@@ -66,7 +66,7 @@ ElevationGrid ElevationGrid::fromCSV(const std::string& filepath) {
     std::vector<double> lats, lngs, alts;
     std::ifstream file(filepath);
     if (!file.is_open()) {
-        throw std::runtime_error("Failed to open CSV file: " + filepath);
+        std::cerr << "Failed to open CSV file: " + filepath << std::endl;
         exit(1);
     }
 
@@ -113,7 +113,10 @@ int ElevationGrid::findIndex(const std::vector<double>& arr, double value) const
 double ElevationGrid::bilinearInterpolation(double lat, double lng) const {
     int i = findIndex(latitudes,  lat);
     int j = findIndex(longitudes, lng);
-    if (i < 0 || j < 0) throw std::runtime_error("Point out of bounds or grid too small");
+    if (i < 0 || j < 0){ 
+        std::cerr << "Point out of bounds or grid too small" << std::endl;
+        exit(1);
+    }
 
     // Neighboring axis values
     const double y1 = latitudes[i],    y2 = latitudes[i+1];
@@ -164,6 +167,25 @@ bool ElevationGrid::lineOfSight(double lat1, double lon1,
         if (terrain > los) return false; // blocked
     }
     return true; // clear
+}
+
+double ElevationGrid::haversine(double lat1, double lon1, double lat2, double lon2) const {
+    const double R = 6371000.0; // Earth radius in meters
+    const double dlat = utils::toRadians(lat2 - lat1);
+    const double dlon = utils::toRadians(lon2 - lon1);
+    const double a = std::sin(dlat/2) * std::sin(dlat/2) +
+                     std::cos(utils::toRadians(lat1)) * std::cos(utils::toRadians(lat2)) *
+                     std::sin(dlon/2) * std::sin(dlon/2);
+    const double c = 2 * std::atan2(std::sqrt(a), std::sqrt(1-a));
+    return R * c;
+}
+
+double ElevationGrid::distance(double lat1, double lon1, double lat2, double lon2, double h1, double h2) const 
+{
+    Vec3 p1 = toECEF(lat1, lon1, h1);
+    Vec3 p2 = toECEF(lat2, lon2, h2);
+    double dx = p2.x - p1.x, dy = p2.y - p1.y, dz = p2.z - p1.z;
+    return std::sqrt(dx*dx + dy*dy + dz*dz);
 }
 
 } // namespace terrain

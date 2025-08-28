@@ -1,33 +1,48 @@
-LOS MANUAL
+LOS MANUAL  
 
-PROLOG
-   This manual is part of the veradynium project. See project documentation at: https://github.com/sendevo/veradynium
+PROLOG  
+   This manual is part of the veradynium project. See project documentation at: https://github.com/sendevo/veradynium  
 
-NAME
-   los - Line of Sight calculation between coordinates
+NAME  
+   los - Line of Sight calculation between coordinates  
 
-SYNOPSIS
-   los [OPTIONS]... -f [FILE] -p1 [lat1 lon1 alt1] -p2 [lat2 lon2 alt2]
+SYNOPSIS  
+   los [OPTIONS]... -f [FILE] -p1 [lat1 lon1 alt1] -p2 [lat2 lon2 alt2] -o [OUTPUT_FORMAT]  
 
-DESCRIPTION:
-   This program determines if two points are in line of sight depending on the terrain elevation (data provided by user) of the area. Earth curvature is not taken into account. 
+DESCRIPTION:  
+   This program determines if two points are in line of sight depending on the terrain elevation (data provided by user) of the area. Earth curvature is not taken into account.  
 
-OPTIONS:
-   -h, --help     Display this help message.
-   -f, --file     File with terrain elevation data. Must be int CSV format (lat, lon, alt).
-   -p1            Coordinates and altitude of point 1 (lat lon alt).
-   -p2            Coordinates and altitude of point 2  (lat lon alt).
+OPTIONS:  
+   -h, --help     Display this help message.  
+   -f, --file     File with terrain elevation data. Must be int CSV format (lat, lon, alt).  
+   -p1            Coordinates and altitude of point 1 (lat lon alt). Altitude is optional.  
+   -p2            Coordinates and altitude of point 2  (lat lon alt). Altitude is optional.  
+   -o, --output   (optional) Output format. Must be "json" or "text". Default value is "text".  
 
-EXAMPLE:
-   los -f elevation.csv -p1 36.733780 -91.237743 2.0 -p2 36.712818 -91.221097 2.5
-   - Check if the provided coordinates (near Mark Twain National Forest, USA) are in line of sight.
+EXAMPLE:  
+   los -f elevation.csv -p1 36.733780 -91.237743 2.0 -p2 36.712818 -91.221097 2.5  
+   
+   - Check if the provided coordinates (near Mark Twain National Forest, USA) are in line of sight. Output will be:  
 
-AUTHORS
-   Code was written by Dr. Matias J. Micheletto from IIDEPyS-GSJ (CONICET) and supervised by Dr. Carlos De Marziani from UNPSJB - IIDEPyS (CONICET) and Dr. Rodrigo M. Santos from DIEC (UNS) - ICIC (CONICET).
+   "Line of sight from (36.7338, -91.2377, 2m) to (36.7128, -91.2211, 2.5m), distance of 2762.97 m: CLEAR"
+   
+   - In case of using json format (adding "-o json" argument), output will be: 
 
-REPORTING BUGS
-   Guidelines available at <https://github.com/sendevo/veradynium>.
+   {
+      "point1": {"lat": 36.7338, "lon": -91.2377, "height_m": 2},
+      "point2": {"lat": 36.7128, "lon": -91.2211, "height_m": 2.5},
+      "distance_m": 2762.97,
+      "line_of_sight": "clear"
+   }
 
-COPYRIGHT
-   Copyright   ©   2023   Free   Software   Foundation,  Inc.   License  GPLv3+:  GNU  GPL  version  3  or  later <https://gnu.org/licenses/gpl.html>.
-   This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the  extent  permitted by law.
+
+
+AUTHORS  
+   Code was written by Dr. Matias J. Micheletto from IIDEPyS-GSJ (CONICET) and supervised by Dr. Carlos De Marziani from UNPSJB - IIDEPyS (CONICET) and Dr. Rodrigo M. Santos from DIEC (UNS) - ICIC (CONICET).  
+
+REPORTING BUGS  
+   Guidelines available at <https://github.com/sendevo/veradynium>.  
+
+COPYRIGHT  
+   Copyright   ©   2023   Free   Software   Foundation,  Inc.   License  GPLv3+:  GNU  GPL  version  3  or  later <https://gnu.org/licenses/gpl.html>.  
+   This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the  extent  permitted by law.  

@@ -16,4 +16,5 @@ void printHelp(const char* file, const char* message) { // Open readme file with
         std::cerr << "Error: Unable to open manual file." << std::endl;
     }
 }
+
 } // namespace utils

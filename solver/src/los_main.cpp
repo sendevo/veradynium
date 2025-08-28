@@ -5,9 +5,13 @@
 #include "../include/utils.hpp"
 #include "../include/terrain.hpp"
 
+enum OUTPUT_FORMAT { PLAIN_TEXT, JSON };
+
 int main(int argc, char **argv) {
 
     std::string filename;
+
+    OUTPUT_FORMAT outputFormat = PLAIN_TEXT;
 
     double lat1 = 0.0, lon1 = 0.0, h1 = 2.0;
     double lat2 = 0.0, lon2 = 0.0, h2 = 2.0;
@@ -21,7 +25,7 @@ int main(int argc, char **argv) {
                 const char* file = argv[i+1];
                 filename = std::string(file);
             }else{
-                utils::printHelp(MANUAL, "Error in argument -f (--file)");
+                utils::printHelp(MANUAL, "Error in argument -f (--file). A filename must be provided");
             }
         }
 
@@ -33,11 +37,9 @@ int main(int argc, char **argv) {
                 // Optional altitude: only parse if present and not another option
                 if (i + 1 < argc && argv[i+1][0] != '-') {
                     h1 = atof(argv[++i]);
-                }else{
-                    std::cout << "Using default observer height h1 = 2.0m\n";
                 }
             } else {
-                utils::printHelp(MANUAL, "Error: -p1 requires at least 2 values (lat lon) and optional altitude");
+                utils::printHelp(MANUAL, "Error in argument -p1. At least 2 values (lat lon) and optional altitude must be provided");
             }
         }
 
@@ -49,17 +51,30 @@ int main(int argc, char **argv) {
                 // Optional altitude: only parse if present and not another option
                 if (i + 1 < argc && argv[i+1][0] != '-') {
                     h2 = atof(argv[++i]);
-                }else{
-                    std::cout << "Using default target height h2 = 2.0m\n";
                 }
             } else {
-                utils::printHelp(MANUAL, "Error: -p2 requires at least 2 values (lat lon) and optional altitude");
+                utils::printHelp(MANUAL, "Error in argument -p2. At least 2 values (lat lon) and optional altitude must be provided");
+            }
+        }
+
+        if(strcmp(argv[i], "-o") == 0 || strcmp(argv[i], "--output") == 0) {
+            if(i+1 < argc) {
+                const char* fmt = argv[i+1];
+                if(strcmp(fmt, "text") == 0) {
+                    outputFormat = PLAIN_TEXT;
+                } else if(strcmp(fmt, "json") == 0) {
+                    outputFormat = JSON;
+                } else {
+                    utils::printHelp(MANUAL, "Error in argument -o (--output). Supported formats: text, json");
+                }
+            } else {
+                utils::printHelp(MANUAL, "Error in argument -o (--output)");
             }
         }
     }
 
     if(filename.empty()){
-        utils::printHelp(MANUAL, "Error in argument -f (--file)");
+        utils::printHelp(MANUAL, "Error in argument -f (--file). A filename must be provided.");
     }
 
     // Validate coordinates
@@ -75,10 +90,27 @@ int main(int argc, char **argv) {
 
     auto grid = terrain::ElevationGrid::fromCSV(filename);
 
-    if (grid.lineOfSight(lat1, lon1, lat2, lon2, h1, h2)) {
-        std::cout << "Clear line of sight\n";
-    } else {
-        std::cout << "Obstructed\n";
+    const bool los = grid.lineOfSight(lat1, lon1, lat2, lon2, h1, h2);
+    const double distance = grid.distance(lat1, lon1, lat2, lon2, h1, h2);
+
+    switch(outputFormat) {
+        case PLAIN_TEXT:
+            std::cout << "Line of sight from (" 
+                << lat1 << ", " << lon1 << ", " << h1 << "m) to (" 
+                << lat2 << ", " << lon2 << ", " << h2 << "m), ";
+            std::cout << "distance of " << distance << " m: ";
+            if (los) std::cout << "CLEAR\n"; else std::cout << "BLOCKED\n";
+            break;
+        case JSON:
+            std::cout << "{\n"
+                      << "  \"point1\": {\"lat\": " << lat1 << ", \"lon\": " << lon1 << ", \"height_m\": " << h1 << "},\n"
+                      << "  \"point2\": {\"lat\": " << lat2 << ", \"lon\": " << lon2 << ", \"height_m\": " << h2 << "},\n"
+                      << "  \"distance_m\": " << distance << ",\n"
+                      << "  \"line_of_sight\": \"" << (los ? "clear" : "blocked") << "\"\n"
+                      << "}\n";
+            break;
+        default:
+            break;
     }
 
     return 0;
