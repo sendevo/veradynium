@@ -1,0 +1,33 @@
+LOS MANUAL
+
+PROLOG
+   This manual is part of the veradynium project. See project documentation at: https://github.com/sendevo/veradynium
+
+NAME
+   los - Line of Sight calculation between coordinates
+
+SYNOPSIS
+   los [OPTIONS]... -f [FILE] -p1 [lat1 lon1 alt1] -p2 [lat2 lon2 alt2]
+
+DESCRIPTION:
+   This program determines if two points are in line of sight depending on the terrain elevation (data provided by user) of the area. Earth curvature is not taken into account. 
+
+OPTIONS:
+   -h, --help     Display this help message.
+   -f, --file     File with terrain elevation data. Must be int CSV format (lat, lon, alt).
+   -p1            Coordinates and altitude of point 1 (lat lon alt).
+   -p2            Coordinates and altitude of point 2  (lat lon alt).
+
+EXAMPLE:
+   los -f elevation.csv -p1 36.733780 -91.237743 2.0 -p2 36.712818 -91.221097 2.5
+   - Check if the provided coordinates (near Mark Twain National Forest, USA) are in line of sight.
+
+AUTHORS
+   Code was written by Dr. Matias J. Micheletto from IIDEPyS-GSJ (CONICET) and supervised by Dr. Carlos De Marziani from UNPSJB - IIDEPyS (CONICET) and Dr. Rodrigo M. Santos from DIEC (UNS) - ICIC (CONICET).
+
+REPORTING BUGS
+   Guidelines available at <https://github.com/sendevo/veradynium>.
+
+COPYRIGHT
+   Copyright   ©   2023   Free   Software   Foundation,  Inc.   License  GPLv3+:  GNU  GPL  version  3  or  later <https://gnu.org/licenses/gpl.html>.
+   This is free software: you are free to change and redistribute it.  There is NO WARRANTY, to the  extent  permitted by law.

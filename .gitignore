@@ -1,10 +1,13 @@
-solver/solver
+solver/bin/
 solver/obj/
+
 gui/node_modules
 gui/dist/
 gui/public/
 gui/package-lock.json
+
 python/venv/
 python/__pycache__
 python/.env
+
 .vscode/settings.json

@@ -8,6 +8,8 @@
 #include <string>
 #include <algorithm>
 
+#define SAMPLES_STEPS 100 // Number of samples along the line of sight. Must be >= 2
+
 /**
  * 
  * @brief Terrain elevation grid and related functions
@@ -33,8 +35,8 @@ public:
     // Line of sight between two (lat,lng) points
     bool lineOfSight(double lat1, double lng1,
                      double lat2, double lng2,
-                     double observerHeight = 1.7,
-                     double targetHeight   = 1.7) const;
+                     double observerHeight = 2.0,
+                     double targetHeight   = 2.0) const;
 
 private:
     std::vector<double> latitudes;

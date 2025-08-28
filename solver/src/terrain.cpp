@@ -36,9 +36,10 @@ ElevationGrid::ElevationGrid(const std::vector<double>& lats_raw,
 
     if (latitudes.size() < 2 || longitudes.size() < 2) {
         throw std::runtime_error("Grid must be at least 2x2 for bilinear interpolation");
+        exit(1);
     }
 
-    // Initialize grid with NaNs (optional but useful when there are gaps)
+    // Initialize grid with NaNs (useful when there are gaps)
     elevationGrid.assign(latitudes.size(), std::vector<double>(longitudes.size(), std::numeric_limits<double>::quiet_NaN()));
 
     // Fill grid: for each raw point, find its (i,j) on the unique axes
@@ -59,8 +60,6 @@ ElevationGrid::ElevationGrid(const std::vector<double>& lats_raw,
 
         elevationGrid[i][j] = alts_raw[k];
     }
-
-    // Optional: if there are NaNs (holes), you could fill them (nearest neighbor) or leave as-is.
 }
 
 ElevationGrid ElevationGrid::fromCSV(const std::string& filepath) {
@@ -68,6 +67,7 @@ ElevationGrid ElevationGrid::fromCSV(const std::string& filepath) {
     std::ifstream file(filepath);
     if (!file.is_open()) {
         throw std::runtime_error("Failed to open CSV file: " + filepath);
+        exit(1);
     }
 
     std::string line;
@@ -150,13 +150,11 @@ bool ElevationGrid::lineOfSight(double lat1, double lon1,
                                 double observerHeight,
                                 double targetHeight) const
 {
-    const int steps = 100; // tune as needed
-
     const double elev1 = bilinearInterpolation(lat1, lon1) + observerHeight;
     const double elev2 = bilinearInterpolation(lat2, lon2) + targetHeight;
 
-    for (int k = 1; k < steps; ++k) {
-        const double t   = double(k) / steps;
+    for (int k = 1; k < SAMPLES_STEPS; ++k) {
+        const double t   = double(k) / SAMPLES_STEPS;
         const double lat = lat1 + t * (lat2 - lat1);
         const double lon = lon1 + t * (lon2 - lon1);
 
