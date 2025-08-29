@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useDropzone } from 'react-dropzone';
+import { getFileFormat } from '../../model/utils';
 
 const dropzoneStyle = {
     verticalAlign: 'middle',
@@ -20,17 +21,15 @@ const dropzoneStyle = {
     textAlign: 'center'
 };
 
-const DropzoneComponent = ({ onDrop }) => {
+const DropzoneComponent = ({ onDrop }) => { // expects onDrop(data, format), where format is "json" or "csv"
+    
     const onDropAccepted = useCallback((acceptedFiles) => {
         acceptedFiles.forEach((file) => {
             const reader = new FileReader();
             reader.onload = () => {
                 const fileContent = reader.result;
-                try {
-                    onDrop(fileContent);
-                } catch (error) {
-                    console.error('Error parsing JSON file:', error);
-                }
+                const format = getFileFormat(fileContent);
+                onDrop(fileContent, format);
             };
             reader.readAsText(file);
         });
