@@ -32,7 +32,7 @@ EXAMPLE:
       "point1": {"lat": 36.7338, "lon": -91.2377, "height_m": 2},
       "point2": {"lat": 36.7128, "lon": -91.2211, "height_m": 2.5},
       "distance_m": 2762.97,
-      "line_of_sight": "clear"
+      "line_of_sight": true
    }
 
 

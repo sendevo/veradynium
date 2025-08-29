@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
                       << "  \"point1\": {\"lat\": " << lat1 << ", \"lon\": " << lon1 << ", \"height_m\": " << h1 << "},\n"
                       << "  \"point2\": {\"lat\": " << lat2 << ", \"lon\": " << lon2 << ", \"height_m\": " << h2 << "},\n"
                       << "  \"distance_m\": " << distance << ",\n"
-                      << "  \"line_of_sight\": \"" << (los ? "clear" : "blocked") << "\"\n"
+                      << "  \"line_of_sight\": " << (los ? "true" : "false") << "\n"
                       << "}\n";
             break;
         default:
