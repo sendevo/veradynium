@@ -37,7 +37,10 @@ const DropzoneComponent = ({ onDrop }) => { // expects onDrop(data, format), whe
 
     const { getRootProps, getInputProps } = useDropzone({
         onDropAccepted,
-        accept: 'application/json',
+        accept: {
+            'application/json': ['.json', '.geojson'],
+            'text/csv': ['.csv', '.txt']
+        },
         multiple: false
     });
 

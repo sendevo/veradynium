@@ -1,6 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo, memo } from "react";
 import { Grid, Box } from "@mui/material";
-import { csvToArray } from "../../model/utils";
+import { 
+    csvToArray, 
+    chunkedMax,
+    chunkedMin,
+    normalizeElevation } from "../../model/utils";
 import MainView from "../../components/MainView";
 import Map from "../../components/Map";
 import DropZone from "../../components/DropZone";
@@ -22,8 +26,16 @@ const View = () => {
                 setFeatureCollection(featureCollection);
                 break;
             case "csv":
-                const arr = csvToArray(data, false);
-                setElevationData(arr);
+                const options = {
+                    withHeaders: false,
+                    delimiter: ",",
+                    maxRows: -1 // All data
+                };
+                const arr = csvToArray(data, options);
+                const alts = arr.map(p => p[2]);
+                const normalizedElevation = normalizeElevation(arr, chunkedMin(alts), chunkedMax(alts));
+                toast(`Datos de elevación cargados. Total de puntos: ${arr.length}`, "success");
+                setElevationData(normalizedElevation);
                 break;
             case "json":
             case "unknown":
@@ -31,6 +43,9 @@ const View = () => {
                 toast("Formato no soportado", "error");
         }
     };
+
+    const memoizedElevationData = useMemo(() => elevationData, [elevationData]);
+    const memoizedFeatureCollection = useMemo(() => featureCollection, [featureCollection]);
 
     return(
         <MainView background={background}>
@@ -43,8 +58,8 @@ const View = () => {
                 <Grid size={8}>
                     <Map 
                         mapCenter={mapCenter}
-                        featureCollection={featureCollection}
-                        elevationData={elevationData}/>
+                        featureCollection={memoizedFeatureCollection}
+                        elevationData={memoizedElevationData}/>
                 </Grid>
             </Grid>
         </MainView>
