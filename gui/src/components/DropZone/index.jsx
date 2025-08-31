@@ -8,7 +8,7 @@ const dropzoneStyle = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: "75vh",
+    height: "100%",
     width: "100%",
     borderWidth: 2,
     borderRadius: 10,
@@ -47,7 +47,7 @@ const DropzoneComponent = ({ onDrop }) => { // expects onDrop(data, format), whe
     return (
         <Box {...getRootProps()} style={dropzoneStyle}>
             <input {...getInputProps()} />
-            <Typography style={{fontSize: 28}}>Arrastrar y soltar archivos aquí o seleccione desde su directorio</Typography>
+            <Typography style={{fontSize: 22}}>Arrastrar y soltar archivos aquí o seleccione desde su directorio</Typography>
         </Box>
     );
 };

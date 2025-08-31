@@ -1,4 +1,4 @@
-import { Container, Box } from '@mui/material';
+import { Container, Box, Typography } from '@mui/material';
 import classes from './style.module.css';
 
 const Component = ({title, background, children}) => (
@@ -8,9 +8,9 @@ const Component = ({title, background, children}) => (
         </Box>
         <Container className={classes.Container}>
             {title && 
-                <h3 className={classes.Title}>
+                <Typography variant="h3" className={classes.Title}>
                     {title}
-                </h3>
+                </Typography>
             }
             {children}            
         </Container>

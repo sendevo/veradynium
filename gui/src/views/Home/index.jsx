@@ -1,17 +1,20 @@
 import { useState, useMemo, memo } from "react";
-import { Grid, Box } from "@mui/material";
+import { Grid, Box, Button, Typography } from "@mui/material";
 import { 
     csvToArray, 
     chunkedMax,
     chunkedMin,
-    normalizeElevation } from "../../model/utils";
+    normalizeElevation 
+} from "../../model/utils";
 import MainView from "../../components/MainView";
 import Map from "../../components/Map";
 import DropZone from "../../components/DropZone";
 import useToast from "../../hooks/useToast";
 import background from "../../assets/backgrounds/background3.jpg";
 
-const mapCenter = [-45.86168350577915, -67.5188749673741]; // Comodoro Rivadavia, Argentina
+
+const initialMapCenter = [-45.86168350577915, -67.5188749673741]; // Comodoro Rivadavia, Argentina
+
 
 const View = () => {
     const [featureCollection, setFeatureCollection] = useState({features:[]});
@@ -23,6 +26,7 @@ const View = () => {
         switch(format){
             case "geojson":
                 const featureCollection = JSON.parse(data);
+                toast(`GeoJSON cargado. Total de features: ${featureCollection.features.length}`, "success");
                 setFeatureCollection(featureCollection);
                 break;
             case "csv":
@@ -47,17 +51,41 @@ const View = () => {
     const memoizedElevationData = useMemo(() => elevationData, [elevationData]);
     const memoizedFeatureCollection = useMemo(() => featureCollection, [featureCollection]);
 
+    const buttonDisabled = memoizedFeatureCollection.features.length === 0 || memoizedElevationData.length === 0;
+
     return(
         <MainView background={background}>
-            <Grid container spacing={2} direction="row">
+            <Grid container spacing={2} direction="row" sx={{height:"75vh"}}>
                 <Grid size={4}>
-                    <Box sx={{height: "100%", width: "100%", display: "flex", alignItems: "center", justifyContent: "center"}}>
-                        <DropZone onDrop={(data, format) => onInputLoaded(data, format)} />
-                    </Box>
+                    <Grid container spacing={1} direction="column">
+                        <Grid size={12}>
+                            <Box sx={{height: "100%", width: "100%"}}>
+                                <Typography variant="h5" sx={{m:2}}>Carga de datos</Typography>
+                                <DropZone onDrop={(data, format) => onInputLoaded(data, format)} />
+                            </Box>
+                        </Grid>
+                        <Grid size={12}>
+                            <Box>
+                                <Typography variant="h5" sx={{m:2}}>Acciones</Typography>
+                                <Button 
+                                    variant={"contained"} 
+                                    sx={{marginRight:1, marginBottom:1}}
+                                    disabled={buttonDisabled}>
+                                    Computar líneas de vista
+                                </Button>
+                                <Button 
+                                    variant={"contained"} 
+                                    sx={{marginRight:1, marginBottom:1}}
+                                    disabled={buttonDisabled}>
+                                    Reposicionar Gateways
+                                </Button>
+                            </Box>  
+                        </Grid>
+                    </Grid>
                 </Grid>
                 <Grid size={8}>
                     <Map 
-                        mapCenter={mapCenter}
+                        mapCenter={initialMapCenter}
                         featureCollection={memoizedFeatureCollection}
                         elevationData={memoizedElevationData}/>
                 </Grid>
