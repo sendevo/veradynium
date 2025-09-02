@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useDropzone } from 'react-dropzone';
 import { getFileFormat } from '../../model/utils';
+import { api } from '../../model/constants';
 
 const dropzoneStyle = {
     verticalAlign: 'middle',
@@ -24,15 +25,33 @@ const dropzoneStyle = {
 const DropzoneComponent = ({ onDrop }) => { // expects onDrop(data, format), where format is "json" or "csv"
     
     const onDropAccepted = useCallback((acceptedFiles) => {
-        acceptedFiles.forEach((file) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                const fileContent = reader.result;
-                const format = getFileFormat(fileContent);
+        const file = acceptedFiles[0]; // only one file allowed
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            // 1. Read file content
+            const fileContent = reader.result;
+            const format = getFileFormat(fileContent);
+
+            // 2. Send raw file to backend
+            const formData = new FormData();            
+            formData.append("file", file);
+            try {
+                const res = await fetch(api("/api/upload"), {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+                console.log("Upload response:", data);
+            } catch (err) {
+                console.error("Upload failed:", err);
+            } finally {
+                // 3. Call onDrop prop with file content and format
                 onDrop(fileContent, format);
-            };
-            reader.readAsText(file);
-        });
+            }
+        };
+        reader.readAsText(file);
     }, [onDrop]);
 
     const { getRootProps, getInputProps } = useDropzone({

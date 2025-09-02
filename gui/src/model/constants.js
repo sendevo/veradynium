@@ -1,0 +1,1 @@
+export const api = (path) => path; // path like "/api/upload"

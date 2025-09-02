@@ -14,6 +14,7 @@ import background from "../../assets/backgrounds/background3.jpg";
 
 
 const initialMapCenter = [-45.86168350577915, -67.5188749673741]; // Comodoro Rivadavia, Argentina
+const initialZoom = 13;
 
 
 const View = () => {
@@ -86,6 +87,7 @@ const View = () => {
                 <Grid size={8}>
                     <Map 
                         mapCenter={initialMapCenter}
+                        initialZoom={initialZoom}
                         featureCollection={memoizedFeatureCollection}
                         elevationData={memoizedElevationData}/>
                 </Grid>

@@ -1,86 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>LOS Tester</title>
+    <meta charset="UTF-8">
+    <title>LOS Tester</title>
 </head>
+
 <body>
-  <h1>Line of Sight Tester</h1>
+    <h1>Line of Sight Tester</h1>
 
-  <!-- Upload CSV -->
-  <h2>1. Upload Elevation CSV</h2>
-  <form id="uploadForm">
-    <input type="file" id="fileInput" accept=".csv" required />
-    <button type="submit">Upload</button>
-  </form>
-  <p id="uploadStatus"></p>
+    <!-- Upload CSV -->
+    <h2>1. Upload Elevation CSV</h2>
+    <form id="uploadForm">
+        <input type="file" id="fileInput" accept=".csv" required />
+        <button type="submit">Upload</button>
+    </form>
+    <p id="uploadStatus"></p>
 
-  <!-- LOS Check -->
-  <h2>2. Check Line of Sight</h2>
-  <form id="losForm">
-    <fieldset>
-      <legend>Point 1</legend>
-      Lat: <input type="number" step="0.000001" id="lat1" value="-45.825412" required><br>
-      Lon: <input type="number" step="0.000001" id="lon1" value="-67.45874" required><br>
-      Height (m): <input type="number" step="0.1" id="h1" value="2" required>
-    </fieldset>
-    <fieldset>
-      <legend>Point 2</legend>
-      Lat: <input type="number" step="0.000001" id="lat2" value="-45.82915" required><br>
-      Lon: <input type="number" step="0.000001" id="lon2" value="-67.45874" required><br>
-      Height (m): <input type="number" step="0.1" id="h2" value="2.5" required>
-    </fieldset>
-    <button type="submit">Check LOS</button>
-  </form>
-  <pre id="losResult"></pre>
+    <!-- LOS Check -->
+    <h2>2. Check Line of Sight</h2>
+    <form id="losForm">
+        <fieldset>
+            <legend>Point 1</legend>
+            Lat: <input type="number" step="0.000001" id="lat1" value="-45.825412" required><br>
+            Lon: <input type="number" step="0.000001" id="lon1" value="-67.45874" required><br>
+            Height (m): <input type="number" step="0.1" id="h1" value="2" required>
+        </fieldset>
+        <fieldset>
+            <legend>Point 2</legend>
+            Lat: <input type="number" step="0.000001" id="lat2" value="-45.82915" required><br>
+            Lon: <input type="number" step="0.000001" id="lon2" value="-67.45874" required><br>
+            Height (m): <input type="number" step="0.1" id="h2" value="2.5" required>
+        </fieldset>
+        <button type="submit">Check LOS</button>
+    </form>
+    <pre id="losResult"></pre>
 
-  <script>
-    const API_BASE = "http://127.0.0.1:8000";
+    <script>
+        const API_BASE = "http://127.0.0.1:8000";
 
-    // Upload CSV
-    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const fileInput = document.getElementById("fileInput");
-      if (!fileInput.files.length) return;
+        // Upload CSV
+        document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById("fileInput");
+            if (!fileInput.files.length) return;
 
-      const formData = new FormData();
-      formData.append("file", fileInput.files[0]);
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
 
-      const res = await fetch(`${API_BASE}/upload`, {
-        method: "POST",
-        body: formData
-      });
+            const res = await fetch(`${API_BASE}/upload`, {
+                method: "POST",
+                body: formData
+            });
 
-      const data = await res.json();
-      document.getElementById("uploadStatus").textContent = JSON.stringify(data, null, 2);
-    });
+            const data = await res.json();
+            document.getElementById("uploadStatus").textContent = JSON.stringify(data, null, 2);
+        });
 
-    // Check LOS
-    document.getElementById("losForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+        // Check LOS
+        document.getElementById("losForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-      const payload = {
-        p1: {
-          lat: parseFloat(document.getElementById("lat1").value),
-          lon: parseFloat(document.getElementById("lon1").value),
-          height_m: parseFloat(document.getElementById("h1").value)
-        },
-        p2: {
-          lat: parseFloat(document.getElementById("lat2").value),
-          lon: parseFloat(document.getElementById("lon2").value),
-          height_m: parseFloat(document.getElementById("h2").value)
-        }
-      };
+            const payload = {
+                p1: {
+                    lat: parseFloat(document.getElementById("lat1").value),
+                    lon: parseFloat(document.getElementById("lon1").value),
+                    height_m: parseFloat(document.getElementById("h1").value)
+                },
+                p2: {
+                    lat: parseFloat(document.getElementById("lat2").value),
+                    lon: parseFloat(document.getElementById("lon2").value),
+                    height_m: parseFloat(document.getElementById("h2").value)
+                }
+            };
 
-      const res = await fetch(`${API_BASE}/los`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+            const res = await fetch(`${API_BASE}/los`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
 
-      const data = await res.json();
-      document.getElementById("losResult").textContent = JSON.stringify(data, null, 2);
-    });
-  </script>
+            const data = await res.json();
+            document.getElementById("losResult").textContent = JSON.stringify(data, null, 2);
+        });
+    </script>
 </body>
+
 </html>
