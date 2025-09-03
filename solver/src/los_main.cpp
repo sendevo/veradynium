@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
                     h1 = atof(argv[++i]);
                 }
             } else {
-                utils::printHelp(MANUAL, "Error in argument -p1. At least 2 values (lat lon) and optional altitude must be provided");
+                utils::printHelp(MANUAL, "Error in argument -p1. At least 2 values (lat lng) and optional altitude must be provided");
             }
         }
 
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
                     h2 = atof(argv[++i]);
                 }
             } else {
-                utils::printHelp(MANUAL, "Error in argument -p2. At least 2 values (lat lon) and optional altitude must be provided");
+                utils::printHelp(MANUAL, "Error in argument -p2. At least 2 values (lat lng) and optional altitude must be provided");
             }
         }
 
@@ -103,8 +103,8 @@ int main(int argc, char **argv) {
             break;
         case JSON:
             std::cout << "{\n"
-                      << "  \"point1\": {\"lat\": " << lat1 << ", \"lon\": " << lon1 << ", \"height_m\": " << h1 << "},\n"
-                      << "  \"point2\": {\"lat\": " << lat2 << ", \"lon\": " << lon2 << ", \"height_m\": " << h2 << "},\n"
+                      << "  \"point1\": {\"lat\": " << lat1 << ", \"lng\": " << lon1 << ", \"height_m\": " << h1 << "},\n"
+                      << "  \"point2\": {\"lat\": " << lat2 << ", \"lng\": " << lon2 << ", \"height_m\": " << h2 << "},\n"
                       << "  \"distance_m\": " << distance << ",\n"
                       << "  \"line_of_sight\": " << (los ? "true" : "false") << "\n"
                       << "}\n";

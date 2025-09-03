@@ -15,6 +15,7 @@ const useComputations = () => {
 
         if (!res.ok) {
             const text = await res.text();
+            return null;
             throw new Error(`Error response: ${res.status} - ${text}`);
         }
 

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Grid, Button } from "@mui/material";
+import { Grid, Button, Box, Typography } from "@mui/material";
 import { 
     csvToArray, 
     chunkedMax,
@@ -10,10 +10,8 @@ import MainView from "../../components/MainView";
 import Map from "../../components/Map";
 import DropZone from "../../components/DropZone";
 import useToast from "../../hooks/useToast";
-
 import { useFileIdsContext } from "../../context/FileIds";
 import useComputations from "../../hooks/useComputations";
-
 import background from "../../assets/backgrounds/background3.jpg";
 
 
@@ -56,7 +54,10 @@ const View = () => {
 
         console.log("Computing LOS with params:", params);
         const result = await computeLOS(params);
-        console.log("LOS result:", result);
+        if(result)
+            setLosResult(result);
+        else
+            toast("Ocurrió un error durante el cálculo de LOS", "error");
     }
 
     const onInputLoaded = (data, extension) => {
@@ -100,11 +101,33 @@ const View = () => {
                                 />
                         </Grid>
                         <Grid>
-                            <Button 
-                                onClick={handleComputeLOS}
-                                variant="contained">
-                                    Calcular LOS
-                            </Button>
+                            {losResult && 
+                                <Box>
+                                    <Typography sx={{fontWeight:"bold"}}>Punto 1</Typography>
+                                    <Typography>lat: {losResult.point1.lat}</Typography>
+                                    <Typography>lon: {losResult.point1.lng}</Typography>
+                                    <Typography>elev: {losResult.point1.height_m} m</Typography>
+
+                                    <Typography sx={{fontWeight:"bold", mt:1}}>Punto 2</Typography>
+                                    <Typography>lat: {losResult.point2.lat}</Typography>
+                                    <Typography>lon: {losResult.point2.lng}</Typography>
+                                    <Typography>elev: {losResult.point2.height_m} m</Typography>
+                                    
+                                    <Typography sx={{mt:1}}><b>Distancia:</b> {losResult.distance_m} m</Typography>
+
+                                    <Typography sx={{mt:1}}><b>Línea de vista:</b> {losResult.line_of_sight ? "Si" : "No"}</Typography>
+                                </Box>
+                            }
+                            {points.length === 2 &&
+                                <Box sx={{mt:2}}>
+                                    <Button 
+                                        fullWidth
+                                        onClick={handleComputeLOS}
+                                        variant="contained">
+                                            Calcular LOS
+                                    </Button>
+                                </Box>
+                            }
                         </Grid>
                     </Grid>
                 </Grid>

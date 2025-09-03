@@ -29,9 +29,9 @@ constexpr double e2 = f * (2 - f);         // eccentricity^2
 struct Vec3 { double x, y, z; };
 
 // Convert geodetic coordinates to ECEF
-static inline Vec3 toECEF(double lat, double lon, double h) {
+static inline Vec3 toECEF(double lat, double lng, double h) {
     double phi = lat * M_PI / 180.0;
-    double lambda = lon * M_PI / 180.0;
+    double lambda = lng * M_PI / 180.0;
     double sinphi = std::sin(phi);
     double cosphi = std::cos(phi);
     double sinlambda = std::sin(lambda);
@@ -66,10 +66,10 @@ public:
                      double observerHeight = 2.0,
                      double targetHeight   = 2.0) const;
 
-    // Haversine distance between two lat/lon points in meters
+    // Haversine distance between two lat/lng points in meters
     double haversine(double lat1, double lon1, double lat2, double lon2) const;
 
-    // Compute straight line distance between two lat/lon/alt points in meters
+    // Compute straight line distance between two lat/lng/alt points in meters
     double distance(double lat1, double lon1, 
                      double lat2, double lon2,
                      double h1, double h2) const; 

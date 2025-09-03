@@ -159,9 +159,9 @@ bool ElevationGrid::lineOfSight(double lat1, double lon1,
     for (int k = 1; k < SAMPLES_STEPS; ++k) {
         const double t   = double(k) / SAMPLES_STEPS;
         const double lat = lat1 + t * (lat2 - lat1);
-        const double lon = lon1 + t * (lon2 - lon1);
+        const double lng = lon1 + t * (lon2 - lon1);
 
-        const double terrain = bilinearInterpolation(lat, lon);
+        const double terrain = bilinearInterpolation(lat, lng);
         const double los     = elev1 + t * (elev2 - elev1);
 
         if (terrain > los) return false; // blocked
