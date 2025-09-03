@@ -1,5 +1,5 @@
 import { useState, useMemo, memo } from "react";
-import { Grid, Box, Button, Typography } from "@mui/material";
+import { Grid, Box, Typography } from "@mui/material";
 import { 
     csvToArray, 
     chunkedMax,
@@ -52,39 +52,17 @@ const View = () => {
     const memoizedElevationData = useMemo(() => elevationData, [elevationData]);
     const memoizedFeatureCollection = useMemo(() => featureCollection, [featureCollection]);
 
-    const buttonDisabled = memoizedFeatureCollection.features.length === 0 || memoizedElevationData.length === 0;
-
     return(
         <MainView background={background}>
             <Grid container spacing={2} direction="row" sx={{height:"75vh"}}>
-                <Grid size={4}>
-                    <Grid container spacing={1} direction="column">
-                        <Grid size={12}>
-                            <Box sx={{height: "100%", width: "100%"}}>
-                                <Typography variant="h5" sx={{m:2}}>Carga de datos</Typography>
-                                <DropZone onDrop={(data, format) => onInputLoaded(data, format)} />
-                            </Box>
-                        </Grid>
-                        <Grid size={12}>
-                            <Box>
-                                <Typography variant="h5" sx={{m:2}}>Acciones</Typography>
-                                <Button 
-                                    variant={"contained"} 
-                                    sx={{marginRight:1, marginBottom:1}}
-                                    disabled={buttonDisabled}>
-                                    Computar líneas de vista
-                                </Button>
-                                <Button 
-                                    variant={"contained"} 
-                                    sx={{marginRight:1, marginBottom:1}}
-                                    disabled={buttonDisabled}>
-                                    Reposicionar Gateways
-                                </Button>
-                            </Box>  
-                        </Grid>
-                    </Grid>
+                <Grid size={3}>
+                    <Box sx={{width: "100%", height: "100%"}}>
+                        <DropZone 
+                            onDrop={(data, format) => onInputLoaded(data, format)} 
+                            onError={message => toast(message, "error")}/>
+                    </Box>
                 </Grid>
-                <Grid size={8}>
+                <Grid size={9}>
                     <Map 
                         mapCenter={initialMapCenter}
                         initialZoom={initialZoom}

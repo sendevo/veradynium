@@ -14,5 +14,6 @@ server/venv/
 server/__pycache__
 server/.env
 server/static/
+server/uploads/
 
 .vscode/settings.json

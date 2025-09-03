@@ -22,7 +22,7 @@ const dropzoneStyle = {
     textAlign: 'center'
 };
 
-const DropzoneComponent = ({ onDrop }) => { // expects onDrop(data, format), where format is "json" or "csv"
+const DropzoneComponent = ({ onDrop, onError }) => { // expects onDrop(data, format), where format is "json" or "csv"
     
     const onDropAccepted = useCallback((acceptedFiles) => {
         const file = acceptedFiles[0]; // only one file allowed
@@ -46,6 +46,8 @@ const DropzoneComponent = ({ onDrop }) => { // expects onDrop(data, format), whe
                 console.log("Upload response:", data);
             } catch (err) {
                 console.error("Upload failed:", err);
+                if (onError) 
+                    onError("Error al cargar el archivo");
             } finally {
                 // 3. Call onDrop prop with file content and format
                 onDrop(fileContent, format);
@@ -66,7 +68,7 @@ const DropzoneComponent = ({ onDrop }) => { // expects onDrop(data, format), whe
     return (
         <Box {...getRootProps()} style={dropzoneStyle}>
             <input {...getInputProps()} />
-            <Typography style={{fontSize: 22}}>Arrastrar y soltar archivos aquí o seleccione desde su directorio</Typography>
+            <Typography style={{fontSize: 18}}>Arrastrar y soltar archivos aquí o seleccione desde su directorio</Typography>
         </Box>
     );
 };

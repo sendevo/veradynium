@@ -3,6 +3,7 @@
     const API_BASE = "http://127.0.0.1:8000";
 
     const payload = {
+        em_file_id: "e23b3a01-6b31-44d3-8546-4cedfef2eab2", // Example file ID
         p1: {
             lat: -45.825412,
             lon: -67.45874,
@@ -18,9 +19,7 @@
     try {
         const res = await fetch(`${API_BASE}/api/los`, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         });
 
