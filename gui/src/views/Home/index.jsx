@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Grid, Box } from "@mui/material";
+import { Grid, Box, Button } from "@mui/material";
 import { 
     csvToArray, 
     chunkedMax,
@@ -10,6 +10,10 @@ import MainView from "../../components/MainView";
 import Map from "../../components/Map";
 import DropZone from "../../components/DropZone";
 import useToast from "../../hooks/useToast";
+
+import { useFileIdsContext } from "../../context/FileIds";
+import useComputations from "../../hooks/useComputations";
+
 import background from "../../assets/backgrounds/background3.jpg";
 
 
@@ -22,6 +26,33 @@ const View = () => {
     const [elevationData, setElevationData] = useState([]);
 
     const toast = useToast();
+
+    //// TEST
+     const { fileIds } = useFileIdsContext();
+    const { los } = useComputations();
+    const handleComputeLOS = async () => {
+        const params = {
+            em_file_id: fileIds.em_file,
+            p1: {
+                lat: -45.825412,
+                lon: -67.45874,
+                height_m: 2.0
+            },
+            p2: {
+                lat: -45.82915,
+                lon: -67.45874,
+                height_m: 2.5
+            }
+        };
+        if (!params.em_file_id) {
+            toast("Por favor, cargue un archivo de mapa de elevación (CSV) antes de calcular la línea de vista.", "error");
+            return;
+        }
+        console.log("Computing LOS with params:", params);
+        const result = await los(params);
+        console.log("LOS result:", result);
+    }
+    /// TEST
 
     const onInputLoaded = (data, extension) => {
         switch(extension){
@@ -60,6 +91,13 @@ const View = () => {
                         <DropZone 
                             onDrop={(data, extension) => onInputLoaded(data, extension)} 
                             onError={message => toast(message, "error")}/>
+
+                        <Button 
+                            onClick={handleComputeLOS}
+                            variant="contained"
+                            sx={{m:2}}>
+                            Calcular LOS
+                        </Button>
                     </Box>
                 </Grid>
                 <Grid size={9}>

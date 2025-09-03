@@ -27,21 +27,23 @@ const useFileIds = () => {
 
         // Server will extract file extension and return unique id
         const data = await res.json(); // { upload_id: "unique-file-id", extension: ".csv" | ".json" }
-
-        const nextState = {...fileIds};
         
-        switch(data.extension) {
-            case ".csv":
-                nextState.em_file = data.upload_id;
-                break;
-            case ".json":
-                nextState.geojson = data.upload_id;
-                break;
-            default:
-                throw new Error("Unsupported file type");
-        }
+        setFileIds(prev => {
+            const nextState = { ...prev };
 
-        setFileIds(nextState);
+            switch (data.extension) {
+                case ".csv":
+                    nextState.em_file = data.upload_id;
+                    break;
+                case ".json":
+                    nextState.geojson = data.upload_id;
+                    break;
+                default:
+                    throw new Error("Unsupported file type");
+            }
+
+            return nextState;
+        });
 
     }, []);
 

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Box, Typography } from '@mui/material';
 import { useDropzone } from 'react-dropzone';
 import { getFileFormat } from '../../model/utils';
-import useFileIds from '../../hooks/useFileIds';
+import { useFileIdsContext } from "../../context/FileIds";
 
 const dropzoneStyle = {
     verticalAlign: 'middle',
@@ -24,7 +24,7 @@ const dropzoneStyle = {
 
 const DropzoneComponent = ({ onDrop, onError }) => { // expects onDrop(data, format), where format is "json" or "csv"
     
-    const { uploadFile } = useFileIds();
+    const { uploadFile } = useFileIdsContext();
 
     const onDropAccepted = useCallback((acceptedFiles) => {
         const file = acceptedFiles[0]; // only one file allowed
