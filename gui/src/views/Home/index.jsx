@@ -34,6 +34,11 @@ const View = () => {
         setPoints(newPoints);
     };
 
+    const handleResetResults = () => {
+        setLosResult(null); 
+        setPoints([]);
+    };
+
     const handleComputeLOS = async () => {
         
         if(points.length < 2){
@@ -58,7 +63,7 @@ const View = () => {
             setLosResult(result);
         else
             toast("Ocurrió un error durante el cálculo de LOS", "error");
-    }
+    };
 
     const onInputLoaded = (data, extension) => {
         switch(extension){
@@ -100,35 +105,44 @@ const View = () => {
                                 onError={message => toast(message, "error")}
                                 />
                         </Grid>
-                        <Grid>
-                            {losResult && 
-                                <Box>
-                                    <Typography sx={{fontWeight:"bold"}}>Punto 1</Typography>
-                                    <Typography>lat: {losResult.point1.lat}</Typography>
-                                    <Typography>lon: {losResult.point1.lng}</Typography>
-                                    <Typography>elev: {losResult.point1.height_m} m</Typography>
 
-                                    <Typography sx={{fontWeight:"bold", mt:1}}>Punto 2</Typography>
-                                    <Typography>lat: {losResult.point2.lat}</Typography>
-                                    <Typography>lon: {losResult.point2.lng}</Typography>
-                                    <Typography>elev: {losResult.point2.height_m} m</Typography>
-                                    
-                                    <Typography sx={{mt:1}}><b>Distancia:</b> {losResult.distance_m} m</Typography>
+                        {losResult && 
+                            <Grid>
+                                <Typography sx={{fontWeight:"bold"}}>Punto 1</Typography>
+                                <Typography>lat: {losResult.point1.lat}</Typography>
+                                <Typography>lon: {losResult.point1.lng}</Typography>
+                                <Typography>elev: {losResult.point1.height_m} m</Typography>
 
-                                    <Typography sx={{mt:1}}><b>Línea de vista:</b> {losResult.line_of_sight ? "Si" : "No"}</Typography>
-                                </Box>
-                            }
-                            {points.length === 2 &&
-                                <Box sx={{mt:2}}>
-                                    <Button 
-                                        fullWidth
-                                        onClick={handleComputeLOS}
-                                        variant="contained">
-                                            Calcular LOS
-                                    </Button>
-                                </Box>
-                            }
-                        </Grid>
+                                <Typography sx={{fontWeight:"bold", mt:1}}>Punto 2</Typography>
+                                <Typography>lat: {losResult.point2.lat}</Typography>
+                                <Typography>lon: {losResult.point2.lng}</Typography>
+                                <Typography>elev: {losResult.point2.height_m} m</Typography>
+                                
+                                <Typography sx={{mt:1}}><b>Distancia:</b> {losResult.distance_m} m</Typography>
+
+                                <Typography sx={{mt:1}}><b>Línea de vista:</b> {losResult.line_of_sight ? "Si" : "No"}</Typography>
+
+                                <Button 
+                                    sx={{mt:2}}
+                                    fullWidth
+                                    color="secondary"
+                                    onClick={handleResetResults}
+                                    variant="contained">
+                                        Restablecer
+                                </Button>
+                            </Grid>
+                        }
+
+                        {points.length === 2 &&
+                            <Grid sx={{mt:1}}>
+                                <Button 
+                                    fullWidth
+                                    onClick={handleComputeLOS}
+                                    variant="contained">
+                                        Calcular LOS
+                                </Button>
+                            </Grid>
+                        }
                     </Grid>
                 </Grid>
                 <Grid size={9}>
