@@ -24,14 +24,15 @@ api = APIRouter(prefix="/api")
 def get_uploaded_file(upload_id: str, expected_ext: str):
     # Retrieve the uploaded file path by its ID
     if not os.path.exists(upload_dir):
-        raise HTTPException(status_code=404, detail="Uploads directory not found")
+        raise HTTPException(status_code=404, detail="Directory not found")
 
     file_path = os.path.join(upload_dir, upload_id) + expected_ext
 
     print(f"Retrieving file: {file_path}")
     
     if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="File not found")
+        detail = "Terrain elevation map not found. Please upload a CSV file." if expected_ext == ".csv" else "GeoJSON features file not found. Please upload a JSON file." 
+        raise HTTPException(status_code=404, detail=detail)
     
     if file_path.endswith(expected_ext):
         return file_path
@@ -42,19 +43,19 @@ def get_uploaded_file(upload_id: str, expected_ext: str):
 @api.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
     # Accept only CSV and JSON files
-    suffix = os.path.splitext(file.filename)[1].lower()
-    if suffix not in [".csv", ".json"]:
+    extension = os.path.splitext(file.filename)[1].lower()
+    if extension not in [".csv", ".json"]:
         raise HTTPException(status_code=400, detail="Invalid file type. Only CSV and JSON are allowed.")
     
     upload_id = str(uuid.uuid4())
     os.makedirs(upload_dir, exist_ok=True)
 
-    with open(f"{upload_dir}/{upload_id}{suffix}", "wb") as f:
+    with open(f"{upload_dir}/{upload_id}{extension}", "wb") as f:
         f.write(await file.read())
     
-    uploaded_files[upload_id] = f"{upload_dir}/{upload_id}{suffix}"
+    uploaded_files[upload_id] = f"{upload_dir}/{upload_id}{extension}"
     print(f"File uploaded: {upload_id}")
-    return {"upload_id": upload_id, "extension": suffix}
+    return {"upload_id": upload_id, "extension": extension}
 
 
 @api.post("/los")

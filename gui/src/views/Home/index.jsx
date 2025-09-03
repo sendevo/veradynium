@@ -1,5 +1,5 @@
-import { useState, useMemo, memo } from "react";
-import { Grid, Box, Typography } from "@mui/material";
+import { useState, useMemo } from "react";
+import { Grid, Box } from "@mui/material";
 import { 
     csvToArray, 
     chunkedMax,
@@ -23,14 +23,14 @@ const View = () => {
 
     const toast = useToast();
 
-    const onInputLoaded = (data, format) => {
-        switch(format){
-            case "geojson":
+    const onInputLoaded = (data, extension) => {
+        switch(extension){
+            case "geojson": // Feature collection -> Draw features
                 const featureCollection = JSON.parse(data);
                 toast(`GeoJSON cargado. Total de features: ${featureCollection.features.length}`, "success");
                 setFeatureCollection(featureCollection);
                 break;
-            case "csv":
+            case "csv": // Elevation data -> Draw heatmap
                 const options = {
                     withHeaders: false,
                     delimiter: ",",
@@ -58,7 +58,7 @@ const View = () => {
                 <Grid size={3}>
                     <Box sx={{width: "100%", height: "100%"}}>
                         <DropZone 
-                            onDrop={(data, format) => onInputLoaded(data, format)} 
+                            onDrop={(data, extension) => onInputLoaded(data, extension)} 
                             onError={message => toast(message, "error")}/>
                     </Box>
                 </Grid>
