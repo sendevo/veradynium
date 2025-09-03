@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Grid, Box, Button } from "@mui/material";
+import { Grid, Button } from "@mui/material";
 import { 
     csvToArray, 
     chunkedMax,
@@ -24,35 +24,40 @@ const initialZoom = 13;
 const View = () => {
     const [featureCollection, setFeatureCollection] = useState({features:[]});
     const [elevationData, setElevationData] = useState([]);
+    const [points, setPoints] = useState([]); // Points for LOS calculation
+    const [losResult, setLosResult] = useState(null);
 
+    const { fileIds } = useFileIdsContext();
+    const { computeLOS } = useComputations();
     const toast = useToast();
 
-    //// TEST
-     const { fileIds } = useFileIdsContext();
-    const { los } = useComputations();
+    const handleNewPoints = newPoints => {
+        setLosResult(null);
+        setPoints(newPoints);
+    };
+
     const handleComputeLOS = async () => {
-        const params = {
-            em_file_id: fileIds.em_file,
-            p1: {
-                lat: -45.825412,
-                lon: -67.45874,
-                height_m: 2.0
-            },
-            p2: {
-                lat: -45.82915,
-                lon: -67.45874,
-                height_m: 2.5
-            }
-        };
-        if (!params.em_file_id) {
-            toast("Por favor, cargue un archivo de mapa de elevación (CSV) antes de calcular la línea de vista.", "error");
+        
+        if(points.length < 2){
+            toast("Coordenadas de prueba no definidas", "error");
             return;
         }
+
+        if (!fileIds.em_file) {
+            toast("Mapa de elevación de terreno no definido", "error");
+            return;
+        }
+
+        const params = {
+            em_file_id: fileIds.em_file,
+            p1: points[0],
+            p2: points[1]
+        };
+
         console.log("Computing LOS with params:", params);
-        const result = await los(params);
+        const result = await computeLOS(params);
         console.log("LOS result:", result);
     }
-    /// TEST
 
     const onInputLoaded = (data, extension) => {
         switch(extension){
@@ -87,25 +92,30 @@ const View = () => {
         <MainView background={background}>
             <Grid container spacing={2} direction="row" sx={{height:"75vh"}}>
                 <Grid size={3}>
-                    <Box sx={{width: "100%", height: "100%"}}>
-                        <DropZone 
-                            onDrop={(data, extension) => onInputLoaded(data, extension)} 
-                            onError={message => toast(message, "error")}/>
-
-                        <Button 
-                            onClick={handleComputeLOS}
-                            variant="contained"
-                            sx={{m:2}}>
-                            Calcular LOS
-                        </Button>
-                    </Box>
+                    <Grid container direction={"column"} spacing={2} sx={{height:"100%"}}>
+                        <Grid size={"grow"}>
+                            <DropZone 
+                                onDrop={(data, extension) => onInputLoaded(data, extension)} 
+                                onError={message => toast(message, "error")}
+                                />
+                        </Grid>
+                        <Grid>
+                            <Button 
+                                onClick={handleComputeLOS}
+                                variant="contained">
+                                    Calcular LOS
+                            </Button>
+                        </Grid>
+                    </Grid>
                 </Grid>
                 <Grid size={9}>
                     <Map 
                         mapCenter={initialMapCenter}
                         initialZoom={initialZoom}
                         featureCollection={memoizedFeatureCollection}
-                        elevationData={memoizedElevationData}/>
+                        elevationData={memoizedElevationData}
+                        points={points}
+                        setPoints={handleNewPoints}/>
                 </Grid>
             </Grid>
         </MainView>

@@ -10,7 +10,7 @@ app = FastAPI(title="Line of Sight API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Temporary storage for uploaded files (maps file_id -> path)
-uploaded_files = {}
+#uploaded_files = {}
 upload_dir = "uploads"
 
 @app.get("/")
@@ -53,7 +53,7 @@ async def upload_file(file: UploadFile = File(...)):
     with open(f"{upload_dir}/{upload_id}{extension}", "wb") as f:
         f.write(await file.read())
     
-    uploaded_files[upload_id] = f"{upload_dir}/{upload_id}{extension}"
+    #uploaded_files[upload_id] = f"{upload_dir}/{upload_id}{extension}"
     print(f"File uploaded: {upload_id}")
     return {"upload_id": upload_id, "extension": extension}
 
@@ -62,8 +62,8 @@ async def upload_file(file: UploadFile = File(...)):
 async def compute_los(data: dict):
     # Data should contain:
     # - em_file_id: ID of the uploaded elevation map CSV file
-    # - p1: {lat, lon, height_m}
-    # - p2: {lat, lon, height_m}
+    # - p1: {lat, lng, height_m}
+    # - p2: {lat, lng, height_m}
 
     em_file_id = data.get("em_file_id") # Elevation map file ID
     em_file_path = get_uploaded_file(em_file_id, ".csv")
@@ -73,16 +73,16 @@ async def compute_los(data: dict):
     cmd = [
         "../solver/bin/los",
         "-f", em_file_path,
-        "-p1", str(p1["lat"]), str(p1["lon"]), str(p1["height_m"]),
-        "-p2", str(p2["lat"]), str(p2["lon"]), str(p2["height_m"]),
+        "-p1", str(p1["lat"]), str(p1["lng"]), str(p1["height_m"]),
+        "-p2", str(p2["lat"]), str(p2["lng"]), str(p2["height_m"]),
         "-o", "json"
     ]
 
     result = subprocess.run(cmd, capture_output=True, text=True)
 
     # Clean up after use
-    os.remove(em_file_path)
-    del uploaded_files[em_file_id]
+    #os.remove(em_file_path)
+    #del uploaded_files[em_file_id]
 
     if result.returncode != 0:
         return JSONResponse(status_code=500, content={"error": result.stderr})
@@ -113,10 +113,10 @@ async def solve(data: dict):
     result = subprocess.run(cmd, capture_output=True, text=True)
 
     # Clean up after use
-    os.remove(em_file_path)
-    os.remove(geojson_file_path)
-    del uploaded_files[em_file_id]
-    del uploaded_files[geojson_file_id]
+    #os.remove(em_file_path)
+    #os.remove(geojson_file_path)
+    #del uploaded_files[em_file_id]
+    #del uploaded_files[geojson_file_id]
 
     if result.returncode != 0:
         return JSONResponse(status_code=500, content={"error": result.stderr})

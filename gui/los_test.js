@@ -6,12 +6,12 @@
         em_file_id: "e23b3a01-6b31-44d3-8546-4cedfef2eab2", // Example file ID
         p1: {
             lat: -45.825412,
-            lon: -67.45874,
+            lng: -67.45874,
             height_m: 2.0
         },
         p2: {
             lat: -45.82915,
-            lon: -67.45874,
+            lng: -67.45874,
             height_m: 2.5
         }
     };

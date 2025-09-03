@@ -4,8 +4,8 @@ import { api } from '../../model/constants';
 
 const useComputations = () => {
 
-    const los = useCallback( async params => { 
-        // params format: {em_file_id, p1: {lat, lon, height_m}, p2: {lat, lon, height_m}}
+    const computeLOS = useCallback( async params => { 
+        // params format: {em_file_id, p1: {lat, lng, height_m}, p2: {lat, lng, height_m}}
 
         const res = await fetch(api("/api/los"), {
             method: "POST",
@@ -23,18 +23,18 @@ const useComputations = () => {
         { 
             line_of_sight: true | false, 
             distance_m: number, 
-            point1: {lat, lon, height_m}, 
-            point2: {lat, lon, height_m} 
+            point1: {lat, lng, height_m}, 
+            point2: {lat, lng, height_m} 
         }
         */
         return data;
     }, []);
 
-    const solve = useCallback( async params => {
+    const runSolver = useCallback( async params => {
         console.log("Solve params:", params);
     }, []);
 
-    return { los, solve  };
+    return { computeLOS, runSolver  };
 };
 
 export default useComputations;

@@ -14,9 +14,9 @@ DESCRIPTION:
 
 OPTIONS:  
    -h, --help     Display this help message.  
-   -f, --file     File with terrain elevation data. Must be int CSV format (lat, lon, alt).  
-   -p1            Coordinates and altitude of point 1 (lat lon alt). Altitude is optional.  
-   -p2            Coordinates and altitude of point 2  (lat lon alt). Altitude is optional.  
+   -f, --file     File with terrain elevation data. Must be int CSV format (lat, lng, alt).  
+   -p1            Coordinates and altitude of point 1 (lat lng alt). Altitude is optional.  
+   -p2            Coordinates and altitude of point 2  (lat lng alt). Altitude is optional.  
    -o, --output   (optional) Output format. Must be "json" or "text". Default value is "text".  
 
 EXAMPLE:  
@@ -29,8 +29,8 @@ EXAMPLE:
    - In case of using json format (adding "-o json" argument), output will be: 
 
    {
-      "point1": {"lat": 36.7338, "lon": -91.2377, "height_m": 2},
-      "point2": {"lat": 36.7128, "lon": -91.2211, "height_m": 2.5},
+      "point1": {"lat": 36.7338, "lng": -91.2377, "height_m": 2},
+      "point2": {"lat": 36.7128, "lng": -91.2211, "height_m": 2.5},
       "distance_m": 2762.97,
       "line_of_sight": true
    }
