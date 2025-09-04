@@ -50,4 +50,21 @@ Network Network::fromJSON(const std::string& filepath) {
     return network;
 }
 
+std::vector<std::vector<bool>> Network::computeLOSMatrix() const {
+    size_t num_gws = gateways.size();
+    size_t num_eds = end_devices.size();
+    std::vector<std::vector<bool>> los_matrix(num_gws, std::vector<bool>(num_eds, false));
+
+    for(size_t i = 0; i < num_gws; i++) {
+        const auto& gw = gateways[i];
+        for(size_t j = 0; j < num_eds; j++) {
+            const auto& ed = end_devices[j];
+            bool los = elevation_grid.lineOfSight(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
+            los_matrix[i][j] = los;
+        }
+    }
+
+    return los_matrix;
+}
+
 } // namespace network

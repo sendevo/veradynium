@@ -7,6 +7,7 @@
 
 #include "json.hpp"
 #include "detail.hpp"
+#include "terrain.hpp"
 
 /**
  * 
@@ -43,10 +44,18 @@ public:
 class Network {
 public:
     Network() = default;
+    Network(const std::vector<Gateway>& gws,
+            const std::vector<EndDevice>& eds,
+            const terrain::ElevationGrid& grid)
+        : gateways(gws), end_devices(eds), elevation_grid(grid) {}
+
     static Network fromJSON(const std::string& filepath);
+
+    std::vector<std::vector<bool>> computeLOSMatrix() const;
 
     std::vector<Gateway> gateways;
     std::vector<EndDevice> end_devices;
+    terrain::ElevationGrid elevation_grid;
 };
 
 static inline Gateway parse_gateway(const nlohmann::json& properties, double lat, double lng) {
