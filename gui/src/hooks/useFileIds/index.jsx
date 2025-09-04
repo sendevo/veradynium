@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { api } from '../../model/constants';
+import { fetchWithTimeout } from "../../model/utils";
 
 
 const useFileIds = () => {
@@ -14,46 +15,69 @@ const useFileIds = () => {
 
     // Upload file to backend
     const uploadFile = useCallback(async file => {
-        const formData = new FormData();
-        formData.append("file", file);
+        try{
+            const formData = new FormData();
+            formData.append("file", file);
+            const res = await fetchWithTimeout(api("/api/upload"), {
+                method: "POST",
+                body: formData,
+            });
+            if (!res.ok) 
+                throw new Error("Failed to upload file");
 
-        const res = await fetch(api("/api/upload"), {
-            method: "POST",
-            body: formData,
-        });
+            // Server will extract file extension and return unique id
+            const data = await res.json(); // { upload_id: "unique-file-id"+(".csv" | ".json") }
+            
+            setFileIds(prev => {
+                const nextFileIds = { ...prev };
 
-        if (!res.ok) 
-            throw new Error("Failed to upload file");
+                switch (data.extension) {
+                    case ".csv":
+                        nextFileIds.em_file = data.upload_id;
+                        break;
+                    case ".json":
+                        nextFileIds.geojson = data.upload_id;
+                        break;
+                    default:
+                        throw new Error("Unsupported file type");
+                }
 
-        // Server will extract file extension and return unique id
-        const data = await res.json(); // { upload_id: "unique-file-id", extension: ".csv" | ".json" }
-        
-        setFileIds(prev => {
-            const nextState = { ...prev };
-
-            switch (data.extension) {
-                case ".csv":
-                    nextState.em_file = data.upload_id;
-                    break;
-                case ".json":
-                    nextState.geojson = data.upload_id;
-                    break;
-                default:
-                    throw new Error("Unsupported file type");
-            }
-
-            return nextState;
-        });
-
+                return nextFileIds;
+            });
+        } catch(err) {
+            console.error("Upload error:", err);
+            throw err;
+        }
     }, []);
 
     // Remove file from state (doesn't delete from backend)
-    const removeFile = useCallback((id) => {
-        const nextState = {...fileIds};
-        if (nextState.em_file === id) nextState.em_file = null;
-        if (nextState.geojson === id) nextState.geojson = null;
-        setFileIds(nextState);
-    }, []);
+    const removeFile = useCallback(async (upload_id, extension) => {
+        console.log("3.- Removing file:", upload_id, extension);
+        console.log("4.- Current fileIds state before removal:", fileIds);
+
+        try{
+            console.log("5.- Sending delete request to server for:", upload_id, extension);
+            const res = await fetchWithTimeout(api(`/api/delete`), {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({upload_id, extension})
+            });
+            if (!res.ok)
+                throw new Error("Failed to delete file from server");
+        }catch(err){
+            console.error("Delete error:", err);
+        }
+
+        setFileIds(prev => {
+            const nextFileIds = { ...prev };
+            if (extension === ".csv") 
+                nextFileIds.em_file = null;
+            if (extension === ".json") 
+                nextFileIds.geojson = null;
+            console.log(".- Updated fileIds state after removal:", fileIds);
+            return nextFileIds;
+        });
+    }, [fileIds, setFileIds]);
 
     return { fileIds, uploadFile, removeFile  };
 }

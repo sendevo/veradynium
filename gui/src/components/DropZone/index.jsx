@@ -36,16 +36,19 @@ const DropzoneComponent = ({ onDrop, onError }) => { // expects onDrop(data, for
             const fileContent = reader.result;
             const format = getFileFormat(fileContent);
 
-            // Send raw file to backend
+            // Send loaded file to parent component for using
+            onDrop(fileContent, format);
+
+            // Send file to backend for storage and further processing
             try {
-                await uploadFile(file);
+                if(format === 'csv' || format === 'geojson')
+                    await uploadFile(file);
+                else
+                    console.error("Unsupported file format for upload");
             } catch (err) {
                 console.error("Upload failed:", err);
                 if (onError) 
                     onError("Error al cargar el archivo");
-            } finally {
-                // Send loaded file to parent component
-                onDrop(fileContent, format);
             }
         };
         reader.readAsText(file);

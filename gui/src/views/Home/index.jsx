@@ -21,11 +21,11 @@ const initialZoom = 13;
 
 const View = () => {
     const [featureCollection, setFeatureCollection] = useState({features:[]});
-    const [elevationData, setElevationData] = useState([]);
+    const [elevationData, setElevationData] = useState([]); // Array of [lat, lng, elevation]
     const [points, setPoints] = useState([]); // Points for LOS calculation
-    const [losResult, setLosResult] = useState(null);
+    const [losResult, setLosResult] = useState(null); // Result of LOS calculation
 
-    const { fileIds } = useFileIdsContext();
+    const { fileIds, removeFile } = useFileIdsContext(); // Ids for csv and json files. Attributes are em_file and geojson
     const { computeLOS } = useComputations();
     const toast = useToast();
 
@@ -47,7 +47,7 @@ const View = () => {
         }
 
         if (!fileIds.em_file) {
-            toast("Mapa de elevación de terreno no definido", "error");
+            toast("El mapa de elevación no está disponible", "error");
             return;
         }
 
@@ -69,7 +69,7 @@ const View = () => {
         switch(extension){
             case "geojson": // Feature collection -> Draw features
                 const featureCollection = JSON.parse(data);
-                toast(`GeoJSON cargado. Total de features: ${featureCollection.features.length}`, "success");
+                toast(`GeoJSON cargado. Geometrías totales: ${featureCollection.features.length}`, "success");
                 setFeatureCollection(featureCollection);
                 break;
             case "csv": // Elevation data -> Draw heatmap
@@ -91,6 +91,25 @@ const View = () => {
         }
     };
 
+    const handleRemoveElements = type => {
+        console.log("1.- Removing elements of type:", type);
+        console.log("2.- Current fileIds state before removal:", fileIds);
+        switch(type){
+            case "features":
+                if(fileIds.geojson)
+                    removeFile(fileIds.geojson, ".json");
+                setFeatureCollection({features:[]});
+                break;
+            case "elevation":
+                if(fileIds.em_file)
+                    removeFile(fileIds.em_file, ".csv");
+                setElevationData([]);
+                break;
+            default:
+                console.warn("Unknown type to remove:", type);
+        }
+    }
+
     const memoizedElevationData = useMemo(() => elevationData, [elevationData]);
     const memoizedFeatureCollection = useMemo(() => featureCollection, [featureCollection]);
 
@@ -105,6 +124,22 @@ const View = () => {
                                 onError={message => toast(message, "error")}
                                 />
                         </Grid>
+
+                        {(featureCollection.features.length > 0 || elevationData.length > 0) &&
+                            <Grid>
+                                <Typography sx={{fontWeight:"bold"}}>Sincronización de datos</Typography>
+                                {fileIds.em_file ? 
+                                    <Typography sx={{fontSize: 12}}>Mapa de elevación cargado</Typography>
+                                    :
+                                    <Typography sx={{fontSize: 12}}>Mapa de elevación en modo local</Typography>
+                                }
+                                {fileIds.geojson ?
+                                    <Typography sx={{fontSize: 12}}>Geometrías cargadas</Typography>
+                                    :
+                                    <Typography sx={{fontSize: 12}}>Geometrías en modo local</Typography>
+                                }
+                            </Grid>
+                        }
 
                         {losResult && 
                             <Grid>
@@ -121,27 +156,53 @@ const View = () => {
                                 <Typography sx={{mt:1}}><b>Distancia:</b> {losResult.distance_m} m</Typography>
 
                                 <Typography sx={{mt:1}}><b>Línea de vista:</b> {losResult.line_of_sight ? "Si" : "No"}</Typography>
+                            </Grid>
+                        }
 
+                        {featureCollection.features.length > 0 &&
+                            <Grid>
                                 <Button 
-                                    sx={{mt:2}}
                                     fullWidth
                                     color="secondary"
-                                    onClick={handleResetResults}
+                                    onClick={() => handleRemoveElements("features")}
                                     variant="contained">
-                                        Restablecer
+                                        Quitar geometrías
+                                </Button>
+                            </Grid>
+                        }
+
+                        {elevationData.length > 0 &&
+                            <Grid>
+                                <Button 
+                                    fullWidth
+                                    color="secondary"
+                                    onClick={() => handleRemoveElements("elevation")}
+                                    variant="contained">
+                                        Quitar altimetría
                                 </Button>
                             </Grid>
                         }
 
                         {points.length === 2 &&
-                            <Grid sx={{mt:1}}>
-                                <Button 
-                                    fullWidth
-                                    onClick={handleComputeLOS}
-                                    variant="contained">
-                                        Calcular LOS
-                                </Button>
-                            </Grid>
+                            <>
+                                <Grid>
+                                    <Button 
+                                        fullWidth
+                                        color="secondary"
+                                        onClick={handleResetResults}
+                                        variant="contained">
+                                            Restablecer puntos
+                                    </Button>
+                                </Grid>
+                                <Grid>
+                                    <Button 
+                                        fullWidth
+                                        onClick={handleComputeLOS}
+                                        variant="contained">
+                                            Calcular LOS
+                                    </Button>
+                                </Grid>
+                            </>
                         }
                     </Grid>
                 </Grid>

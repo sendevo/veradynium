@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, APIRouter, HTTPException
+from fastapi import FastAPI, File, Form, UploadFile, APIRouter, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -56,6 +56,24 @@ async def upload_file(file: UploadFile = File(...)):
     #uploaded_files[upload_id] = f"{upload_dir}/{upload_id}{extension}"
     print(f"File uploaded: {upload_id}")
     return {"upload_id": upload_id, "extension": extension}
+
+
+@api.post("/delete")
+async def delete_file(data: dict):
+    upload_id = data.get("upload_id")
+    extension = data.get("extension")
+
+    if extension not in [".csv", ".json"]:
+        raise HTTPException(status_code=400, detail="Invalid extension. Only CSV and JSON are allowed.")
+
+    file_path = os.path.join(upload_dir, upload_id) + extension
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"File deleted: {file_path}")
+        return {"detail": "File deleted successfully."}
+    else:
+        raise HTTPException(status_code=404, detail="File not found.")
+
 
 
 @api.post("/los")

@@ -1,5 +1,24 @@
 export const removeSlash = path => path.startsWith('/') ? path.slice(1) : path;
 
+export const fetchWithTimeout = async (url, options = {}, timeout = 5000) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    try {
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal,
+        });
+        return response;
+    } catch (err) {
+        if (err.name === "AbortError") {
+            throw new Error("Request timed out");
+        }
+        throw err;
+    } finally {
+        clearTimeout(id);
+    }
+};
+
 export const isValidGeoJSON = geoJSON => {
     try {
         if (!geoJSON || geoJSON.type !== "FeatureCollection") return false;

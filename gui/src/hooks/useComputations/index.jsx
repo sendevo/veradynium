@@ -15,8 +15,8 @@ const useComputations = () => {
 
         if (!res.ok) {
             const text = await res.text();
+            //throw new Error(`Error response: ${res.status} - ${text}`);
             return null;
-            throw new Error(`Error response: ${res.status} - ${text}`);
         }
 
         const data = await res.json();
