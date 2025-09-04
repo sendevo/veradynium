@@ -25,9 +25,10 @@ const View = () => {
     const [elevationData, setElevationData] = useState([]); // Array of [lat, lng, elevation]
     const [points, setPoints] = useState([]); // Points for LOS calculation
     const [losResult, setLosResult] = useState(null); // Result of LOS calculation
+    const [solverResult, setSolverResult] = useState(null); // Result of solver
 
     const { fileIds, removeFile } = useFileIdsContext(); // Ids for csv and json files. Attributes are em_file and geojson
-    const { computeLOS } = useComputations();
+    const { computeLOS, runSolver } = useComputations();
     const toast = useToast();
     const preloader = usePreloader();
 
@@ -39,33 +40,6 @@ const View = () => {
     const handleResetResults = () => {
         setLosResult(null); 
         setPoints([]);
-    };
-
-    const handleComputeLOS = async () => {
-        if(points.length < 2){
-            toast("Coordenadas de prueba no definidas", "error");
-            return;
-        }
-
-        if (!fileIds.em_file) {
-            toast("El mapa de elevación no está disponible", "error");
-            return;
-        }
-
-        const params = {
-            em_file_id: fileIds.em_file,
-            p1: points[0],
-            p2: points[1]
-        };
-
-        preloader(true);
-        console.log("Computing LOS with params:", params);
-        const result = await computeLOS(params);
-        if(result)
-            setLosResult(result);
-        else
-            toast("Ocurrió un error durante el cálculo de LOS", "error");
-        preloader(false);
     };
 
     const onInputLoaded = (data, extension) => {
@@ -111,7 +85,60 @@ const View = () => {
             default:
                 console.warn("Unknown type to remove:", type);
         }
-    }
+    };
+
+    const handleComputeLOS = async () => {
+        if(points.length < 2){
+            toast("Coordenadas de prueba no definidas", "error");
+            return;
+        }
+
+        if (!fileIds.em_file) {
+            toast("El mapa de elevación no está disponible", "error");
+            return;
+        }
+
+        const params = {
+            em_file_id: fileIds.em_file,
+            p1: points[0],
+            p2: points[1]
+        };
+
+        preloader(true);
+        console.log("Computing LOS with params:", params);
+        const result = await computeLOS(params);
+        if(result)
+            setLosResult(result);
+        else
+            toast("Ocurrió un error durante el cálculo de LOS", "error");
+        preloader(false);
+    };
+
+    const handleRunSolver = async () => {
+        if (!fileIds.em_file) {
+            toast("El mapa de elevación no está disponible", "error");
+            return;
+        }
+
+        if (!fileIds.features_file) {
+            toast("El archivo de geometrías no está disponible", "error");
+            return;
+        }
+
+        const params = {
+            em_file_id: fileIds.em_file,
+            features_file_id: fileIds.features_file
+        };
+
+        preloader(true);
+        const result = await runSolver(params);
+        if(result)
+            console.log(result);
+            //setSolverResult(result);
+        else
+            toast("Ocurrió un error durante el cálculo de la solución", "error");
+        preloader(false);
+    };
 
     const memoizedElevationData = useMemo(() => elevationData, [elevationData]);
     const memoizedFeatureCollection = useMemo(() => featureCollection, [featureCollection]);
@@ -206,6 +233,17 @@ const View = () => {
                                     </Button>
                                 </Grid>
                             </>
+                        }
+
+                        {featureCollection.features.length > 0 && elevationData.length > 0 &&
+                            <Grid>
+                                <Button 
+                                    fullWidth
+                                    onClick={handleRunSolver}
+                                    variant="contained">
+                                        Ejecutar solver
+                                </Button>
+                            </Grid>
                         }
                     </Grid>
                 </Grid>

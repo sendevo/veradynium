@@ -98,10 +98,6 @@ async def compute_los(data: dict):
 
     result = subprocess.run(cmd, capture_output=True, text=True)
 
-    # Clean up after use
-    #os.remove(em_file_path)
-    #del uploaded_files[em_file_id]
-
     if result.returncode != 0:
         return JSONResponse(status_code=500, content={"error": result.stderr})
 
@@ -116,7 +112,7 @@ async def compute_los(data: dict):
 @app.post("/solve")
 async def solve(data: dict):
     em_file_id = data.get("em_file_id") # Elevation map file ID
-    geojson_file_id = data.get("geojson_file_id") # GeoJSON features file ID
+    geojson_file_id = data.get("features_file_id") # GeoJSON features file ID
 
     em_file_path = get_uploaded_file(em_file_id, ".csv")
     geojson_file_path = get_uploaded_file(geojson_file_id, ".json")
@@ -129,12 +125,6 @@ async def solve(data: dict):
     ]
 
     result = subprocess.run(cmd, capture_output=True, text=True)
-
-    # Clean up after use
-    #os.remove(em_file_path)
-    #os.remove(geojson_file_path)
-    #del uploaded_files[em_file_id]
-    #del uploaded_files[geojson_file_id]
 
     if result.returncode != 0:
         return JSONResponse(status_code=500, content={"error": result.stderr})

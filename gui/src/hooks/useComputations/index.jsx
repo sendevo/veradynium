@@ -14,7 +14,7 @@ const useComputations = () => {
         });
 
         if (!res.ok) {
-            const text = await res.text();
+            //const text = await res.text();
             //throw new Error(`Error response: ${res.status} - ${text}`);
             return null;
         }
@@ -32,7 +32,27 @@ const useComputations = () => {
     }, []);
 
     const runSolver = useCallback( async params => {
-        console.log("Solve params:", params);
+        // params format: {em_file_id, features_file_id}
+        
+        const res = await fetch(api("/api/solve"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(params)
+        });
+
+        if (!res.ok) {
+            //const text = await res.text();
+            //throw new Error(`Error response: ${res.status} - ${text}`);
+            return null;
+        }
+
+        const data = await res.json();
+        /* output format:
+        {
+            
+        }
+        */
+        return data;
     }, []);
 
     return { computeLOS, runSolver  };

@@ -14,7 +14,7 @@ DESCRIPTION:
 
 OPTIONS:  
    -h, --help     Display this help message.  
-   -f, --file     File with terrain elevation data. Must be int CSV format (lat, lng, alt).  
+   -f, --file     File with terrain elevation data. Must be in CSV format (lat, lng, alt).  
    -p1            Coordinates and altitude of point 1 (lat lng alt). Altitude is optional.  
    -p2            Coordinates and altitude of point 2  (lat lng alt). Altitude is optional.  
    -o, --output   (optional) Output format. Must be "json" or "text". Default value is "text".  
