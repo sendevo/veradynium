@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "json.hpp"
+#include "detail.hpp"
 
 /**
  * 
@@ -47,5 +48,17 @@ public:
     std::vector<Gateway> gateways;
     std::vector<EndDevice> end_devices;
 };
+
+static inline Gateway parse_gateway(const nlohmann::json& properties, double lat, double lng) {
+    std::string id = detail::require_string(properties, "id");
+    double height = detail::require_number(properties, "height");
+    return Gateway{id, lat, lng, height};
+}
+
+static inline EndDevice parse_end_device(const nlohmann::json& properties, double lat, double lng) {
+    std::string id = detail::require_string(properties, "id");
+    double height = detail::optional_number(properties, "height", 0.0);
+    return EndDevice{id, lat, lng, height};
+}
 
 } // namespace network
