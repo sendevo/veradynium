@@ -44,9 +44,9 @@ export const getFileFormat = content => {
         try {
             const jsn = JSON.parse(trimmed); // will throw if not valid JSON
             if (isValidGeoJSON(jsn))
-                return "geojson";
+                return ".geojson";
             else
-                return "json";
+                return ".json";
         } catch (e) {
             return "unknown";
         }
@@ -66,7 +66,7 @@ export const getFileFormat = content => {
             const secondLine = lines[1].split(delimiter).length;
 
             if (columns > 1 && columns === secondLine) {
-                return "csv";
+                return ".csv";
             }
         }
     }

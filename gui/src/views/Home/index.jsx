@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Grid, Button, Box, Typography } from "@mui/material";
+import { Grid, Button, Typography } from "@mui/material";
 import { 
     csvToArray, 
     chunkedMax,
@@ -10,6 +10,7 @@ import MainView from "../../components/MainView";
 import Map from "../../components/Map";
 import DropZone from "../../components/DropZone";
 import useToast from "../../hooks/useToast";
+import usePreloader from "../../hooks/usePreloader";
 import { useFileIdsContext } from "../../context/FileIds";
 import useComputations from "../../hooks/useComputations";
 import background from "../../assets/backgrounds/background3.jpg";
@@ -28,6 +29,7 @@ const View = () => {
     const { fileIds, removeFile } = useFileIdsContext(); // Ids for csv and json files. Attributes are em_file and geojson
     const { computeLOS } = useComputations();
     const toast = useToast();
+    const preloader = usePreloader();
 
     const handleNewPoints = newPoints => {
         setLosResult(null);
@@ -40,7 +42,6 @@ const View = () => {
     };
 
     const handleComputeLOS = async () => {
-        
         if(points.length < 2){
             toast("Coordenadas de prueba no definidas", "error");
             return;
@@ -57,22 +58,24 @@ const View = () => {
             p2: points[1]
         };
 
+        preloader(true);
         console.log("Computing LOS with params:", params);
         const result = await computeLOS(params);
         if(result)
             setLosResult(result);
         else
             toast("Ocurrió un error durante el cálculo de LOS", "error");
+        preloader(false);
     };
 
     const onInputLoaded = (data, extension) => {
         switch(extension){
-            case "geojson": // Feature collection -> Draw features
+            case ".geojson": // Feature collection -> Draw features
                 const featureCollection = JSON.parse(data);
                 toast(`GeoJSON cargado. Geometrías totales: ${featureCollection.features.length}`, "success");
                 setFeatureCollection(featureCollection);
                 break;
-            case "csv": // Elevation data -> Draw heatmap
+            case ".csv": // Elevation data -> Draw heatmap
                 const options = {
                     withHeaders: false,
                     delimiter: ",",
@@ -84,7 +87,7 @@ const View = () => {
                 toast(`Datos de elevación cargados. Total de puntos: ${arr.length}`, "success");
                 setElevationData(normalizedElevation);
                 break;
-            case "json":
+            case ".json":
             case "unknown":
             default:
                 toast("Formato no soportado", "error");
@@ -92,18 +95,18 @@ const View = () => {
     };
 
     const handleRemoveElements = type => {
-        console.log("1.- Removing elements of type:", type);
-        console.log("2.- Current fileIds state before removal:", fileIds);
         switch(type){
             case "features":
-                if(fileIds.geojson)
-                    removeFile(fileIds.geojson, ".json");
+                if(fileIds.features_file)
+                    removeFile(fileIds.features_file, ".geojson");
                 setFeatureCollection({features:[]});
                 break;
             case "elevation":
                 if(fileIds.em_file)
                     removeFile(fileIds.em_file, ".csv");
                 setElevationData([]);
+                setPoints([]);
+                setLosResult(null);
                 break;
             default:
                 console.warn("Unknown type to remove:", type);
@@ -133,7 +136,7 @@ const View = () => {
                                     :
                                     <Typography sx={{fontSize: 12}}>Mapa de elevación en modo local</Typography>
                                 }
-                                {fileIds.geojson ?
+                                {fileIds.features_file ?
                                     <Typography sx={{fontSize: 12}}>Geometrías cargadas</Typography>
                                     :
                                     <Typography sx={{fontSize: 12}}>Geometrías en modo local</Typography>
@@ -183,7 +186,7 @@ const View = () => {
                             </Grid>
                         }
 
-                        {points.length === 2 &&
+                        {points.length === 2 && elevationData.length > 0 &&
                             <>
                                 <Grid>
                                     <Button 

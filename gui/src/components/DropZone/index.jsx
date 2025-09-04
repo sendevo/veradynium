@@ -3,6 +3,7 @@ import { Box, Typography } from '@mui/material';
 import { useDropzone } from 'react-dropzone';
 import { getFileFormat } from '../../model/utils';
 import { useFileIdsContext } from "../../context/FileIds";
+import usePreloader from '../../hooks/usePreloader';
 
 const dropzoneStyle = {
     verticalAlign: 'middle',
@@ -24,7 +25,8 @@ const dropzoneStyle = {
 
 const DropzoneComponent = ({ onDrop, onError }) => { // expects onDrop(data, format), where format is "json" or "csv"
     
-    const { uploadFile } = useFileIdsContext();
+    const { fileIds, uploadFile, removeFile } = useFileIdsContext();
+    const preloader = usePreloader();
 
     const onDropAccepted = useCallback((acceptedFiles) => {
         const file = acceptedFiles[0]; // only one file allowed
@@ -39,9 +41,23 @@ const DropzoneComponent = ({ onDrop, onError }) => { // expects onDrop(data, for
             // Send loaded file to parent component for using
             onDrop(fileContent, format);
 
+            // Check if file is already uploaded, if so, try to remove it first
+            try{
+                const id = { // map file types to context ids
+                    '.csv': fileIds.em_file,
+                    '.geojson': fileIds.features_file
+                }
+                if(id[format]) {
+                    console.log("Removing previous file with id:", id[format], "and format:", format);
+                    await removeFile(id[format], format);
+                }
+            } catch(err) {
+                console.error("Error removing previous file:", err);
+            }
+
             // Send file to backend for storage and further processing
             try {
-                if(format === 'csv' || format === 'geojson')
+                if(format === '.csv' || format === '.geojson')
                     await uploadFile(file);
                 else
                     console.error("Unsupported file format for upload");
@@ -50,8 +66,10 @@ const DropzoneComponent = ({ onDrop, onError }) => { // expects onDrop(data, for
                 if (onError) 
                     onError("Error al cargar el archivo");
             }
+            preloader(false);
         };
         reader.readAsText(file);
+        preloader(true);
     }, [onDrop]);
 
     const { getRootProps, getInputProps } = useDropzone({
