@@ -2,8 +2,11 @@
 
 #include <iostream>
 #include <cstring>
+
+#include "../include/json.hpp"
 #include "../include/utils.hpp"
 #include "../include/terrain.hpp"
+#include "../include/network.hpp"
 
 enum OUTPUT_FORMAT { PLAIN_TEXT, JSON };
 
@@ -61,14 +64,42 @@ int main(int argc, char **argv) {
     }
 
     auto grid = terrain::ElevationGrid::fromCSV(em_filename);
+    auto network = network::Network::fromJSON(nw_filename);
 
-    
     switch(outputFormat) {
         case PLAIN_TEXT:
-            
+            std::cout << "Plain text output not implemented yet." << std::endl;
             break;
         case JSON:
-            
+            // Print network info
+            std::cout << "{\n";
+            std::cout << "  \"gateways\": [\n";
+            for(size_t i = 0; i < network.gateways.size(); i++) {
+                const auto& gw = network.gateways[i];
+                std::cout << "    {\n";
+                std::cout << "      \"id\": \"" << gw.id << "\",\n";
+                std::cout << "      \"lat\": " << gw.lat << ",\n";
+                std::cout << "      \"lng\": " << gw.lng << ",\n";
+                std::cout << "      \"height\": " << gw.height << "\n";
+                std::cout << "    }";
+                if(i < network.gateways.size() - 1) std::cout << ",";
+                std::cout << "\n";
+            }
+            std::cout << "  ],\n";
+            std::cout << "  \"end_devices\": [\n";
+            for(size_t i = 0; i < network.end_devices.size(); i++) {
+                const auto& ed = network.end_devices[i];
+                std::cout << "    {\n";
+                std::cout << "      \"id\": \"" << ed.id << "\",\n";
+                std::cout << "      \"lat\": " << ed.lat << ",\n";
+                std::cout << "      \"lng\": " << ed.lng << ",\n";
+                std::cout << "      \"height\": " << ed.height << "\n";
+                std::cout << "    }";
+                if(i < network.end_devices.size() - 1) std::cout << ",";
+                std::cout << "\n";
+            }
+            std::cout << "  ]\n";
+            std::cout << "}\n";
             break;
         default:
             break;
