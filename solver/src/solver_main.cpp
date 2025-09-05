@@ -12,8 +12,8 @@ enum OUTPUT_FORMAT { PLAIN_TEXT, JSON };
 
 int main(int argc, char **argv) {
 
-    std::string em_filename;
-    std::string nw_filename;
+    std::string em_filename; // Terrain elevation model file (csv)
+    std::string nw_filename; // Network file (geojson)
 
     OUTPUT_FORMAT outputFormat = PLAIN_TEXT;
 
@@ -53,53 +53,32 @@ int main(int argc, char **argv) {
                 utils::printHelp(MANUAL, "Error in argument -o (--output)");
             }
         }
+
     }
 
-    if(em_filename.empty()) {
-        utils::printHelp(MANUAL, "Error in argument -f (--em_file). A filename must be provided.");
-    }
-
+    /// Load network
     if(nw_filename.empty()) {
         utils::printHelp(MANUAL, "Error in argument -g (--nw_file). A filename must be provided.");
     }
-
+    
+    /// Load elevation model
+    if(em_filename.empty()) {
+        utils::printHelp(MANUAL, "Error in argument -f (--em_file). A filename must be provided.");
+    }
+    
     auto grid = terrain::ElevationGrid::fromCSV(em_filename);
-    auto network = network::Network::fromJSON(nw_filename);
+    auto network = network::Network::fromJSON(nw_filename, grid);
+
+    network.printInfo();
+
+    network.printDistanceMatrix();
 
     switch(outputFormat) {
         case PLAIN_TEXT:
-            std::cout << "Plain text output not implemented yet." << std::endl;
+            std::cout << "Solver not implemented yet." << std::endl;
             break;
         case JSON:
-            // Print network info
-            std::cout << "{\n";
-            std::cout << "  \"gateways\": [\n";
-            for(size_t i = 0; i < network.gateways.size(); i++) {
-                const auto& gw = network.gateways[i];
-                std::cout << "    {\n";
-                std::cout << "      \"id\": \"" << gw.id << "\",\n";
-                std::cout << "      \"lat\": " << gw.lat << ",\n";
-                std::cout << "      \"lng\": " << gw.lng << ",\n";
-                std::cout << "      \"height\": " << gw.height << "\n";
-                std::cout << "    }";
-                if(i < network.gateways.size() - 1) std::cout << ",";
-                std::cout << "\n";
-            }
-            std::cout << "  ],\n";
-            std::cout << "  \"end_devices\": [\n";
-            for(size_t i = 0; i < network.end_devices.size(); i++) {
-                const auto& ed = network.end_devices[i];
-                std::cout << "    {\n";
-                std::cout << "      \"id\": \"" << ed.id << "\",\n";
-                std::cout << "      \"lat\": " << ed.lat << ",\n";
-                std::cout << "      \"lng\": " << ed.lng << ",\n";
-                std::cout << "      \"height\": " << ed.height << "\n";
-                std::cout << "    }";
-                if(i < network.end_devices.size() - 1) std::cout << ",";
-                std::cout << "\n";
-            }
-            std::cout << "  ]\n";
-            std::cout << "}\n";
+            std::cout << "Solver not implemented yet." << std::endl;
             break;
         default:
             break;

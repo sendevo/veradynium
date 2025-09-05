@@ -25,6 +25,12 @@ public:
     double lat;
     double lng;
     double height; // Height above ground in meters
+    inline double distanceTo(const Node& other, const terrain::ElevationGrid& grid) const {
+        return grid.distance(lat, lng, other.lat, other.lng, height, other.height);
+    }
+    inline bool lineOfSightTo(const Node& other, const terrain::ElevationGrid& grid) const {
+        return grid.lineOfSight(lat, lng, other.lat, other.lng, height, other.height);
+    }
 };
 
 class EndDevice : public Node {
@@ -44,18 +50,27 @@ public:
 class Network {
 public:
     Network() = default;
+
     Network(const std::vector<Gateway>& gws,
             const std::vector<EndDevice>& eds,
             const terrain::ElevationGrid& grid)
-        : gateways(gws), end_devices(eds), elevation_grid(grid) {}
+        : gateways(gws), end_devices(eds), elevation_grid(grid) {
+            computeDistanceMatrix();
+        }
+    
+    // Build network from GeoJSON file
+    static Network fromJSON(const std::string& filepath, terrain::ElevationGrid grid);
+    
+    void printInfo() const;
+    void printDistanceMatrix() const;
 
-    static Network fromJSON(const std::string& filepath);
-
-    std::vector<std::vector<bool>> computeLOSMatrix() const;
+private:    
+    void computeDistanceMatrix();
 
     std::vector<Gateway> gateways;
     std::vector<EndDevice> end_devices;
     terrain::ElevationGrid elevation_grid;
+    std::vector<std::vector<double>> distance_matrix;
 };
 
 static inline Gateway parse_gateway(const nlohmann::json& properties, double lat, double lng) {

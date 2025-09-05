@@ -18,8 +18,8 @@ OPTIONS:
    -g, --nw_file  File with the current network's nodes locations. Must be in JSON (GeoJSON) format.  
    -o, --output   (optional) Output format. Must be "json" or "text". Default value is "text".  
 
-EXAMPLE:  
-   solver -f elevation.csv -g network.json -o json
+EXAMPLES:  
+   solver -f elevation.csv -g network.json -o json  
 
 AUTHORS  
    Code was written by Dr. Matias J. Micheletto from IIDEPyS-GSJ (CONICET) and supervised by Dr. Carlos De Marziani from UNPSJB - IIDEPyS (CONICET) and Dr. Rodrigo M. Santos from DIEC (UNS) - ICIC (CONICET).  

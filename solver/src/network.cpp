@@ -2,8 +2,11 @@
 
 namespace network {
 
-Network Network::fromJSON(const std::string& filepath) {
+Network Network::fromJSON(const std::string& filepath, terrain::ElevationGrid grid) {
+    
     Network network;
+    network.elevation_grid = grid;
+
     std::ifstream file(filepath);
     if (!file.is_open()) {
         throw std::runtime_error("Failed to open JSON file: " + filepath);
@@ -47,24 +50,73 @@ Network Network::fromJSON(const std::string& filepath) {
         }
     }
 
+    network.computeDistanceMatrix();
+
     return network;
 }
 
-std::vector<std::vector<bool>> Network::computeLOSMatrix() const {
+void Network::printInfo() const {
+    std::cout << "Network Information:" << std::endl;
+    std::cout << "Number of Gateways: " << gateways.size() << std::endl;
+    for (const auto& gw : gateways) {
+        std::cout << "  Gateway ID: " << gw.id 
+                  << ", Lat: " << gw.lat 
+                  << ", Lng: " << gw.lng 
+                  << ", Height: " << gw.height << "m" << std::endl;
+    }
+    std::cout << "Number of End Devices: " << end_devices.size() << std::endl;
+    for (const auto& ed : end_devices) {
+        std::cout << "  End Device ID: " << ed.id 
+                  << ", Lat: " << ed.lat 
+                  << ", Lng: " << ed.lng 
+                  << ", Height: " << ed.height << "m" << std::endl;
+    }
+}
+
+void Network::printDistanceMatrix() const {
+    std::cout << "Distance Matrix (Gateways to End Devices):" << std::endl;
+    std::cout << "      ";
+    for (const auto& ed : end_devices) {
+        std::cout << ed.id << "     ";
+    }
+    std::cout << std::endl;
+
+    for (size_t i = 0; i < gateways.size(); ++i) {
+        std::cout << gateways[i].id << "  ";
+        for (size_t j = 0; j < end_devices.size(); ++j) {
+            if (distance_matrix[i][j] < 0) {
+                std::cout << " No LOS ";
+            } else {
+                std::cout << std::fixed << std::setprecision(1) << distance_matrix[i][j] << "m ";
+            }
+        }
+        std::cout << std::endl;
+    }
+}
+
+void Network::computeDistanceMatrix() {
     size_t num_gws = gateways.size();
     size_t num_eds = end_devices.size();
-    std::vector<std::vector<bool>> los_matrix(num_gws, std::vector<bool>(num_eds, false));
+    
+    distance_matrix = std::vector<std::vector<double>>(num_gws, std::vector<double>(num_eds, false));
 
     for(size_t i = 0; i < num_gws; i++) {
+        
         const auto& gw = gateways[i];
+        
         for(size_t j = 0; j < num_eds; j++) {
+            
             const auto& ed = end_devices[j];
+            
             bool los = elevation_grid.lineOfSight(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
-            los_matrix[i][j] = los;
+            double dist = elevation_grid.distance(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
+            
+            if(los)
+                distance_matrix[i][j] = dist;
+            else
+                distance_matrix[i][j] = -1.0; // Indicate no LOS with -1
         }
     }
-
-    return los_matrix;
 }
 
 } // namespace network
