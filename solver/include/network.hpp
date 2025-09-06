@@ -11,7 +11,7 @@
 
 /**
  * 
- * @brief Network elements: gateways and end devices
+ * @brief Models a LoRaWAN network with Gateways and End Devices, with terrain elevation awareness.
  * 
  */
 namespace network {
@@ -33,19 +33,44 @@ public:
     }
 };
 
+
+// Forward declaration to avodd circular dependency
+// (Gateway has vector of EndDevice pointers and EndDevice has pointer to Gateway)
+class Gateway;   
+class EndDevice;
+
+
 class EndDevice : public Node {
 public:
     EndDevice() = default;
     EndDevice(const std::string& id, double lat, double lng, double height = 0.0)
         : Node(id, lat, lng, height) {}
+    
+    static inline EndDevice parse_end_device(const nlohmann::json& properties, double lat, double lng) {
+        std::string id = detail::require_string(properties, "id");
+        double height = detail::optional_number(properties, "height", 0.0);
+        return EndDevice{id, lat, lng, height};
+    };
+
+    Gateway* assigned_gateway = nullptr; // Pointer to assigned gateway
 };
+
 
 class Gateway : public Node {
 public:
     Gateway() = default;
     Gateway(const std::string& id, double lat, double lng, double height)
         : Node(id, lat, lng, height) {}
+
+    static inline Gateway parse_gateway(const nlohmann::json& properties, double lat, double lng) {
+        std::string id = detail::require_string(properties, "id");
+        double height = detail::require_number(properties, "height");
+        return Gateway{id, lat, lng, height};
+    };
+
+    std::vector<EndDevice*> connected_devices; // Pointers to connected end devices
 };
+
 
 class Network {
 public:
@@ -66,23 +91,12 @@ public:
 
 private:    
     void computeDistanceMatrix();
+    void assignDevices();
 
     std::vector<Gateway> gateways;
     std::vector<EndDevice> end_devices;
     terrain::ElevationGrid elevation_grid;
     std::vector<std::vector<double>> distance_matrix;
 };
-
-static inline Gateway parse_gateway(const nlohmann::json& properties, double lat, double lng) {
-    std::string id = detail::require_string(properties, "id");
-    double height = detail::require_number(properties, "height");
-    return Gateway{id, lat, lng, height};
-}
-
-static inline EndDevice parse_end_device(const nlohmann::json& properties, double lat, double lng) {
-    std::string id = detail::require_string(properties, "id");
-    double height = detail::optional_number(properties, "height", 0.0);
-    return EndDevice{id, lat, lng, height};
-}
 
 } // namespace network

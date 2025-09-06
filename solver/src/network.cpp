@@ -42,9 +42,9 @@ Network Network::fromJSON(const std::string& filepath, terrain::ElevationGrid gr
         std::string type = detail::require_string(properties, "type");
 
         if(type == "gateway") {
-            network.gateways.push_back(parse_gateway(properties, lat, lng));
+            network.gateways.push_back(Gateway::parse_gateway(properties, lat, lng));
         } else if(type == "end_device") {
-            network.end_devices.push_back(parse_end_device(properties, lat, lng));
+            network.end_devices.push_back(EndDevice::parse_end_device(properties, lat, lng));
         } else {
             throw std::runtime_error("Invalid GeoJSON: unknown feature type '" + type + "'");
         }
@@ -53,48 +53,43 @@ Network Network::fromJSON(const std::string& filepath, terrain::ElevationGrid gr
     network.computeDistanceMatrix();
 
     return network;
-}
+};
 
-void Network::printInfo() const {
-    std::cout << "Network Information:" << std::endl;
-    std::cout << "Number of Gateways: " << gateways.size() << std::endl;
-    for (const auto& gw : gateways) {
-        std::cout << "  Gateway ID: " << gw.id 
-                  << ", Lat: " << gw.lat 
-                  << ", Lng: " << gw.lng 
-                  << ", Height: " << gw.height << "m" << std::endl;
+void Network::assignDevices() { // Assign end devices to closest reachable gateway
+    // First, clear previous connections
+    for (auto& gw : gateways) {
+        gw.connected_devices.clear();
     }
-    std::cout << "Number of End Devices: " << end_devices.size() << std::endl;
-    for (const auto& ed : end_devices) {
-        std::cout << "  End Device ID: " << ed.id 
-                  << ", Lat: " << ed.lat 
-                  << ", Lng: " << ed.lng 
-                  << ", Height: " << ed.height << "m" << std::endl;
+    for (auto& dev : end_devices) {
+        dev.assigned_gateway = nullptr;
     }
-}
 
-void Network::printDistanceMatrix() const {
-    std::cout << "Distance Matrix (Gateways to End Devices):" << std::endl;
-    std::cout << "      ";
-    for (const auto& ed : end_devices) {
-        std::cout << ed.id << "     ";
-    }
-    std::cout << std::endl;
+    // Assign each end device to the closest reachable gateway
+    for (auto& dev : end_devices) {
+        double minDist = std::numeric_limits<double>::max();
+        network::Gateway* closestGateway = nullptr;
 
-    for (size_t i = 0; i < gateways.size(); ++i) {
-        std::cout << gateways[i].id << "  ";
-        for (size_t j = 0; j < end_devices.size(); ++j) {
-            if (distance_matrix[i][j] < 0) {
-                std::cout << " No LOS ";
-            } else {
-                std::cout << std::fixed << std::setprecision(1) << distance_matrix[i][j] << "m ";
+        for (auto& gw : gateways) {
+            // Only consider gateways with line-of-sight
+            if (elevation_grid.lineOfSight(gw.lat, gw.lng, dev.lat, dev.lng, gw.height, dev.height)) {
+                double dist = elevation_grid.distance(gw.lat, gw.lng, dev.lat, dev.lng, gw.height, dev.height);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestGateway = &gw;
+                }
             }
         }
-        std::cout << std::endl;
+
+        // Assign device to closest gateway if reachable
+        if (closestGateway) {
+            dev.assigned_gateway = closestGateway;
+            closestGateway->connected_devices.push_back(&dev);
+        } 
+        // else device remains unassigned
     }
 }
 
-void Network::computeDistanceMatrix() {
+void Network::computeDistanceMatrix() { // LOS aware distance matrix
     size_t num_gws = gateways.size();
     size_t num_eds = end_devices.size();
     
@@ -117,6 +112,45 @@ void Network::computeDistanceMatrix() {
                 distance_matrix[i][j] = -1.0; // Indicate no LOS with -1
         }
     }
-}
+};
+
+void Network::printInfo() const {
+    std::cout << "Network Information:" << std::endl;
+    std::cout << "Number of Gateways: " << gateways.size() << std::endl;
+    for (const auto& gw : gateways) {
+        std::cout << "  Gateway ID: " << gw.id 
+                  << ", Lat: " << gw.lat 
+                  << ", Lng: " << gw.lng 
+                  << ", Height: " << gw.height << "m" << std::endl;
+    }
+    std::cout << "Number of End Devices: " << end_devices.size() << std::endl;
+    for (const auto& ed : end_devices) {
+        std::cout << "  End Device ID: " << ed.id 
+                  << ", Lat: " << ed.lat 
+                  << ", Lng: " << ed.lng 
+                  << ", Height: " << ed.height << "m" << std::endl;
+    }
+};
+
+void Network::printDistanceMatrix() const {
+    std::cout << "Distance Matrix (Gateways to End Devices):" << std::endl;
+    std::cout << "      ";
+    for (const auto& ed : end_devices) {
+        std::cout << ed.id << "     ";
+    }
+    std::cout << std::endl;
+
+    for (size_t i = 0; i < gateways.size(); ++i) {
+        std::cout << gateways[i].id << "  ";
+        for (size_t j = 0; j < end_devices.size(); ++j) {
+            if (distance_matrix[i][j] < 0) {
+                std::cout << " No LOS ";
+            } else {
+                std::cout << std::fixed << std::setprecision(1) << distance_matrix[i][j] << "m ";
+            }
+        }
+        std::cout << std::endl;
+    }
+};
 
 } // namespace network
