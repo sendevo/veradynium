@@ -107,10 +107,10 @@ const View = () => {
         preloader(true);
         console.log("Computing LOS with params:", params);
         const result = await computeLOS(params);
-        if(result)
+        if(!result.error)
             setLosResult(result);
         else
-            toast("Ocurrió un error durante el cálculo de LOS", "error");
+            toast(result.error, "error");
         preloader(false);
     };
 
@@ -132,11 +132,11 @@ const View = () => {
 
         preloader(true);
         const result = await runSolver(params);
-        if(result)
+        if(!result.error)
             console.log(result);
             //setSolverResult(result);
         else
-            toast("Ocurrió un error durante el cálculo de la solución", "error");
+            toast(result.error, "error");
         preloader(false);
     };
 

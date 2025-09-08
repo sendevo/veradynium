@@ -55,6 +55,12 @@ public:
                      double lat2, double lon2,
                      double h1, double h2) const; 
 
+    // Check if a lat/lng is within the grid bounds
+    bool inElevationGrid(double lat, double lng) const {
+        return !(lat < latitudes.front() || lat > latitudes.back() ||
+                 lng < longitudes.front() || lng > longitudes.back());
+    }
+
 private:
     std::vector<double> latitudes;
     std::vector<double> longitudes;

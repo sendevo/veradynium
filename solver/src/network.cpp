@@ -50,12 +50,11 @@ Network Network::fromJSON(const std::string& filepath, terrain::ElevationGrid gr
         }
     }
 
-    network.computeDistanceMatrix();
-
     return network;
 };
 
-void Network::assignDevices() { // Assign end devices to closest reachable gateway
+/* NOT PARALELIZED VERSION
+void Network::assignDevices() { // For each end-device, assigns its pointer to the closest reachable gateway.
     // First, clear previous connections
     for (auto& gw : gateways) {
         gw.connected_devices.clear();
@@ -66,11 +65,10 @@ void Network::assignDevices() { // Assign end devices to closest reachable gatew
 
     // Assign each end device to the closest reachable gateway
     for (auto& dev : end_devices) {
-        double minDist = std::numeric_limits<double>::max();
+        double minDist = std::numeric_limits<double>::max(); // Start with a large distance
         network::Gateway* closestGateway = nullptr;
 
         for (auto& gw : gateways) {
-            // Only consider gateways with line-of-sight
             if (elevation_grid.lineOfSight(gw.lat, gw.lng, dev.lat, dev.lng, gw.height, dev.height)) {
                 double dist = elevation_grid.distance(gw.lat, gw.lng, dev.lat, dev.lng, gw.height, dev.height);
                 if (dist < minDist) {
@@ -88,31 +86,51 @@ void Network::assignDevices() { // Assign end devices to closest reachable gatew
         // else device remains unassigned
     }
 }
+*/
 
-void Network::computeDistanceMatrix() { // LOS aware distance matrix
-    size_t num_gws = gateways.size();
-    size_t num_eds = end_devices.size();
-    
-    distance_matrix = std::vector<std::vector<double>>(num_gws, std::vector<double>(num_eds, false));
+void Network::assignDevices() {
+    const size_t num_gws = gateways.size();
+    const size_t num_eds = end_devices.size();
 
-    for(size_t i = 0; i < num_gws; i++) {
-        
-        const auto& gw = gateways[i];
-        
-        for(size_t j = 0; j < num_eds; j++) {
-            
+    // Phase 1: parallel per-device search for best gateway
+    std::vector<int> best_gw_idx(num_eds, -1);
+    std::vector<double> best_dist(num_eds, std::numeric_limits<double>::infinity());
+
+    #pragma omp parallel for schedule(dynamic) // parallelize over end devices
+    for (int j = 0; j < static_cast<int>(num_eds); ++j) {
+        double minDist = std::numeric_limits<double>::infinity();
+        int best = -1;
+
+        for (int i = 0; i < static_cast<int>(num_gws); ++i) {
+            const auto& gw = gateways[i];
             const auto& ed = end_devices[j];
-            
-            bool los = elevation_grid.lineOfSight(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
-            double dist = elevation_grid.distance(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
-            
-            if(los)
-                distance_matrix[i][j] = dist;
-            else
-                distance_matrix[i][j] = -1.0; // Indicate no LOS with -1
+
+            // call combined LOS+distance (fast single call)
+            bool los =     elevation_grid.lineOfSight(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
+            double distance = elevation_grid.distance(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
+
+            if (los && distance < minDist) {
+                minDist = distance;
+                best = i;
+            }
+        }
+
+        best_gw_idx[j] = best;
+        best_dist[j] = minDist;
+    }
+
+    // Phase 2: clear and populate connections (sequential)
+    for (auto& gw : gateways) gw.connected_devices.clear();
+    for (auto& dev : end_devices) dev.assigned_gateway = nullptr;
+
+    for (size_t j = 0; j < num_eds; ++j) {
+        int best = best_gw_idx[j];
+        if (best >= 0) {
+            end_devices[j].assigned_gateway = &gateways[best];
+            gateways[best].connected_devices.push_back(&end_devices[j]);
         }
     }
-};
+}
 
 void Network::printInfo() const {
     std::cout << "Network Information:" << std::endl;
@@ -129,27 +147,6 @@ void Network::printInfo() const {
                   << ", Lat: " << ed.lat 
                   << ", Lng: " << ed.lng 
                   << ", Height: " << ed.height << "m" << std::endl;
-    }
-};
-
-void Network::printDistanceMatrix() const {
-    std::cout << "Distance Matrix (Gateways to End Devices):" << std::endl;
-    std::cout << "      ";
-    for (const auto& ed : end_devices) {
-        std::cout << ed.id << "     ";
-    }
-    std::cout << std::endl;
-
-    for (size_t i = 0; i < gateways.size(); ++i) {
-        std::cout << gateways[i].id << "  ";
-        for (size_t j = 0; j < end_devices.size(); ++j) {
-            if (distance_matrix[i][j] < 0) {
-                std::cout << " No LOS ";
-            } else {
-                std::cout << std::fixed << std::setprecision(1) << distance_matrix[i][j] << "m ";
-            }
-        }
-        std::cout << std::endl;
     }
 };
 

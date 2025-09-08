@@ -79,24 +79,19 @@ public:
     Network(const std::vector<Gateway>& gws,
             const std::vector<EndDevice>& eds,
             const terrain::ElevationGrid& grid)
-        : gateways(gws), end_devices(eds), elevation_grid(grid) {
-            computeDistanceMatrix();
-        }
+        : gateways(gws), end_devices(eds), elevation_grid(grid) {}
     
-    // Build network from GeoJSON file
     static Network fromJSON(const std::string& filepath, terrain::ElevationGrid grid);
     
+    
     void printInfo() const;
-    void printDistanceMatrix() const;
 
 private:    
-    void computeDistanceMatrix();
     void assignDevices();
 
     std::vector<Gateway> gateways;
     std::vector<EndDevice> end_devices;
     terrain::ElevationGrid elevation_grid;
-    std::vector<std::vector<double>> distance_matrix;
 };
 
 } // namespace network

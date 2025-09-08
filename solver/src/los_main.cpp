@@ -90,6 +90,15 @@ int main(int argc, char **argv) {
 
     auto grid = terrain::ElevationGrid::fromCSV(filename);
 
+    if (!grid.inElevationGrid(lat1, lon1)) {
+        utils::printHelp(MANUAL, "Point 1 is outside the elevation grid bounds");
+        return 1;
+    }
+    if (!grid.inElevationGrid(lat2, lon2)) {
+        utils::printHelp(MANUAL, "Point 2 is outside the elevation grid bounds");
+        return 1;
+    }
+
     const bool los = grid.lineOfSight(lat1, lon1, lat2, lon2, h1, h2);
     const double distance = grid.distance(lat1, lon1, lat2, lon2, h1, h2);
 

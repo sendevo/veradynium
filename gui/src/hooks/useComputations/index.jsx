@@ -16,7 +16,16 @@ const useComputations = () => {
         if (!res.ok) {
             //const text = await res.text();
             //throw new Error(`Error response: ${res.status} - ${text}`);
-            return null;
+            const text = await res.text();
+            try{
+                const error = JSON.parse(text);
+                const errorMessage = error.error || text;
+                console.error("Error response:", res.status, errorMessage);
+                return { error: errorMessage };
+            }catch{
+                console.error("Error response:", res.status, text);
+                return { error: "Ocurrió un error al calcular LOS" };
+            }
         }
 
         const data = await res.json();
@@ -41,9 +50,16 @@ const useComputations = () => {
         });
 
         if (!res.ok) {
-            //const text = await res.text();
-            //throw new Error(`Error response: ${res.status} - ${text}`);
-            return null;
+            const text = await res.text();
+            try{
+                const error = JSON.parse(text);
+                const errorMessage = error.error || text;
+                console.error("Error response:", res.status, errorMessage);
+                return { error: errorMessage };
+            }catch{
+                console.error("Error response:", res.status, text);
+                return { error: "Ocurrió un error al procesar la solicitud" };
+            }
         }
 
         const data = await res.json();

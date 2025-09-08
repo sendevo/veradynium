@@ -1,5 +1,5 @@
 CPP      = g++
-CFLAGS   = -Wall -pthread
+CFLAGS   = -Wall -pthread -fopenmp -O3
 LDFLAGS  = -lgsl -lgslcblas -lm
 
 SRCDIR   = src
@@ -29,13 +29,16 @@ $(BINDIR)/%: $(COMMON_OBJECTS) $(OBJDIR)/%_main.o
 	@mkdir -p $(@D)
 	@echo "Linking $@..."
 	$(CPP) $(CFLAGS) $(INCLUDES) $^ -o $@ $(LDFLAGS)
+	@mkdir -p $(BINDIR)/assets
+	cp assets/*_manual.txt $(BINDIR)/assets/
 	@echo "$@ built successfully"
 
-# Compile rule for all .cpp files
+# Compile rule for all .cpp files and move manual files to bin
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(HEADERS)
 	@mkdir -p $(@D)
 	@echo "Compiling $<..."
 	$(CPP) $(CFLAGS) $(INCLUDES) -c $< -o $@
+	@echo "$< compiled successfully"
 
 clean:
 	rm -rf $(OBJDIR) $(BINDIR)

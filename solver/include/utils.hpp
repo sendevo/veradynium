@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <unistd.h>
+#include <limits.h>
 
 /**
  * 
@@ -13,6 +15,9 @@
 namespace utils { // Utility functions
 
     inline constexpr const char defaultMessage[] = "Error in command line arguments. See manual or documentation.";
+
+    // Get directory of the executable (to load the manual file if not specified)
+    std::string getExecutableDir();
 
     // Print help message from file
     void printHelp(const char* file, const char* message = defaultMessage); 

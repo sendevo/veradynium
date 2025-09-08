@@ -71,8 +71,6 @@ int main(int argc, char **argv) {
 
     network.printInfo();
 
-    network.printDistanceMatrix();
-
     switch(outputFormat) {
         case PLAIN_TEXT:
             std::cout << "Solver not implemented yet." << std::endl;
