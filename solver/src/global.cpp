@@ -1,6 +1,6 @@
-#include "../include/utils.hpp"
+#include "../include/global.hpp"
 
-namespace utils {
+namespace global {
 
 std::string getExecutableDir() {
 #ifdef _WIN32

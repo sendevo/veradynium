@@ -9,7 +9,7 @@
 #include <string>
 #include <algorithm>
 
-#include "utils.hpp"
+#include "global.hpp"
 
 #define SAMPLES_STEPS 100 // Number of samples along the line of sight. Must be >= 2
 
@@ -25,6 +25,12 @@ struct LatLngAlt {
     double lat;
     double lng;
     double alt;
+};
+
+class FeatureCollection {
+public:
+    FeatureCollection() = default;
+    std::vector<LatLngAlt> points;
 };
 
 class ElevationGrid {
@@ -56,10 +62,22 @@ public:
                      double h1, double h2) const; 
 
     // Check if a lat/lng is within the grid bounds
-    bool inElevationGrid(double lat, double lng) const {
+    inline bool inElevationGrid(double lat, double lng) const {
         return !(lat < latitudes.front() || lat > latitudes.back() ||
                  lng < longitudes.front() || lng > longitudes.back());
     }
+
+    inline std::vector<LatLngAlt> getBoundingBox() const {
+        return {
+            {latitudes.front(), longitudes.front(), 0.0},
+            {latitudes.front(), longitudes.back(),  0.0},
+            {latitudes.back(),  longitudes.back(),  0.0},
+            {latitudes.back(),  longitudes.front(), 0.0}
+        };
+    }
+
+    double getMaxAltitude() const;
+    double getMinAltitude() const;
 
 private:
     std::vector<double> latitudes;

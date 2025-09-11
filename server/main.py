@@ -135,7 +135,35 @@ async def solve(data: dict):
         return json.loads(result.stdout)
     except json.JSONDecodeError:
         return JSONResponse(status_code=500, content={"error": "Invalid output from Solver program."})
-        
+
+
+@app.post("/allocation")
+async def allocation(data: dict):
+    em_file_id = data.get("em_file_id") # Elevation map file ID
+    geojson_file_id = data.get("features_file_id") # GeoJSON features file ID
+
+    em_file_path = get_uploaded_file(em_file_id, ".csv")
+    geojson_file_path = get_uploaded_file(geojson_file_id, ".json")
+
+    cmd = [
+        "../solver/bin/compute_allocation",
+        "-f", em_file_path,
+        "-g", geojson_file_path,
+        "-o", "json"
+    ]
+
+    result = subprocess.run(cmd, capture_output=True, text=True)
+
+    if result.returncode != 0:
+        return JSONResponse(status_code=500, content={"error": result.stderr})
+
+    try: # Parse JSON output
+        print("Allocation command output:")
+        print(result.stdout)
+        return json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return JSONResponse(status_code=500, content={"error": "Invalid output from Compute Allocation program."})
+
 
 app.include_router(api)
 

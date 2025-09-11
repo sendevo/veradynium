@@ -1,16 +1,16 @@
-SOLVER MANUAL  
+COMPUTE_ALLOCATION MANUAL  
 
 PROLOG  
    This manual is part of the veradynium project. See project documentation at: https://github.com/sendevo/veradynium  
 
 NAME  
-   solver - Gateway placement problem solver.  
+   compute_allocation - Computes the connection of end-devices to nodes.  
 
 SYNOPSIS  
-   solver [OPTIONS]... -f [EM_FILE] -g [GEOJSON_FILE] -o [OUTPUT_FORMAT]  
+   compute_allocation -f [EM_FILE] -g [GEOJSON_FILE] -o [OUTPUT_FORMAT]
 
 DESCRIPTION:  
-   Given a geojson file containing the locations of end-devices and current gateways, and the terrain elevation file, this program approximates the current energy consumption of the network and suggest a optimal locations for gateways in order to minimize gateway number and energy consumption.  
+   This program computes the allocation of the LoRaWAN network composed by a set of end-devices and a set of gateways taking into account the terrain elevation of the area. The program requires both files with the terrain elevation data and the network topology in GeoJSON format. The program returns the connected end-devices of each gateway.
 
 OPTIONS:  
    -h, --help     Display this help message.  
@@ -19,8 +19,8 @@ OPTIONS:
    -o, --output   (optional) Output format. Must be "json" or "text". Default value is "text".  
 
 EXAMPLES:  
-   solver -f elevation.csv -g network.json -o json  
-
+   compute_allocation -f elevation.csv -g network.json -o json  
+   
 AUTHORS  
    Code was written by Dr. Matias J. Micheletto from IIDEPyS-GSJ (CONICET) and supervised by Dr. Carlos De Marziani from UNPSJB - IIDEPyS (CONICET) and Dr. Rodrigo M. Santos from DIEC (UNS) - ICIC (CONICET).  
 

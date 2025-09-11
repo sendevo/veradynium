@@ -2,8 +2,12 @@
 
 namespace kmean {
 
-void KMeansOptimizer::optimize(int maxIterations, double epsilon) {
-    // Not implemented yet
+Result KMeansOptimizer::optimize(int maxIterations, double epsilon) {
+    // TODO
+    Result result;
+    result.iterations = 0;
+    result.total_distance = 0.0;
+    return result;
 };
 
 terrain::LatLngAlt KMeansOptimizer::computeCentroid(const network::Gateway& gw) {

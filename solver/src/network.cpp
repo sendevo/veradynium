@@ -2,93 +2,59 @@
 
 namespace network {
 
-Network Network::fromJSON(const std::string& filepath, terrain::ElevationGrid grid) {
+Network Network::fromFeatureCollection(const geojson::FeatureCollection& fc) {
     
     Network network;
-    network.elevation_grid = grid;
 
-    std::ifstream file(filepath);
-    if (!file.is_open()) {
-        throw std::runtime_error("Failed to open JSON file: " + filepath);
-    }
+    network.gateways.clear();
+    network.end_devices.clear();
 
-    nlohmann::json j;
-    file >> j;
+    for (size_t i = 0; i < fc.featureCount(); ++i) {
+        const auto& feature = fc.getFeature(i);
+        const auto& properties = feature.properties;
 
-    if(j.value("type", "") != "FeatureCollection"){
-        throw std::runtime_error("Invalid GeoJSON: expected 'FeatureCollection'");
-    }
-
-    for (const auto& feature : j["features"]) {
-        if(feature.value("type", "") != "Feature") {
-            throw std::runtime_error("Invalid GeoJSON: feature missing or incorrect 'type'");
+        if (feature.geometry_type != geojson::POINT) {
+            // Later we can add support for polygons to limit coverage areas
+            throw std::runtime_error("Invalid GeoJSON: only 'Point' geometry is supported.");
         }
 
-        const auto& properties = feature.at("properties");
-        const auto& geometry   = feature.at("geometry");
-
-        if(geometry.value("type", "") != "Point") {
-            throw std::runtime_error("Invalid GeoJSON: only 'Point' geometries are supported.");
-        }
-
-        auto coords = geometry.at("coordinates");
-        if(!coords.is_array() || coords.size() < 2) {
-            throw std::runtime_error("Invalid GeoJSON: invalid coordinates.");
-        }
-
-        double lng = coords[0];
-        double lat = coords[1];
-
-        std::string type = detail::require_string(properties, "type");
-
-        if(type == "gateway") {
-            network.gateways.push_back(Gateway::parse_gateway(properties, lat, lng));
-        } else if(type == "end_device") {
-            network.end_devices.push_back(EndDevice::parse_end_device(properties, lat, lng));
-        } else {
-            throw std::runtime_error("Invalid GeoJSON: unknown feature type '" + type + "'");
+        if (std::holds_alternative<geojson::Position>(feature.coords)) {
+            const geojson::Position& pos = std::get<geojson::Position>(feature.coords);
+            if (pos.size() < 2) {
+                throw std::runtime_error("Invalid Point: must have at least [lon, lat]");
+            }
+            double lng = pos[0];
+            double lat = pos[1];
+            if (detail::require_string(properties, "type") == "end_device"){
+                network.end_devices.push_back(EndDevice::parse_end_device(properties, lat, lng));
+            }else{ 
+                if (detail::require_string(properties, "type") == "gateway"){
+                    network.gateways.push_back(Gateway::parse_gateway(properties, lat, lng));        
+                } else {
+                    throw std::runtime_error("Invalid GeoJSON: unknown feature type '" + detail::require_string(properties, "type") + "'");
+                }
+            }
+        }else{
+            throw std::runtime_error("Invalid GeoJSON: Point geometry must have Position coordinates.");
         }
     }
 
+    network.feature_collection = fc;
+
+    return network;
+}
+
+Network Network::fromGeoJSON(const std::string& filepath) {
+    auto fc = geojson::FeatureCollection::fromGeoJSON(filepath);
+    Network network = Network::fromFeatureCollection(fc);
     return network;
 };
 
-/* NOT PARALELIZED VERSION
-void Network::assignDevices() { // For each end-device, assigns its pointer to the closest reachable gateway.
-    // First, clear previous connections
-    for (auto& gw : gateways) {
-        gw.connected_devices.clear();
-    }
-    for (auto& dev : end_devices) {
-        dev.assigned_gateway = nullptr;
-    }
-
-    // Assign each end device to the closest reachable gateway
-    for (auto& dev : end_devices) {
-        double minDist = std::numeric_limits<double>::max(); // Start with a large distance
-        network::Gateway* closestGateway = nullptr;
-
-        for (auto& gw : gateways) {
-            if (elevation_grid.lineOfSight(gw.lat, gw.lng, dev.lat, dev.lng, gw.height, dev.height)) {
-                double dist = elevation_grid.distance(gw.lat, gw.lng, dev.lat, dev.lng, gw.height, dev.height);
-                if (dist < minDist) {
-                    minDist = dist;
-                    closestGateway = &gw;
-                }
-            }
-        }
-
-        // Assign device to closest gateway if reachable
-        if (closestGateway) {
-            dev.assigned_gateway = closestGateway;
-            closestGateway->connected_devices.push_back(&dev);
-        } 
-        // else device remains unassigned
-    }
-}
-*/
 
 void Network::assignDevices() {
+    // Parallelized version of assignDevices using OpenMP
+    // This function assigns each end device to the closest reachable gateway
+
     const size_t num_gws = gateways.size();
     const size_t num_eds = end_devices.size();
 
@@ -106,7 +72,7 @@ void Network::assignDevices() {
             const auto& ed = end_devices[j];
 
             // call combined LOS+distance (fast single call)
-            bool los =     elevation_grid.lineOfSight(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
+            bool los = elevation_grid.lineOfSight(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
             double distance = elevation_grid.distance(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
 
             if (los && distance < minDist) {
@@ -132,7 +98,54 @@ void Network::assignDevices() {
     }
 }
 
-void Network::printInfo() const {
+void Network::updateFeatureCollection() {
+    feature_collection = geojson::FeatureCollection(); // Clear existing features
+
+    // Add gateways
+    for (const auto& gw : gateways) {
+        geojson::Feature gw_location;
+        gw_location.geometry_type = geojson::POINT;
+        gw_location.properties = nlohmann::json{
+            {"type", "gateway"},
+            {"id", gw.id},
+            {"height", gw.height}
+        };
+        gw_location.coords = geojson::Position{gw.lng, gw.lat};
+        feature_collection.addFeature(gw_location);
+    }
+
+    // Add end devices and connections to assigned gateways (if any)
+    for (const auto& ed : end_devices) {
+        geojson::Feature ed_location;
+        ed_location.geometry_type = geojson::POINT;
+        ed_location.properties = nlohmann::json{
+            {"type", "end_device"},
+            {"id", ed.id},
+            {"height", ed.height}
+        };
+        ed_location.coords = geojson::Position{ed.lng, ed.lat};
+        if (ed.assigned_gateway) { // If assigned, add a line to the gateway
+            ed_location.properties["assigned_gateway"] = ed.assigned_gateway->id;
+            geojson::Feature connection;
+            connection.geometry_type = geojson::LINESTRING;
+            connection.properties = nlohmann::json{
+                {"type", "connection"},
+                {"from", ed.id},
+                {"to", ed.assigned_gateway->id}
+            };
+            connection.coords = geojson::LineString{
+                geojson::Position{ed.lng, ed.lat}, 
+                geojson::Position{ed.assigned_gateway->lng, ed.assigned_gateway->lat}
+            };
+            feature_collection.addFeature(connection);
+        } else {
+            ed_location.properties["assigned_gateway"] = nullptr;
+        }
+        feature_collection.addFeature(ed_location);
+    }
+}
+
+void Network::printPlainText() const {
     std::cout << "Network Information:" << std::endl;
     std::cout << "Number of Gateways: " << gateways.size() << std::endl;
     for (const auto& gw : gateways) {
@@ -146,8 +159,35 @@ void Network::printInfo() const {
         std::cout << "  End Device ID: " << ed.id 
                   << ", Lat: " << ed.lat 
                   << ", Lng: " << ed.lng 
-                  << ", Height: " << ed.height << "m" << std::endl;
+                  << ", Height: " << ed.height << "m"
+                  << ", Assigned Gateway: " 
+                  << (ed.assigned_gateway ? ed.assigned_gateway->id : "None")
+                  << std::endl;
     }
+    std::cout << "Terrain Elevation Grid:" << std::endl;
+    std::cout << "Bounding Box:" << std::endl;
+    std::cout << "   Upper right position: [" << elevation_grid.getBoundingBox()[0].lat << ", " << elevation_grid.getBoundingBox()[0].lng << "]" << std::endl;
+    std::cout << "   Bottom left position: [" << elevation_grid.getBoundingBox()[2].lat << ", " << elevation_grid.getBoundingBox()[2].lng << "]" << std::endl;
+    std::cout << "   Altitude range: [" << elevation_grid.getMinAltitude() << ", " << elevation_grid.getMaxAltitude() << "] meters" << std::endl;
 };
+
+void Network::printJSON() const {
+    feature_collection.print();
+};
+
+void Network::print(global::PRINT_TYPE format) {
+    assignDevices();
+    updateFeatureCollection();
+    switch (format) {
+        case global::PLAIN_TEXT:
+            printPlainText();
+            break;
+        case global::JSON:
+            printJSON();
+            break;
+        default:
+            throw std::runtime_error("Unknown output format.");
+    }
+}
 
 } // namespace network

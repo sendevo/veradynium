@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "json.hpp"
+#include "feature_collection.hpp"
 #include "detail.hpp"
 #include "terrain.hpp"
 
@@ -71,7 +72,6 @@ public:
     std::vector<EndDevice*> connected_devices; // Pointers to connected end devices
 };
 
-
 class Network {
 public:
     Network() = default;
@@ -81,17 +81,24 @@ public:
             const terrain::ElevationGrid& grid)
         : gateways(gws), end_devices(eds), elevation_grid(grid) {}
     
-    static Network fromJSON(const std::string& filepath, terrain::ElevationGrid grid);
+    inline void setElevationGrid(const terrain::ElevationGrid& grid) {elevation_grid = grid;};
     
+    static Network fromFeatureCollection(const geojson::FeatureCollection& fc);
+    static Network fromGeoJSON(const std::string& filepath);
     
-    void printInfo() const;
+    void print(global::PRINT_TYPE format = global::PLAIN_TEXT);
 
-private:    
+private:
     void assignDevices();
+    void updateFeatureCollection();
+
+    void printPlainText() const;
+    void printJSON() const;
 
     std::vector<Gateway> gateways;
     std::vector<EndDevice> end_devices;
     terrain::ElevationGrid elevation_grid;
+    geojson::FeatureCollection feature_collection;
 };
 
 } // namespace network

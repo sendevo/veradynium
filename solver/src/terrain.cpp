@@ -171,10 +171,10 @@ bool ElevationGrid::lineOfSight(double lat1, double lon1,
 
 double ElevationGrid::haversine(double lat1, double lon1, double lat2, double lon2) const {
     const double R = 6371000.0; // Earth radius in meters
-    const double dlat = utils::toRadians(lat2 - lat1);
-    const double dlon = utils::toRadians(lon2 - lon1);
+    const double dlat = global::toRadians(lat2 - lat1);
+    const double dlon = global::toRadians(lon2 - lon1);
     const double a = std::sin(dlat/2) * std::sin(dlat/2) +
-                     std::cos(utils::toRadians(lat1)) * std::cos(utils::toRadians(lat2)) *
+                     std::cos(global::toRadians(lat1)) * std::cos(global::toRadians(lat2)) *
                      std::sin(dlon/2) * std::sin(dlon/2);
     const double c = 2 * std::atan2(std::sqrt(a), std::sqrt(1-a));
     return R * c;
@@ -186,6 +186,28 @@ double ElevationGrid::distance(double lat1, double lon1, double lat2, double lon
     Vec3 p2 = toECEF(lat2, lon2, h2);
     double dx = p2.x - p1.x, dy = p2.y - p1.y, dz = p2.z - p1.z;
     return std::sqrt(dx*dx + dy*dy + dz*dz);
+}
+
+double ElevationGrid::getMaxAltitude() const {
+    double maxAlt = -std::numeric_limits<double>::infinity();
+    for(const auto& row : elevationGrid) {
+        double rowMax = *std::max_element(row.begin(), row.end());
+        if(rowMax > maxAlt) {
+            maxAlt = rowMax;
+        }
+    }
+    return maxAlt;
+}
+
+double ElevationGrid::getMinAltitude() const {
+    double minAlt = std::numeric_limits<double>::infinity();
+    for(const auto& row : elevationGrid) {
+        double rowMin = *std::min_element(row.begin(), row.end());
+        if(rowMin < minAlt) {
+            minAlt = rowMin;
+        }
+    }
+    return minAlt;
 }
 
 } // namespace terrain
