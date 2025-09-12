@@ -91,7 +91,7 @@ const View = () => {
                             </Grid>
                         }
 
-                        {losResult && <ResultsModal {...losResult} />/*Not a modal for now*/}
+                        {losResult && <ResultsModal result={losResult}/>}
 
                         {featureCollection.features.length > 0 &&
                             <Grid>
