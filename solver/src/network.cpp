@@ -178,7 +178,6 @@ void Network::printJSON() const {
 
 void Network::print(global::PRINT_TYPE format) {
     assignDevices();
-    toFeatureCollection();
     switch (format) {
         case global::PLAIN_TEXT:
             printPlainText();

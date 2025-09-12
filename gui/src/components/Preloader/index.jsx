@@ -5,7 +5,7 @@ import classes from './style.module.css';
 const Preloader = () => ( // Full screen preloader
     <div className={classes.Container}>
         <div className={classes.SpinnerContainer}>
-            <CircularProgress />
+            <CircularProgress color='white'/>
         </div>
     </div>
 );

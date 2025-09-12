@@ -148,6 +148,24 @@ double ElevationGrid::bilinearInterpolation(double lat, double lng) const {
     return fxy1 * (1 - ty) + fxy2 * ty;
 }
 
+std::vector<double> ElevationGrid::terrainProfile(double lat1, double lon1,
+                                                  double lat2, double lon2,
+                                                  int steps) const
+{
+    std::vector<double> profile;
+    profile.reserve(steps + 1);
+
+    for (int k = 0; k <= steps; ++k) {
+        const double t   = double(k) / steps;
+        const double lat = lat1 + t * (lat2 - lat1);
+        const double lng = lon1 + t * (lon2 - lon1);
+
+        const double terrain = bilinearInterpolation(lat, lng);
+        profile.push_back(terrain);
+    }
+    return profile;
+}
+
 bool ElevationGrid::lineOfSight(double lat1, double lon1,
                                 double lat2, double lon2,
                                 double observerHeight,

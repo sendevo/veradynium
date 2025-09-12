@@ -1,0 +1,1 @@
+./bin/los -f ../data/topography/data/topography_nasa.csv  -p1 -45.853468 -67.475718 2.0 -p2 -45.838355 -67.490056 2.5 -o json

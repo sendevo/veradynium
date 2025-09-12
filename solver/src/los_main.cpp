@@ -99,6 +99,7 @@ int main(int argc, char **argv) {
 
     const bool los = grid.lineOfSight(lat1, lon1, lat2, lon2, h1, h2);
     const double distance = grid.distance(lat1, lon1, lat2, lon2, h1, h2);
+    const std::vector<double> profile = grid.terrainProfile(lat1, lon1, lat2, lon2);
 
     switch(outputFormat) {
         case global::PLAIN_TEXT:
@@ -110,11 +111,18 @@ int main(int argc, char **argv) {
             break;
         case global::JSON:
             std::cout << "{\n"
-                      << "  \"point1\": {\"lat\": " << lat1 << ", \"lng\": " << lon1 << ", \"height_m\": " << h1 << "},\n"
-                      << "  \"point2\": {\"lat\": " << lat2 << ", \"lng\": " << lon2 << ", \"height_m\": " << h2 << "},\n"
-                      << "  \"distance_m\": " << distance << ",\n"
-                      << "  \"line_of_sight\": " << (los ? "true" : "false") << "\n"
-                      << "}\n";
+                    << "  \"point1\": {\"lat\": " << lat1 << ", \"lng\": " << lon1 << ", \"height_m\": " << h1 << "},\n"
+                    << "  \"point2\": {\"lat\": " << lat2 << ", \"lng\": " << lon2 << ", \"height_m\": " << h2 << "},\n"
+                    << "  \"distance_m\": " << distance << ",\n"
+                    << "  \"line_of_sight\": " << (los ? "true" : "false") << ",\n"
+                    << "  \"terrain_profile_m\": [";
+            for (size_t i = 0; i < profile.size(); ++i) {
+                std::cout << profile[i];
+                if (i < profile.size() - 1) 
+                    std::cout << ", ";
+            }
+            std::cout << "]\n";
+            std::cout << "}\n";
             break;
         default:
             break;

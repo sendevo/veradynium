@@ -28,6 +28,18 @@ prompt: {
     onConfirm: val=>console.log(val),
     showCancelButton: true,
     onCancel: ()=>{}
+},
+hint: {
+    open: false,
+    title: "",
+    message: "",
+    onConfirm: ()=>{}
+}
+modal: {
+    open: false,
+    title: "",
+    message: "",
+    onCancel: ()=>{}
 }
 */
 
@@ -127,6 +139,24 @@ export const reducer = (prevState, action) => {
             return {
                 ...prevState,
                 hint: null
+            }
+        }
+        case 'SHOW_MODAL': {
+            const {title, message, onCancel} = action.payload;
+            return {
+                ...prevState,
+                modal: {
+                    open: true,
+                    title,
+                    message,
+                    onCancel
+                }
+            };
+        }
+        case 'HIDE_MODAL': {
+            return {
+                ...prevState,
+                modal: null
             }
         }
         default: 

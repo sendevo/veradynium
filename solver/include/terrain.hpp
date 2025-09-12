@@ -47,6 +47,11 @@ public:
     // Interpolation
     double bilinearInterpolation(double lat, double lng) const;
 
+    // Terrain profile between two (lat,lng) points with given number of steps
+    std::vector<double> terrainProfile(double lat1, double lng1,
+                                      double lat2, double lng2,
+                                      int steps = SAMPLES_STEPS) const;
+
     // Line of sight between two (lat,lng) points
     bool lineOfSight(double lat1, double lng1,
                      double lat2, double lng2,
