@@ -71,6 +71,7 @@ public:
 
 private:
     std::vector<Feature> features;
+    std::vector<double> bbox;
 };
 
 } // namespace geojson

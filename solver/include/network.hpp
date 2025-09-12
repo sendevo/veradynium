@@ -83,14 +83,14 @@ public:
     
     inline void setElevationGrid(const terrain::ElevationGrid& grid) {elevation_grid = grid;};
     
-    static Network fromFeatureCollection(const geojson::FeatureCollection& fc);
     static Network fromGeoJSON(const std::string& filepath);
+    static Network fromFeatureCollection(const geojson::FeatureCollection& fc);
+    geojson::FeatureCollection toFeatureCollection() const;
     
     void print(global::PRINT_TYPE format = global::PLAIN_TEXT);
 
 private:
     void assignDevices();
-    void updateFeatureCollection();
 
     void printPlainText() const;
     void printJSON() const;
@@ -98,7 +98,6 @@ private:
     std::vector<Gateway> gateways;
     std::vector<EndDevice> end_devices;
     terrain::ElevationGrid elevation_grid;
-    geojson::FeatureCollection feature_collection;
 };
 
 } // namespace network

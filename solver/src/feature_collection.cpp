@@ -18,8 +18,6 @@ FeatureCollection FeatureCollection::fromGeoJSON(const std::string& filename) {
         throw std::runtime_error("Invalid GeoJSON: root type is not FeatureCollection");
     }
 
-    fc.features.clear();
-
     for (const auto& feature : data["features"]) {
         if (feature.value("type", "") != "Feature") {
             throw std::runtime_error("Invalid GeoJSON: feature missing or incorrect 'type'");
@@ -46,6 +44,26 @@ FeatureCollection FeatureCollection::fromGeoJSON(const std::string& filename) {
             fc.addFeature(Feature(POINT, Position{lng, lat}, properties));
         } else {
             throw std::runtime_error("Invalid GeoJSON: unknown feature type '" + type + "'");
+        }
+    }
+
+    // compute bbox if not present
+    if(data.contains("bbox") && data["bbox"].is_array() && data["bbox"].size() == 4) {
+        fc.bbox = data["bbox"].get<std::vector<double>>();
+    } else {
+        if(!fc.features.empty()) {
+            double minX = std::get<Position>(fc.features[0].coords)[0];
+            double minY = std::get<Position>(fc.features[0].coords)[1];
+            double maxX = minX;
+            double maxY = minY;
+            for(const auto& feat : fc.features) {
+                const auto& pos = std::get<Position>(feat.coords);
+                if(pos[0] < minX) minX = pos[0];
+                if(pos[1] < minY) minY = pos[1];
+                if(pos[0] > maxX) maxX = pos[0];
+                if(pos[1] > maxY) maxY = pos[1];
+            }
+            fc.bbox = {minX, minY, maxX, maxY};
         }
     }
 

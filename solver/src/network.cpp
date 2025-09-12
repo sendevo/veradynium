@@ -39,8 +39,6 @@ Network Network::fromFeatureCollection(const geojson::FeatureCollection& fc) {
         }
     }
 
-    network.feature_collection = fc;
-
     return network;
 }
 
@@ -98,8 +96,8 @@ void Network::assignDevices() {
     }
 }
 
-void Network::updateFeatureCollection() {
-    feature_collection = geojson::FeatureCollection(); // Clear existing features
+geojson::FeatureCollection Network::toFeatureCollection() const {
+    geojson::FeatureCollection feature_collection = geojson::FeatureCollection(); 
 
     // Add gateways
     for (const auto& gw : gateways) {
@@ -143,6 +141,8 @@ void Network::updateFeatureCollection() {
         }
         feature_collection.addFeature(ed_location);
     }
+
+    return feature_collection;
 }
 
 void Network::printPlainText() const {
@@ -172,12 +172,13 @@ void Network::printPlainText() const {
 };
 
 void Network::printJSON() const {
+    geojson::FeatureCollection feature_collection = toFeatureCollection();
     feature_collection.print();
 };
 
 void Network::print(global::PRINT_TYPE format) {
     assignDevices();
-    updateFeatureCollection();
+    toFeatureCollection();
     switch (format) {
         case global::PLAIN_TEXT:
             printPlainText();

@@ -96,7 +96,12 @@ async def compute_los(data: dict):
         "-o", "json"
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(
+        cmd, 
+        capture_output=True, 
+        text=True,
+        timeout=10
+    )
 
     if result.returncode != 0:
         return JSONResponse(status_code=500, content={"error": result.stderr})
@@ -124,7 +129,12 @@ async def solve(data: dict):
         "-o", "json"
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(
+        cmd, 
+        capture_output=True, 
+        text=True,
+        timeout=60
+    )
 
     if result.returncode != 0:
         return JSONResponse(status_code=500, content={"error": result.stderr})
@@ -152,7 +162,12 @@ async def allocation(data: dict):
         "-o", "json"
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(
+        cmd, 
+        capture_output=True, 
+        text=True,
+        timeout=10
+    )
 
     if result.returncode != 0:
         return JSONResponse(status_code=500, content={"error": result.stderr})
