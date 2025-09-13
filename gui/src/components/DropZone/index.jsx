@@ -29,54 +29,69 @@ const DropzoneComponent = ({ onDrop, onError }) => { // expects onDrop(data, for
     const preloader = usePreloader();
 
     const onDropAccepted = useCallback((acceptedFiles) => {
-        const file = acceptedFiles[0]; // only one file allowed
+        const file = acceptedFiles[0];
         if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = async () => {
-            // Read file content
-            const fileContent = reader.result;
-            const format = getFileFormat(fileContent);
+        const extension = file.name.split('.').pop().toLowerCase();
 
-            // Send loaded file to parent component for using
-            onDrop(fileContent, format);
+        if (extension === "csv" || extension === "geojson") {
+            const reader = new FileReader();
+            reader.onload = () => {
+                (async () => {
+                    const fileContent = reader.result;
+                    const format = "." + extension;
 
-            // Check if file is already uploaded, if so, try to remove it first
-            try{
-                const id = { // map file types to context ids
-                    '.csv': fileIds.em_file,
-                    '.geojson': fileIds.features_file
+                    onDrop(fileContent, format);
+
+                    try {
+                        const id = {
+                            '.csv': fileIds.em_file,
+                            '.geojson': fileIds.features_file
+                        };
+                        if (id[format]) {
+                            await removeFile(id[format], format);
+                        }
+                    } catch (err) {
+                        console.error("Error removing previous file:", err);
+                    }
+
+                    try {
+                        await uploadFile(file);  // still upload to server
+                    } catch (err) {
+                        console.error("Upload failed:", err);
+                        if (onError) onError("Error al cargar el archivo");
+                    }
+                    preloader(false);
+                })();
+            };
+            reader.readAsText(file);
+            preloader(true);
+        } else if (extension === "nc") {
+            const format = ".nc";
+            onDrop(null, format);
+
+            (async () => {
+                try {
+                    await uploadFile(file);  // send raw binary
+                } catch (err) {
+                    console.error("Upload failed:", err);
+                    if (onError) onError("Error al cargar el archivo");
                 }
-                if(id[format]) {
-                    console.log("Removing previous file with id:", id[format], "and format:", format);
-                    await removeFile(id[format], format);
-                }
-            } catch(err) {
-                console.error("Error removing previous file:", err);
-            }
+                preloader(false);
+            })();
+        } else {
+            console.error("Unsupported file format for upload");
+        }
+    }, [onDrop, fileIds, uploadFile, removeFile, onError, preloader]);
 
-            // Send file to backend for storage and further processing
-            try {
-                if(format === '.csv' || format === '.geojson')
-                    await uploadFile(file);
-                else
-                    console.error("Unsupported file format for upload");
-            } catch (err) {
-                console.error("Upload failed:", err);
-                if (onError) 
-                    onError("Error al cargar el archivo");
-            }
-            preloader(false);
-        };
-        reader.readAsText(file);
-        preloader(true);
-    }, [onDrop]);
 
     const { getRootProps, getInputProps } = useDropzone({
         onDropAccepted,
         accept: {
-            'application/json': ['.json', '.geojson'],
-            'text/csv': ['.csv', '.txt']
+            'text/csv': ['.csv'],
+            'application/geo+json': ['.geojson'],
+            'application/x-netcdf': ['.nc'],   // NetCDF
+            'application/octet-stream': ['.nc'] // fallback
         },
         multiple: false
     });

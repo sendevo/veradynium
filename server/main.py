@@ -2,7 +2,10 @@ from fastapi import FastAPI, File, Form, UploadFile, APIRouter, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from pathlib import Path
 import os, subprocess, tempfile, json, uuid
+from util import nc_to_csv
+
 
 app = FastAPI(title="Line of Sight API")
 
@@ -43,20 +46,26 @@ def get_uploaded_file(upload_id: str, expected_ext: str):
 @api.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
     # Accept only CSV and JSON files
-    extension = os.path.splitext(file.filename)[1].lower()
-    if extension not in [".csv", ".json"]:
-        raise HTTPException(status_code=400, detail="Invalid file type. Only CSV and JSON are allowed.")
+    extension = Path(file.filename).suffix.lower()
+    if extension not in [".csv", ".json", ".nc"]:
+        raise HTTPException(status_code=400, detail="Invalid file type. Only CSV, JSON or NC are allowed.")
     
     upload_id = str(uuid.uuid4())
     os.makedirs(upload_dir, exist_ok=True)
 
-    with open(f"{upload_dir}/{upload_id}{extension}", "wb") as f:
+    original_path = Path(upload_dir) / f"{upload_id}{extension}"
+    with open(original_path, "wb") as f:
         f.write(await file.read())
-    
-    #uploaded_files[upload_id] = f"{upload_dir}/{upload_id}{extension}"
-    print(f"File uploaded: {upload_id}")
-    return {"upload_id": upload_id, "extension": extension}
 
+    # If file is .nc (NetCDF DEM), convert to .csv
+    if extension == ".nc":
+        csv_path = Path(upload_dir) / f"{upload_id}.csv"
+        data_array = nc_to_csv(str(original_path), str(csv_path))
+        os.remove(original_path)
+        return {"upload_id": upload_id, "extension": ".csv", "data": data_array}
+    
+    return {"upload_id": upload_id, "extension": extension}
+    
 
 @api.post("/delete")
 async def delete_file(data: dict):
