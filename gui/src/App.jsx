@@ -7,7 +7,7 @@ import Home from "./views/Home";
 import ErrorBoundary from './components/ErrorBoundary';
 import Navigation from "./components/Navigation";
 import UIUtilsProvider from './context/UIFeedback';
-import { FileIdsProvider } from './context/FileIds';
+import { FilesProvider } from './context/Files';
 
 const App = () =>(
     <ThemeProvider theme={theme}>
@@ -15,7 +15,7 @@ const App = () =>(
         <GlobalStyles styles={globalStyles}/>
         <UIUtilsProvider>
             <BrowserRouter>
-                <FileIdsProvider>
+                <FilesProvider>
                     <ErrorBoundary>
                         <Navigation/>
                         <Routes>
@@ -28,7 +28,7 @@ const App = () =>(
                             <Route path="*" element={<Navigate replace to="/" />} />
                         </Routes>
                     </ErrorBoundary>
-                </FileIdsProvider>
+                </FilesProvider>
             </BrowserRouter>
         </UIUtilsProvider>
     </ThemeProvider>

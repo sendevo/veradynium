@@ -6,7 +6,7 @@ import DropZone from "../../components/DropZone";
 import ResultsModal from "./resultsModal";
 import useToast from "../../hooks/useToast";
 import usePreloader from "../../hooks/usePreloader";
-import useFileLoader from "../../hooks/useFileLoader";
+import useFiles from "../../hooks/useFiles";
 import useAnalysis from "../../hooks/useAnalysis";
 import background from "../../assets/backgrounds/background3.jpg";
 
@@ -22,20 +22,21 @@ const View = () => {
     const preloader = usePreloader();
 
     const {
+        files,
+        uploadFile,
+        removeFile
+    } = useFiles(toast, preloader);
+
+    const {
         losResult,
         computeLOSAction,
         runSolverAction,
         resetLOS,
         resetResults
-    } = useAnalysis(toast, preloader);
+    } = useAnalysis(toast, preloader, files);
 
-    const {
-        fileIds,
-        featureCollection,
-        elevationData,
-        loadFile,
-        removeElements,
-    } = useFileLoader(toast);
+    const elevationData = files.elevation_map.content || [];
+    const featureCollection = files.features.content || { features: [] };
 
     const handleNewPoints = newPoints => {
         resetLOS();
@@ -51,18 +52,21 @@ const View = () => {
     };
 
     const handleRemoveElevation = () => {
-        removeElements("elevation");
+        removeFile(files.elevation_map.id, ".csv");
         resetLOS();
         setPoints([]);
     };
 
     const handleRemoveFeatures = () => {
-        removeElements("features");
+        removeFile(files.features.id, ".geojson");
         resetResults();
     };
 
     const memoizedElevationData = useMemo(() => elevationData, [elevationData]);
     const memoizedFeatureCollection = useMemo(() => featureCollection, [featureCollection]);
+
+    const hasElevation = elevationData && elevationData.length > 0;
+    const hasFeatures = featureCollection && featureCollection.features && featureCollection.features.length > 0;
 
     return(
         <MainView background={background}>
@@ -71,19 +75,19 @@ const View = () => {
                     <Grid container direction={"column"} spacing={2} sx={{height:"100%"}}>
                         <Grid size={"grow"}>
                             <DropZone 
-                                onDrop={(data, extension) => loadFile(data, extension)} 
+                                onDrop={uploadFile} 
                                 onError={message => toast(message, "error")}/>
                         </Grid>
 
-                        {(featureCollection.features.length > 0 || elevationData.length > 0) &&
+                        {(hasElevation > 0 || hasFeatures > 0) &&
                             <Grid>
                                 <Typography sx={{fontWeight:"bold"}}>Sincronización de datos</Typography>
-                                {fileIds.em_file ? 
+                                {hasElevation ? 
                                     <Typography sx={{fontSize: 12}}>Mapa de elevación cargado</Typography>
                                     :
                                     <Typography sx={{fontSize: 12}}>Mapa de elevación en modo local</Typography>
                                 }
-                                {fileIds.features_file ?
+                                {hasFeatures ?
                                     <Typography sx={{fontSize: 12}}>Geometrías cargadas</Typography>
                                     :
                                     <Typography sx={{fontSize: 12}}>Geometrías en modo local</Typography>
@@ -93,7 +97,7 @@ const View = () => {
 
                         {losResult && <ResultsModal result={losResult}/>}
 
-                        {featureCollection.features.length > 0 &&
+                        {hasFeatures > 0 &&
                             <Grid>
                                 <Button 
                                     fullWidth
@@ -105,7 +109,7 @@ const View = () => {
                             </Grid>
                         }
 
-                        {elevationData.length > 0 &&
+                        {hasElevation > 0 &&
                             <Grid>
                                 <Button 
                                     fullWidth
@@ -117,7 +121,7 @@ const View = () => {
                             </Grid>
                         }
 
-                        {points.length === 2 && elevationData.length > 0 &&
+                        {points.length === 2 && hasElevation &&
                             <>
                                 <Grid>
                                     <Button 
@@ -139,7 +143,7 @@ const View = () => {
                             </>
                         }
 
-                        {featureCollection.features.length > 0 && elevationData.length > 0 &&
+                        {hasFeatures && hasElevation &&
                             <Grid>
                                 <Button 
                                     fullWidth

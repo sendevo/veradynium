@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { useFileIdsContext } from "../../context/FileIds";
 import useComputations from "../useComputations";
 
 
-const useAnalysis = (toast, preloader) => {
+const useAnalysis = (toast, preloader, files) => {
     const [losResult, setLosResult] = useState(null);
     const [solverResult, setSolverResult] = useState(null);
 
-    const { fileIds } = useFileIdsContext();
     const { computeLOS, runSolver } = useComputations();
 
     const computeLOSAction = async (points) => {
@@ -15,13 +13,13 @@ const useAnalysis = (toast, preloader) => {
             toast("Coordenadas de prueba no definidas", "error");
             return;
         }
-        if (!fileIds.em_file) {
+        if (!files.elevation_map.id) {
             toast("El mapa de elevación no está disponible", "error");
             return;
         }
 
         const params = {
-            em_file_id: fileIds.em_file,
+            em_file_id: files.elevation_map.id,
             p1: points[0],
             p2: points[1],
         };
@@ -39,18 +37,18 @@ const useAnalysis = (toast, preloader) => {
     };
 
     const runSolverAction = async () => {
-        if (!fileIds.em_file) {
+        if (!files.elevation_map.id) {
             toast("El mapa de elevación no está disponible", "error");
             return;
         }
-        if (!fileIds.features_file) {
+        if (!files.features.id) {
             toast("El archivo de geometrías no está disponible", "error");
             return;
         }
 
         const params = {
-            em_file_id: fileIds.em_file,
-            features_file_id: fileIds.features_file,
+            em_file_id: files.elevation_map.id,
+            features_file_id: files.features.id
         };
 
         preloader(true);
