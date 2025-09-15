@@ -79,15 +79,18 @@ const View = () => {
                                 onError={message => toast(message, "error")}/>
                         </Grid>
 
-                        {(hasElevation > 0 || hasFeatures > 0) &&
+                        {hasElevation && 
                             <Grid>
-                                <Typography sx={{fontWeight:"bold"}}>Sincronización de datos</Typography>
-                                {hasElevation ? 
+                                {files.elevation_map.id ? 
                                     <Typography sx={{fontSize: 12}}>Mapa de elevación cargado</Typography>
                                     :
                                     <Typography sx={{fontSize: 12}}>Mapa de elevación en modo local</Typography>
                                 }
-                                {hasFeatures ?
+                            </Grid>
+                        }
+                        {hasFeatures &&  
+                            <Grid>
+                                {files.features.id ?
                                     <Typography sx={{fontSize: 12}}>Geometrías cargadas</Typography>
                                     :
                                     <Typography sx={{fontSize: 12}}>Geometrías en modo local</Typography>
