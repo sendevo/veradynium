@@ -13,9 +13,10 @@ export const fetchWithTimeout = async (url, options = {}, timeout = api_call_tim
         return response;
     } catch (err) {
         if (err.name === "AbortError") {
-            throw new Error("Request timed out");
+            console.error("Request timed out");
+            //throw new Error("Request timed out");
         }
-        throw err;
+        console.error("Fetch error:", err);
     } finally {
         clearTimeout(id);
     }

@@ -90,19 +90,22 @@ const useFiles = (toast, preloader) => {
                     body: formData,
                 });
 
+                let upload_id = null;
+                let data = null;
+
                 if (!res.ok) {
-                    toast("Error al cargar el archivo", "error");
-                    throw new Error("Failed to upload file");
+                    toast("Servidor no disponible", "error");
+                    //throw new Error("Failed to upload file");
+                }else{ // 
+                    ({ upload_id, data } = await res.json());
+                    if (extension === ".nc") {
+                        setFile("elevation_map", upload_id, data);
+                        toast(`Archivo ${file.name} cargado exitosamente`, "success");
+                    }
                 }
 
-                const { upload_id, data } = await res.json();
-
-                if (extension === ".nc") {
-                    setFile("elevation_map", upload_id, data);
-                    toast(`Archivo ${file.name} cargado exitosamente`, "success");
-                } else {
-                    await handleClientFile(file, upload_id);
-                }
+                await handleClientFile(file, upload_id);
+                
             } catch (err) {
                 console.error("Upload error:", err);
                 toast("Error al cargar el archivo", "error");
@@ -127,7 +130,10 @@ const useFiles = (toast, preloader) => {
                         extension
                     }),
                 });
-                if (!res.ok) throw new Error("Failed to delete file from server");
+                if (!res.ok) {
+                    toast("No se pudo eliminar el archivo del servidor", "error");
+                    //throw new Error("Failed to delete file from server");
+                }
 
                 if ([".csv", ".nc"].includes(format)) {
                     setFile("elevation_map", null, null);
