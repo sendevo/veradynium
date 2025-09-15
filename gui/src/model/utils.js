@@ -1,6 +1,8 @@
+import { api_call_timeout } from "./constants";
+
 export const removeSlash = path => path.startsWith('/') ? path.slice(1) : path;
 
-export const fetchWithTimeout = async (url, options = {}, timeout = 5000) => {
+export const fetchWithTimeout = async (url, options = {}, timeout = api_call_timeout) => {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
     try {
@@ -163,11 +165,22 @@ export const chunkedMin = (array, chunkSize = 10000) => {
     return min;
 }
 
-export const normalizeElevation = (data, min, max) => {
-    // Data is expected to be an array of [lat, lng, elevation]
-    // Returns the same structure with normalized elevation values (between 0 and 1)
+export const csvToElevation = csvString => {
+    // Data is expected to be in the format: lat, lng, elevation
+    // Returns an array with normalized elevation values (between 0 and 1)
+
+    const data = csvToArray(csvString, {
+        withHeaders: false,
+        delimiter: ",",
+        maxRows: -1,
+    });
 
     if (data.length === 0) return [];
+
+    const alts = data.map((p) => p[2]);
+
+    const min = chunkedMin(alts);
+    const max = chunkedMax(alts);
 
     // Normalize elevations to 0-1 range for better color distribution
     return data.map(point => [

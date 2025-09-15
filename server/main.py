@@ -1,10 +1,12 @@
+import os, subprocess, tempfile, json, uuid
+import asyncio
 from fastapi import FastAPI, File, Form, UploadFile, APIRouter, HTTPException
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
-import os, subprocess, tempfile, json, uuid
 from util import nc_to_csv
+
 
 
 app = FastAPI(title="Line of Sight API")
@@ -60,7 +62,15 @@ async def upload_file(file: UploadFile = File(...)):
     # If file is .nc (NetCDF DEM), convert to .csv
     if extension == ".nc":
         csv_path = Path(upload_dir) / f"{upload_id}.csv"
-        data_array = nc_to_csv(str(original_path), str(csv_path))
+        loop = asyncio.get_event_loop()
+        data_array = await loop.run_in_executor(
+            None,
+            lambda: nc_to_csv(
+                str(original_path),
+                str(csv_path),
+                grid_size=(600, 600)
+            )
+        )
         os.remove(original_path)
         return {"upload_id": upload_id, "extension": ".csv", "data": data_array}
     

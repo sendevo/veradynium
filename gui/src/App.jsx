@@ -7,7 +7,7 @@ import Home from "./views/Home";
 import ErrorBoundary from './components/ErrorBoundary';
 import Navigation from "./components/Navigation";
 import UIUtilsProvider from './context/UIFeedback';
-import { FilesProvider } from './context/Files';
+
 
 const App = () =>(
     <ThemeProvider theme={theme}>
@@ -15,20 +15,18 @@ const App = () =>(
         <GlobalStyles styles={globalStyles}/>
         <UIUtilsProvider>
             <BrowserRouter>
-                <FilesProvider>
-                    <ErrorBoundary>
-                        <Navigation/>
-                        <Routes>
-                            <Route index element={<Home/>} />
-                            {
-                                views.map((v,k) => (
-                                    <Route key={k} path={v.path} element={v.component} />
-                                ))        
-                            }
-                            <Route path="*" element={<Navigate replace to="/" />} />
-                        </Routes>
-                    </ErrorBoundary>
-                </FilesProvider>
+                <ErrorBoundary>
+                    <Navigation/>
+                    <Routes>
+                        <Route index element={<Home/>} />
+                        {
+                            views.map((v,k) => (
+                                <Route key={k} path={v.path} element={v.component} />
+                            ))        
+                        }
+                        <Route path="*" element={<Navigate replace to="/" />} />
+                    </Routes>
+                </ErrorBoundary>
             </BrowserRouter>
         </UIUtilsProvider>
     </ThemeProvider>
