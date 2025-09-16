@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Box } from '@mui/material';
 import { 
     MapContainer, 
@@ -13,6 +13,19 @@ import ZoomWatcher from './zoomWatcher';
 import HeatMapLayer from './heatmapLayer';
 import { pointToLayer } from './icons';
 
+
+const GeoJSONLayer = ({ data, pointToLayer }) => {
+  const layerRef = useRef();
+
+  useEffect(() => {
+    if (layerRef.current) {
+      layerRef.current.clearLayers();
+      layerRef.current.addData(data);
+    }
+  }, [data]);
+
+  return <GeoJSON ref={layerRef} data={data} pointToLayer={pointToLayer} />;
+};
 
 const PointSetter = ({ setPoints }) => {
     useMapEvents({
@@ -55,7 +68,7 @@ const Map = props => {
                     
                     {featureCollection.features.length > 0 &&
                         <FeatureGroup>
-                            <GeoJSON data={featureCollection} pointToLayer={pointToLayer}/>
+                            <GeoJSONLayer data={featureCollection} pointToLayer={pointToLayer} />
                         </FeatureGroup>
                     }
 

@@ -22,6 +22,15 @@ export const fetchWithTimeout = async (url, options = {}, timeout = api_call_tim
     }
 };
 
+export const readFile = file => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsText(file);
+    });
+};
+
 export const isValidGeoJSON = geoJSON => {
     try {
         if (!geoJSON || geoJSON.type !== "FeatureCollection") return false;

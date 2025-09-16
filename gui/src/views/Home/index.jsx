@@ -62,9 +62,6 @@ const View = () => {
         resetResults();
     };
 
-    const memoizedElevationData = useMemo(() => elevationData, [elevationData]);
-    const memoizedFeatureCollection = useMemo(() => featureCollection, [featureCollection]);
-
     const hasElevation = elevationData && elevationData.length > 0;
     const hasFeatures = featureCollection && featureCollection.features && featureCollection.features.length > 0;
 
@@ -162,8 +159,8 @@ const View = () => {
                     <Map 
                         mapCenter={initialMapCenter}
                         initialZoom={initialZoom}
-                        featureCollection={memoizedFeatureCollection}
-                        elevationData={memoizedElevationData}
+                        featureCollection={featureCollection || { features: [] }}
+                        elevationData={elevationData || []}
                         points={points}
                         setPoints={handleNewPoints}/>
                 </Grid>
