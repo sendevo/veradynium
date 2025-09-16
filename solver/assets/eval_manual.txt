@@ -1,13 +1,13 @@
-COMPUTE_ALLOCATION MANUAL  
+EVAL MANUAL  
 
 PROLOG  
    This manual is part of the veradynium project. See project documentation at: https://github.com/sendevo/veradynium  
 
 NAME  
-   compute_allocation - Computes the connection of end-devices to nodes.  
+   eval - Computes the connection of end-devices to nodes.  
 
 SYNOPSIS  
-   compute_allocation -f [EM_FILE] -g [GEOJSON_FILE] -o [OUTPUT_FORMAT]
+   eval -f [EM_FILE] -g [GEOJSON_FILE] -o [OUTPUT_FORMAT]
 
 DESCRIPTION:  
    This program computes the allocation of the LoRaWAN network composed by a set of end-devices and a set of gateways taking into account the terrain elevation of the area. The program requires both files with the terrain elevation data and the network topology in GeoJSON format. The program returns the connected end-devices of each gateway.

@@ -10,9 +10,10 @@ const useAnalysis = () => {
     const preloader = usePreloader();
     
     const [losResult, setLosResult] = useState(null);
+    const [networkEvalResult, setNetworkEvalResult] = useState(null);
     const [solverResult, setSolverResult] = useState(null);
 
-    const { computeLOS, runSolver } = useComputations();
+    const { computeLOS, evalNetwork, runSolver } = useComputations();
 
     const { files } = useFilesContext();
 
@@ -38,6 +39,32 @@ const useAnalysis = () => {
         if(!result.error){
             console.log("LOS result:", result);
             setLosResult(result);
+        }else{
+            toast(result.error, "error");
+        }
+        preloader(false);
+    };
+
+    const evalNetworkAction = async () => {
+        if (!files.elevation_map.id) {
+            toast("El mapa de elevación no está disponible", "error");
+            return;
+        }
+        if (!files.features.id) {
+            toast("El archivo de geometrías no está disponible", "error");
+            return;
+        }
+
+        const params = {
+            em_file_id: files.elevation_map.id,
+            features_file_id: files.features.id
+        };
+
+        preloader(true);
+        const result = await evalNetwork(params);
+        if(!result.error){
+            console.log(result);
+            setNetworkEvalResult(result);
         }else{
             toast(result.error, "error");
         }
@@ -72,15 +99,17 @@ const useAnalysis = () => {
 
     const resetLOS = () => setLosResult(null);
 
-    const resetResults = () => setSolverResult(null);
+    const resetSolverResults = () => setSolverResult(null);
 
     return {
         losResult,
+        networkEvalResult,
         solverResult,
         computeLOSAction,
+        evalNetworkAction,
         runSolverAction,
         resetLOS,
-        resetResults
+        resetSolverResults
     };
 };
 

@@ -28,10 +28,11 @@ const View = () => {
 
     const {
         losResult,
+        evalNetworkAction,
         computeLOSAction,
         runSolverAction,
         resetLOS,
-        resetResults
+        resetSolverResults
     } = useAnalysis();
 
     const elevationData = files.elevation_map.content || [];
@@ -46,10 +47,6 @@ const View = () => {
         computeLOSAction(points);
     };
 
-    const handleRunSolver = async () => {
-        runSolverAction();
-    };
-
     const handleRemoveElevation = () => {
         removeFile(files.elevation_map.id, ".csv");
         resetLOS();
@@ -58,7 +55,7 @@ const View = () => {
 
     const handleRemoveFeatures = () => {
         removeFile(files.features.id, ".geojson");
-        resetResults();
+        resetSolverResults();
     };
 
     const handleResetPoints = () => { 
@@ -112,8 +109,9 @@ const View = () => {
                             handleRemoveFeatures={handleRemoveFeatures}
                             handleRemoveElevation={handleRemoveElevation}
                             handleResetPoints={handleResetPoints}
+                            handleEvalNetwork={evalNetworkAction}
                             handleComputeLOS={handleComputeLOS}
-                            handleRunSolver={handleRunSolver}/>
+                            handleRunSolver={runSolverAction}/>
 
                         {losResult && <ResultsModal result={losResult}/>}
 

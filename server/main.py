@@ -9,7 +9,7 @@ from util import nc_to_csv
 
 
 
-app = FastAPI(title="Line of Sight API")
+app = FastAPI(title="Veradynium API")
 
 # Frontend build
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -166,8 +166,8 @@ async def solve(data: dict):
         return JSONResponse(status_code=500, content={"error": "Invalid output from Solver program."})
 
 
-@app.post("/allocation")
-async def allocation(data: dict):
+@app.post("/eval")
+async def eval_network(data: dict):
     em_file_id = data.get("em_file_id") # Elevation map file ID
     geojson_file_id = data.get("features_file_id") # GeoJSON features file ID
 
@@ -175,7 +175,7 @@ async def allocation(data: dict):
     geojson_file_path = get_uploaded_file(geojson_file_id, ".json")
 
     cmd = [
-        "../solver/bin/compute_allocation",
+        "../solver/bin/eval_network",
         "-f", em_file_path,
         "-g", geojson_file_path,
         "-o", "json"
@@ -192,11 +192,11 @@ async def allocation(data: dict):
         return JSONResponse(status_code=500, content={"error": result.stderr})
 
     try: # Parse JSON output
-        print("Allocation command output:")
+        print("Network evaluation command output:")
         print(result.stdout)
         return json.loads(result.stdout)
     except json.JSONDecodeError:
-        return JSONResponse(status_code=500, content={"error": "Invalid output from Compute Allocation program."})
+        return JSONResponse(status_code=500, content={"error": "Invalid output from Network Evaluation program."})
 
 
 app.include_router(api)

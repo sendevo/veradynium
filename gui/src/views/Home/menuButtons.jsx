@@ -7,6 +7,7 @@ const MenuButtons = ({
     handleRemoveFeatures,
     handleRemoveElevation,
     handleResetPoints,
+    handleEvalNetwork,
     handleComputeLOS,
     handleRunSolver
 }) => (
@@ -51,10 +52,21 @@ const MenuButtons = ({
                         fullWidth
                         onClick={handleComputeLOS}
                         variant="contained">
-                            Calcular LOS
+                            Evaluar LOS
                     </Button>
                 </Grid>
             </>
+        }
+
+        {hasFeatures && hasElevation && 
+            <Grid>
+                <Button 
+                    fullWidth
+                    onClick={handleEvalNetwork}
+                    variant="contained">
+                        Test conectividad
+                </Button>
+            </Grid>
         }
 
         {hasFeatures && hasElevation &&

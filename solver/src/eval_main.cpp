@@ -1,4 +1,4 @@
-#define MANUAL "assets/compute_allocation_manual.txt"
+#define MANUAL "assets/eval_manual.txt"
 
 #include <iostream>
 #include <cstring>

@@ -16,4 +16,4 @@ server/.env
 server/static/
 server/uploads/
 
-.vscode/settings.json
+.vscode/
