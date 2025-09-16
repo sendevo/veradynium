@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { api } from '../../model/constants';
+import { fetchWithTimeout } from "../../model/utils";
 
 
 const useComputations = () => {
@@ -7,7 +8,7 @@ const useComputations = () => {
     const computeLOS = useCallback( async params => { 
         // params format: {em_file_id, p1: {lat, lng, height_m}, p2: {lat, lng, height_m}}
 
-        const res = await fetch(api("/api/los"), {
+        const res = await fetchWithTimeout(api("/api/los"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(params)
@@ -43,7 +44,7 @@ const useComputations = () => {
     const runSolver = useCallback( async params => {
         // params format: {em_file_id, features_file_id}
         
-        const res = await fetch(api("/api/solve"), {
+        const res = await fetchWithTimeout(api("/api/solve"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(params)

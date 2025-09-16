@@ -1,12 +1,20 @@
 import { useState } from "react";
 import useComputations from "../useComputations";
+import useToast from "../useToast";
+import usePreloader from "../usePreloader";
+import { useFilesContext } from "../../context/Files";
 
 
-const useAnalysis = (toast, preloader, files) => {
+const useAnalysis = () => {
+    const toast = useToast();
+    const preloader = usePreloader();
+    
     const [losResult, setLosResult] = useState(null);
     const [solverResult, setSolverResult] = useState(null);
 
     const { computeLOS, runSolver } = useComputations();
+
+    const { files } = useFilesContext();
 
     const computeLOSAction = async (points) => {
         if (points.length < 2) {

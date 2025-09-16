@@ -6,6 +6,8 @@ import {
     csvToElevation,
     readFile
 } from "../../model/utils";
+import useToast from "../useToast";
+import usePreloader from "../usePreloader";
 
 
 const initialFiles = { // System uses elevation map and FeatureCollection files
@@ -20,7 +22,9 @@ const extensionToType = {
     ".json": "features"
 };
 
-const useFiles = (toast, preloader) => {
+const useFiles = () => {
+    const toast = useToast();
+    const preloader = usePreloader();
     
     const [files, setFiles] = useState(initialFiles);
 

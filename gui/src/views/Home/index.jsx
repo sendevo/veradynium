@@ -1,12 +1,12 @@
-import { useState, useMemo } from "react";
-import { Grid, Button, Typography } from "@mui/material";
+import { useState } from "react";
+import { Grid, Typography } from "@mui/material";
 import MainView from "../../components/MainView";
 import Map from "../../components/Map";
 import DropZone from "../../components/DropZone";
 import ResultsModal from "./resultsModal";
+import MenuButtons from "./menuButtons";
 import useToast from "../../hooks/useToast";
-import usePreloader from "../../hooks/usePreloader";
-import useFiles from "../../hooks/useFiles";
+import { useFilesContext } from "../../context/Files";
 import useAnalysis from "../../hooks/useAnalysis";
 import background from "../../assets/backgrounds/background3.jpg";
 
@@ -19,13 +19,12 @@ const View = () => {
     const [points, setPoints] = useState([]); // Points for LOS calculation
 
     const toast = useToast();
-    const preloader = usePreloader();
 
     const {
         files,
         uploadFile,
         removeFile
-    } = useFiles(toast, preloader);
+    } = useFilesContext();
 
     const {
         losResult,
@@ -33,7 +32,7 @@ const View = () => {
         runSolverAction,
         resetLOS,
         resetResults
-    } = useAnalysis(toast, preloader, files);
+    } = useAnalysis();
 
     const elevationData = files.elevation_map.content || [];
     const featureCollection = files.features.content || { features: [] };
@@ -62,6 +61,11 @@ const View = () => {
         resetResults();
     };
 
+    const handleResetPoints = () => { 
+        resetLOS(); 
+        setPoints([]); 
+    };
+
     const hasElevation = elevationData && elevationData.length > 0;
     const hasFeatures = featureCollection && featureCollection.features && featureCollection.features.length > 0;
 
@@ -76,85 +80,47 @@ const View = () => {
                                 onError={message => toast(message, "error")}/>
                         </Grid>
 
-                        {hasElevation && 
+                        {(hasElevation || hasFeatures) && 
                             <Grid>
-                                {files.elevation_map.id ? 
-                                    <Typography sx={{fontSize: 12}}>Mapa de elevación cargado</Typography>
-                                    :
-                                    <Typography sx={{fontSize: 12}}>Mapa de elevación en modo local</Typography>
+                                <Typography>Estado de los archivos:</Typography>
+                            
+                                {hasElevation && 
+                                    <>
+                                        {files.elevation_map.id ? 
+                                            <Typography sx={{fontSize: 12}}>Mapa de elevación cargado</Typography>
+                                            :
+                                            <Typography sx={{fontSize: 12}}>Mapa de elevación en modo local</Typography>
+                                        }
+                                    </>
+                                }
+                                {hasFeatures &&  
+                                    <>
+                                        {files.features.id ?
+                                            <Typography sx={{fontSize: 12}}>Geometrías cargadas</Typography>
+                                            :
+                                            <Typography sx={{fontSize: 12}}>Geometrías en modo local</Typography>
+                                        }
+                                    </>
                                 }
                             </Grid>
                         }
-                        {hasFeatures &&  
-                            <Grid>
-                                {files.features.id ?
-                                    <Typography sx={{fontSize: 12}}>Geometrías cargadas</Typography>
-                                    :
-                                    <Typography sx={{fontSize: 12}}>Geometrías en modo local</Typography>
-                                }
-                            </Grid>
-                        }
+
+                        <MenuButtons
+                            hasFeatures={hasFeatures}
+                            hasElevation={hasElevation}
+                            points={points}
+                            handleRemoveFeatures={handleRemoveFeatures}
+                            handleRemoveElevation={handleRemoveElevation}
+                            handleResetPoints={handleResetPoints}
+                            handleComputeLOS={handleComputeLOS}
+                            handleRunSolver={handleRunSolver}/>
 
                         {losResult && <ResultsModal result={losResult}/>}
 
-                        {hasFeatures > 0 &&
-                            <Grid>
-                                <Button 
-                                    fullWidth
-                                    color="secondary"
-                                    onClick={handleRemoveFeatures}
-                                    variant="contained">
-                                        Quitar geometrías
-                                </Button>
-                            </Grid>
-                        }
-
-                        {hasElevation > 0 &&
-                            <Grid>
-                                <Button 
-                                    fullWidth
-                                    color="secondary"
-                                    onClick={handleRemoveElevation}
-                                    variant="contained">
-                                        Quitar altimetría
-                                </Button>
-                            </Grid>
-                        }
-
-                        {points.length === 2 && hasElevation &&
-                            <>
-                                <Grid>
-                                    <Button 
-                                        fullWidth
-                                        color="secondary"
-                                        onClick={() => { resetLOS(); setPoints([]); }}
-                                        variant="contained">
-                                            Restablecer puntos
-                                    </Button>
-                                </Grid>
-                                <Grid>
-                                    <Button 
-                                        fullWidth
-                                        onClick={handleComputeLOS}
-                                        variant="contained">
-                                            Calcular LOS
-                                    </Button>
-                                </Grid>
-                            </>
-                        }
-
-                        {hasFeatures && hasElevation &&
-                            <Grid>
-                                <Button 
-                                    fullWidth
-                                    onClick={handleRunSolver}
-                                    variant="contained">
-                                        Ejecutar solver
-                                </Button>
-                            </Grid>
-                        }
+                        
                     </Grid>
                 </Grid>
+
                 <Grid size={9}>
                     <Map 
                         mapCenter={initialMapCenter}
