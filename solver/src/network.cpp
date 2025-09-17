@@ -199,10 +199,10 @@ void Network::printPlainText() const {
                   << std::endl;
     }
     std::cout << "Terrain Elevation Grid:" << std::endl;
-    std::cout << "Bounding Box:" << std::endl;
-    std::cout << "   Upper right position: [" << elevation_grid.getBoundingBox()[0].lat << ", " << elevation_grid.getBoundingBox()[0].lng << "]" << std::endl;
-    std::cout << "   Bottom left position: [" << elevation_grid.getBoundingBox()[2].lat << ", " << elevation_grid.getBoundingBox()[2].lng << "]" << std::endl;
-    std::cout << "   Altitude range: [" << elevation_grid.getMinAltitude() << ", " << elevation_grid.getMaxAltitude() << "] meters" << std::endl;
+    std::cout << "   Bounding Box:" << std::endl;
+    std::cout << "      Upper right position: [" << elevation_grid.getBoundingBox()[0].lat << ", " << elevation_grid.getBoundingBox()[0].lng << "]" << std::endl;
+    std::cout << "      Bottom left position: [" << elevation_grid.getBoundingBox()[2].lat << ", " << elevation_grid.getBoundingBox()[2].lng << "]" << std::endl;
+    std::cout << "      Altitude range: [" << elevation_grid.getMinAltitude() << ", " << elevation_grid.getMaxAltitude() << "] meters" << std::endl;
     std::cout << "Total distance from end devices to assigned gateways: " << total_distance << " meters" << std::endl;
     std::cout << "----------------------------------------" << std::endl;
 };

@@ -6,7 +6,7 @@ void KMeansOptimizer::optimize(int maxIterations, double epsilon) {
     
     iterations = 0;
 
-    // Remove all gateways from network
+    // Reset connections
     for (auto& gw : network.gateways) {
         gw.connected_devices.clear();
     }
@@ -14,54 +14,85 @@ void KMeansOptimizer::optimize(int maxIterations, double epsilon) {
         ed.assigned_gateway = nullptr;
     }
 
+    // Remove all gateways to allocate from scratch
     network.gateways.clear();
 
-    for (int i = 0; i < maxIterations; ++i) {
-        // Step 1: Assignment
-        network.assignDevices(); // First pass will do nothing
-
-        // Check for empty gateways and re-assign them to a random unconnected device if necessary
-        for (auto& gw : network.gateways) {
-            if (gw.connected_devices.empty()) {
-                // Find an unassigned device to move this gateway to
-                network::EndDevice* unassigned_device = nullptr;
-                for (auto& ed : network.end_devices) {
-                    if (ed.assigned_gateway == nullptr) {
-                        unassigned_device = &ed;
-                        break;
+    while (true) {
+        // Step 1: Check coverage
+        network.assignDevices();
+        
+        bool all_devices_covered = true;
+        network::EndDevice* furthest_device = nullptr;
+        double max_dist_sq = 0.0;
+        
+        for (auto& ed : network.end_devices) {
+            if (!ed.assigned_gateway) {
+                all_devices_covered = false;
+                
+                // Find the device furthest from any existing gateway
+                double min_dist_sq_for_device = std::numeric_limits<double>::infinity();
+                for (const auto& gw : network.gateways) {
+                    double dist_sq = network.elevation_grid.distance(
+                        ed.lat, ed.lng, gw.lat, gw.lng, ed.height, gw.height);
+                    if (dist_sq < min_dist_sq_for_device) {
+                        min_dist_sq_for_device = dist_sq;
                     }
                 }
-                if (unassigned_device) {
-                    gw.lat = unassigned_device->lat;
-                    gw.lng = unassigned_device->lng;
+                
+                if (min_dist_sq_for_device > max_dist_sq) {
+                    max_dist_sq = min_dist_sq_for_device;
+                    furthest_device = &ed;
                 }
             }
         }
-
-        double max_movement = 0.0;
-        std::vector<terrain::LatLngAlt> old_positions;
-        for (const auto& gw : network.gateways) {
-            old_positions.push_back({gw.lat, gw.lng, gw.height});
-        }
         
-        // Step 2: Update
-        for (size_t j = 0; j < network.gateways.size(); ++j) {
-            auto new_pos = computeCentroid(network.gateways[j]);
-            network.gateways[j].lat = new_pos.lat;
-            network.gateways[j].lng = new_pos.lng;
-
-            double movement = network.elevation_grid.distance(
-                old_positions[j].lat, old_positions[j].lng, new_pos.lat, new_pos.lng, 0, 0);
-            if (movement > max_movement) {
-                max_movement = movement;
-            }
-        }
-        
-        iterations = i + 1;
-
-        // Step 3: Convergence check
-        if (max_movement < epsilon) {
+        if (all_devices_covered) {
             break;
+        }
+
+        // Step 2: Add a new gateway at the location of the furthest uncovered device
+        if (furthest_device) {
+            network::Gateway new_gw(
+                //global::generate_uuid(), 
+                std::to_string(network.gateways.size() + 1), // Simple ID
+                furthest_device->lat, 
+                furthest_device->lng, 
+                2.0 // Default height
+            );
+           network.gateways.push_back(new_gw);
+        } else {
+            // No unassigned devices, but all_devices_covered was false.
+            // This case should ideally not be reached if logic is correct,
+            // but is a safe exit.
+            break; 
+        }
+
+        // Step 3: Run K-Means-like local optimization on the new set of gateways
+        for (int i = 0; i < maxIterations; ++i) {
+            network.assignDevices();
+            double max_movement = 0.0;
+            std::vector<terrain::LatLngAlt> old_positions;
+            for (const auto& gw : network.gateways) {
+                old_positions.push_back({gw.lat, gw.lng, gw.height});
+            }
+            
+            for (size_t j = 0; j < network.gateways.size(); ++j) {
+                if (!network.gateways[j].connected_devices.empty()) {
+                    auto new_pos = computeCentroid(network.gateways[j]);
+                    network.gateways[j].lat = new_pos.lat;
+                    network.gateways[j].lng = new_pos.lng;
+
+                    double movement = network.elevation_grid.distance(
+                        old_positions[j].lat, old_positions[j].lng, new_pos.lat, new_pos.lng, 0, 0);
+                    if (movement > max_movement) {
+                        max_movement = movement;
+                    }
+                }
+            }
+            
+            if (max_movement < epsilon) {
+                break;
+            }
         }
     }
 };
