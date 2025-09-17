@@ -54,6 +54,7 @@ public:
     };
 
     Gateway* assigned_gateway = nullptr; // Pointer to assigned gateway
+    double distance_to_gateway = std::numeric_limits<double>::max(); // Distance to assigned gateway
 };
 
 
@@ -87,17 +88,17 @@ public:
     static Network fromFeatureCollection(const geojson::FeatureCollection& fc);
     geojson::FeatureCollection toFeatureCollection() const;
     
-    void print(global::PRINT_TYPE format = global::PLAIN_TEXT);
-
-private:
     void assignDevices();
-
-    void printPlainText() const;
-    void printJSON() const;
-
     std::vector<Gateway> gateways;
     std::vector<EndDevice> end_devices;
     terrain::ElevationGrid elevation_grid;
+
+    void print(global::PRINT_TYPE format = global::PLAIN_TEXT);
+
+private:
+    double total_distance;
+    void printPlainText() const;
+    void printJSON() const;
 };
 
 } // namespace network

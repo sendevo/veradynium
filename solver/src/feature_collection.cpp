@@ -149,7 +149,14 @@ void FeatureCollection::print() const {
         std::cout << "      \"properties\": " << feature.properties.dump(6) << "\n";
         std::cout << "    }" << (i < features.size() - 1 ? "," : "") << "\n";
     }
-    std::cout << "  ]\n}\n";
+    std::cout << "  ]\n";
+    if(!properties.is_null()) {
+        std::cout << ",  \"properties\": " << properties.dump(2) << "\n";
+    }
+    if(!bbox.empty()) {
+        std::cout << ",  \"bbox\": " << json(bbox).dump() << "\n";
+    }
+    std::cout << "}\n";
 }
 
 } // namespace geojson

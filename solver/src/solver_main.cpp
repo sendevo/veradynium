@@ -81,9 +81,7 @@ int main(int argc, char **argv) {
     auto network = network::Network::fromGeoJSON(nw_filename);
     network.setElevationGrid(grid);
 
-    auto optimizer = kmean::KMeansOptimizer(network);
-
-    auto result = optimizer.optimize(max_iterations, epsilon);
+    kmean::KMeansOptimizer(network).optimize(max_iterations, epsilon);
 
     network.print(outputFormat);
 

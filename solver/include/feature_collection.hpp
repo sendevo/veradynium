@@ -66,11 +66,16 @@ public:
     inline size_t featureCount() const { return features.size(); }
     inline Feature getFeature(size_t index) const { return features.at(index); }
     inline void addFeature(Feature feature) { features.push_back(feature); }
+    inline void setProperties(const json& props) { properties = props; }
+    inline json getProperties() const { return properties; }
+    inline void setBBox(const std::vector<double>& box) { bbox = box; }
+    inline std::vector<double> getBBox() const { return bbox; }
 
     void print() const;
 
 private:
     std::vector<Feature> features;
+    json properties;
     std::vector<double> bbox;
 };
 

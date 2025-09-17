@@ -54,6 +54,14 @@ void Network::assignDevices() {
     // This function assigns each end device to the closest reachable gateway
 
     const size_t num_gws = gateways.size();
+
+    if(num_gws == 0) { // No gateways available, all devices remain unassigned
+        for (auto& ed : end_devices) {
+            ed.assigned_gateway = nullptr;
+        }
+        return;
+    }
+
     const size_t num_eds = end_devices.size();
 
     // Phase 1: parallel per-device search for best gateway
@@ -87,17 +95,26 @@ void Network::assignDevices() {
     for (auto& gw : gateways) gw.connected_devices.clear();
     for (auto& dev : end_devices) dev.assigned_gateway = nullptr;
 
+    total_distance = 0.0;
     for (size_t j = 0; j < num_eds; ++j) {
         int best = best_gw_idx[j];
         if (best >= 0) {
             end_devices[j].assigned_gateway = &gateways[best];
+            end_devices[j].distance_to_gateway = best_dist[j];
             gateways[best].connected_devices.push_back(&end_devices[j]);
+            total_distance += best_dist[j];
         }
     }
 }
 
 geojson::FeatureCollection Network::toFeatureCollection() const {
     geojson::FeatureCollection feature_collection = geojson::FeatureCollection(); 
+
+
+    double minLat = std::numeric_limits<double>::max();
+    double minLng = std::numeric_limits<double>::max();
+    double maxLat = std::numeric_limits<double>::lowest();
+    double maxLng = std::numeric_limits<double>::lowest();
 
     // Add gateways
     for (const auto& gw : gateways) {
@@ -110,6 +127,10 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
         };
         gw_location.coords = geojson::Position{gw.lng, gw.lat};
         feature_collection.addFeature(gw_location);
+        if (gw.lat < minLat) minLat = gw.lat;
+        if (gw.lat > maxLat) maxLat = gw.lat;
+        if (gw.lng < minLng) minLng = gw.lng;
+        if (gw.lng > maxLng) maxLng = gw.lng;
     }
 
     // Add end devices and connections to assigned gateways (if any)
@@ -129,7 +150,8 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
             connection.properties = nlohmann::json{
                 {"type", "connection"},
                 {"from", ed.id},
-                {"to", ed.assigned_gateway->id}
+                {"to", ed.assigned_gateway->id},
+                {"distance", ed.distance_to_gateway}
             };
             connection.coords = geojson::LineString{
                 geojson::Position{ed.lng, ed.lat}, 
@@ -140,7 +162,19 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
             ed_location.properties["assigned_gateway"] = nullptr;
         }
         feature_collection.addFeature(ed_location);
+        if (ed.lat < minLat) minLat = ed.lat;
+        if (ed.lat > maxLat) maxLat = ed.lat;
+        if (ed.lng < minLng) minLng = ed.lng;
+        if (ed.lng > maxLng) maxLng = ed.lng;
     }
+
+    feature_collection.setBBox({minLng, minLat, maxLng, maxLat});
+
+    feature_collection.setProperties({
+        {"num_gateways", gateways.size()},
+        {"num_end_devices", end_devices.size()},
+        {"total_distance", total_distance}
+    });
 
     return feature_collection;
 }
@@ -169,6 +203,8 @@ void Network::printPlainText() const {
     std::cout << "   Upper right position: [" << elevation_grid.getBoundingBox()[0].lat << ", " << elevation_grid.getBoundingBox()[0].lng << "]" << std::endl;
     std::cout << "   Bottom left position: [" << elevation_grid.getBoundingBox()[2].lat << ", " << elevation_grid.getBoundingBox()[2].lng << "]" << std::endl;
     std::cout << "   Altitude range: [" << elevation_grid.getMinAltitude() << ", " << elevation_grid.getMaxAltitude() << "] meters" << std::endl;
+    std::cout << "Total distance from end devices to assigned gateways: " << total_distance << " meters" << std::endl;
+    std::cout << "----------------------------------------" << std::endl;
 };
 
 void Network::printJSON() const {
