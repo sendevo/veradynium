@@ -10,8 +10,7 @@ const useAnalysis = () => {
     const preloader = usePreloader();
     
     const [losResult, setLosResult] = useState(null);
-    const [networkEvalResult, setNetworkEvalResult] = useState(null);
-    const [solverResult, setSolverResult] = useState(null);
+    const [networkResult, setNetworkResult] = useState(null);
 
     const { computeLOS, evalNetwork, runSolver } = useComputations();
 
@@ -45,7 +44,7 @@ const useAnalysis = () => {
         preloader(false);
     };
 
-    const evalNetworkAction = async () => {
+    const solverAction = async solver => {
         if (!files.elevation_map.id) {
             toast("El mapa de elevación no está disponible", "error");
             return;
@@ -61,52 +60,33 @@ const useAnalysis = () => {
         };
 
         preloader(true);
-        const result = await evalNetwork(params);
+        const result = await solver(params);
         if(!result.error){
             console.log(result);
-            setNetworkEvalResult(result);
+            setNetworkResult(result);
         }else{
             toast(result.error, "error");
         }
         preloader(false);
     };
 
+    const evalNetworkAction = async () => {
+        await solverAction(evalNetwork);
+    };
+
     const runSolverAction = async () => {
-        if (!files.elevation_map.id) {
-            toast("El mapa de elevación no está disponible", "error");
-            return;
-        }
-        if (!files.features.id) {
-            toast("El archivo de geometrías no está disponible", "error");
-            return;
-        }
-
-        const params = {
-            em_file_id: files.elevation_map.id,
-            features_file_id: files.features.id
-        };
-
-        preloader(true);
-        const result = await runSolver(params);
-        if(!result.error){
-            console.log(result);
-            setSolverResult(result);
-        }else{
-            toast(result.error, "error");
-        }
-        preloader(false);
+        await solverAction(runSolver);
     };
 
     const resetLOS = () => setLosResult(null);
 
-    const resetNetworkConnection = () => setNetworkEvalResult(null);
+    const resetNetworkConnection = () => setNetworkResult(null);
 
-    const resetSolverResults = () => setSolverResult(null);
+    const resetSolverResults = () => setNetworkResult(null);
 
     return {
         losResult,
-        networkEvalResult,
-        solverResult,
+        networkResult,
         computeLOSAction,
         evalNetworkAction,
         runSolverAction,

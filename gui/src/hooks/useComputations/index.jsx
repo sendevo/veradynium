@@ -76,7 +76,8 @@ const useComputations = () => {
         const res = await fetchWithTimeout(api("/api/solve"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(params)
+            body: JSON.stringify(params),
+            timeout: 120000 // 2 minutes
         });
 
         if (!res.ok) {

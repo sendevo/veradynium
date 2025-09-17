@@ -28,8 +28,7 @@ const View = () => {
 
     const {
         losResult,
-        networkEvalResult,
-        solverResult,
+        networkResult,
         evalNetworkAction,
         computeLOSAction,
         runSolverAction,
@@ -39,7 +38,7 @@ const View = () => {
     } = useAnalysis();
 
     const elevationData = files.elevation_map.content || [];
-    const featureCollection = networkEvalResult || files.features.content || { features: [] };
+    const featureCollection = networkResult || files.features.content || { features: [] };
     
     const handleUploadFile = file => {
         const extension = "." + file.name.split(".").pop().toLowerCase();
