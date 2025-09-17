@@ -34,4 +34,13 @@ void printHelp(const char* file, const char* message = defaultMessage);
 // Convert degrees to radians
 inline double toRadians(double degree) { return degree * M_PI / 180.0; }
 
+// Debug output stream (disabled by default)
+// Usage: global::dbg << "Debug info: " << value << std::endl;
+struct NullBuffer : std::streambuf {
+    int overflow(int c) override { return c; }
+};
+static NullBuffer null_buffer;
+static std::ostream null_stream(&null_buffer);
+std::ostream& dbg = null_stream;
+
 } // namespace global

@@ -64,6 +64,10 @@ int main(int argc, char **argv) {
                 global::printHelp(MANUAL, "Error in argument -o (--output)");
             }
         }
+
+        if(strcmp(argv[i], "--dbg") == 0) {
+            global::dbg.rdbuf(std::cout.rdbuf()); // Enable debug output to std::cout
+        }
     }
 
     /// Load network
