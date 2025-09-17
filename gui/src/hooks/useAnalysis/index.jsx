@@ -99,6 +99,8 @@ const useAnalysis = () => {
 
     const resetLOS = () => setLosResult(null);
 
+    const resetNetworkConnection = () => setNetworkEvalResult(null);
+
     const resetSolverResults = () => setSolverResult(null);
 
     return {
@@ -109,6 +111,7 @@ const useAnalysis = () => {
         evalNetworkAction,
         runSolverAction,
         resetLOS,
+        resetNetworkConnection,
         resetSolverResults
     };
 };

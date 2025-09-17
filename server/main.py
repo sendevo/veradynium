@@ -126,14 +126,14 @@ async def compute_los(data: dict):
         return JSONResponse(status_code=500, content={"error": result.stderr})
 
     try: # Parse JSON output
-        print("LOS command output:")
-        print(result.stdout)
+        #print("LOS command output:")
+        #print(result.stdout)
         return json.loads(result.stdout)
     except json.JSONDecodeError:
         return JSONResponse(status_code=500, content={"error": "Invalid output from LOS program."})
 
 
-@app.post("/solve")
+@api.post("/solve")
 async def solve(data: dict):
     em_file_id = data.get("em_file_id") # Elevation map file ID
     geojson_file_id = data.get("features_file_id") # GeoJSON features file ID
@@ -159,15 +159,19 @@ async def solve(data: dict):
         return JSONResponse(status_code=500, content={"error": result.stderr})
 
     try: # Parse JSON output
-        print("Solver command output:")
-        print(result.stdout)
+        #print("Solver command output:")
+        #print(result.stdout)
         return json.loads(result.stdout)
     except json.JSONDecodeError:
         return JSONResponse(status_code=500, content={"error": "Invalid output from Solver program."})
 
 
-@app.post("/eval")
+@api.post("/eval")
 async def eval_network(data: dict):
+    # Data should contain:
+    # - em_file_id: ID of the uploaded elevation map CSV file
+    # - features_file_id: ID of the uploaded GeoJSON features file
+
     em_file_id = data.get("em_file_id") # Elevation map file ID
     geojson_file_id = data.get("features_file_id") # GeoJSON features file ID
 
@@ -175,7 +179,7 @@ async def eval_network(data: dict):
     geojson_file_path = get_uploaded_file(geojson_file_id, ".json")
 
     cmd = [
-        "../solver/bin/eval_network",
+        "../solver/bin/eval",
         "-f", em_file_path,
         "-g", geojson_file_path,
         "-o", "json"
@@ -192,8 +196,8 @@ async def eval_network(data: dict):
         return JSONResponse(status_code=500, content={"error": result.stderr})
 
     try: # Parse JSON output
-        print("Network evaluation command output:")
-        print(result.stdout)
+        #print("Network evaluation command output:")
+        #print(result.stdout)
         return json.loads(result.stdout)
     except json.JSONDecodeError:
         return JSONResponse(status_code=500, content={"error": "Invalid output from Network Evaluation program."})

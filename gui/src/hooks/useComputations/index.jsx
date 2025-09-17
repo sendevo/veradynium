@@ -44,6 +44,8 @@ const useComputations = () => {
     const evalNetwork = useCallback( async params => {
         // params format: {em_file_id, features_file_id}
         
+        console.log("Evaluating network with params:", params);
+
         const res = await fetchWithTimeout(api("/api/eval"), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -64,11 +66,7 @@ const useComputations = () => {
         }
 
         const data = await res.json();
-        /* output format:
-        {
-            
-        }
-        */
+        /* output format: GeoJSON FeatureCollection */
         return data;
     }, []);
 

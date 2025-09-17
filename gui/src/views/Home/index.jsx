@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Grid, Typography } from "@mui/material";
 import MainView from "../../components/MainView";
 import Map from "../../components/Map";
@@ -28,15 +28,25 @@ const View = () => {
 
     const {
         losResult,
+        networkEvalResult,
+        solverResult,
         evalNetworkAction,
         computeLOSAction,
         runSolverAction,
         resetLOS,
+        resetNetworkConnection,
         resetSolverResults
     } = useAnalysis();
 
     const elevationData = files.elevation_map.content || [];
-    const featureCollection = files.features.content || { features: [] };
+    const featureCollection = networkEvalResult || files.features.content || { features: [] };
+    
+    const handleUploadFile = file => {
+        const extension = "." + file.name.split(".").pop().toLowerCase();
+        if(extension === ".json")
+            resetNetworkConnection();
+        uploadFile(file);
+    }
 
     const handleNewPoints = newPoints => {
         resetLOS();
@@ -50,12 +60,14 @@ const View = () => {
     const handleRemoveElevation = () => {
         removeFile(files.elevation_map.id, ".csv");
         resetLOS();
+        resetNetworkConnection();
         setPoints([]);
     };
 
     const handleRemoveFeatures = () => {
         removeFile(files.features.id, ".geojson");
-        resetSolverResults();
+        resetNetworkConnection();
+        resetSolverResults(); 
     };
 
     const handleResetPoints = () => { 
@@ -63,8 +75,13 @@ const View = () => {
         setPoints([]); 
     };
 
+    const handleResetConnections = () => {
+        setFeatureCollection(files.features.content || {features: []});
+    };
+
     const hasElevation = elevationData && elevationData.length > 0;
     const hasFeatures = featureCollection && featureCollection.features && featureCollection.features.length > 0;
+    const hasConnections = featureCollection.features.filter(f => f.geometry.type === "LineString").length > 0;
 
     return(
         <MainView background={background}>
@@ -73,7 +90,7 @@ const View = () => {
                     <Grid container direction={"column"} spacing={2} sx={{height:"100%"}}>
                         <Grid size={"grow"}>
                             <DropZone 
-                                onDrop={uploadFile} 
+                                onDrop={handleUploadFile} 
                                 onError={message => toast(message, "error")}/>
                         </Grid>
 
