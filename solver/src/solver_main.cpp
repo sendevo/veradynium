@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
     kmean::KMeansOptimizer(network).optimize(max_iterations, epsilon);
 
-    network.print(outputFormat);
+    //network.print(outputFormat);
 
     return 0;
 }

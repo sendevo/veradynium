@@ -2,9 +2,7 @@
 
 #include <vector>
 #include <cmath>
-//#include "global.hpp"
 #include "network.hpp"
-#include "terrain.hpp"
 
 /**
  * 

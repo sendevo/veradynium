@@ -88,7 +88,9 @@ public:
     static Network fromFeatureCollection(const geojson::FeatureCollection& fc);
     geojson::FeatureCollection toFeatureCollection() const;
     
-    void assignDevices();
+    void connect();
+    void disconnect();
+
     std::vector<Gateway> gateways;
     std::vector<EndDevice> end_devices;
     terrain::ElevationGrid elevation_grid;

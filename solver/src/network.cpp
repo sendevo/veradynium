@@ -49,8 +49,8 @@ Network Network::fromGeoJSON(const std::string& filepath) {
 };
 
 
-void Network::assignDevices() {
-    // Parallelized version of assignDevices using OpenMP
+void Network::connect() {
+    // Parallelized version of connect using OpenMP
     // This function assigns each end device to the closest reachable gateway
 
     const size_t num_gws = gateways.size();
@@ -66,11 +66,11 @@ void Network::assignDevices() {
 
     // Phase 1: parallel per-device search for best gateway
     std::vector<int> best_gw_idx(num_eds, -1);
-    std::vector<double> best_dist(num_eds, std::numeric_limits<double>::infinity());
+    std::vector<double> best_dist(num_eds, INF);
 
     #pragma omp parallel for schedule(dynamic) // parallelize over end devices
     for (int j = 0; j < static_cast<int>(num_eds); ++j) {
-        double minDist = std::numeric_limits<double>::infinity();
+        double minDist = INF;
         int best = -1;
 
         for (int i = 0; i < static_cast<int>(num_gws); ++i) {
@@ -92,8 +92,7 @@ void Network::assignDevices() {
     }
 
     // Phase 2: clear and populate connections (sequential)
-    for (auto& gw : gateways) gw.connected_devices.clear();
-    for (auto& dev : end_devices) dev.assigned_gateway = nullptr;
+    disconnect();
 
     total_distance = 0.0;
     for (size_t j = 0; j < num_eds; ++j) {
@@ -105,7 +104,12 @@ void Network::assignDevices() {
             total_distance += best_dist[j];
         }
     }
-}
+};
+
+void Network::disconnect() {
+    for (auto& gw : gateways) gw.connected_devices.clear();
+    for (auto& dev : end_devices) dev.assigned_gateway = nullptr;
+};
 
 geojson::FeatureCollection Network::toFeatureCollection() const {
     geojson::FeatureCollection feature_collection = geojson::FeatureCollection(); 
@@ -177,7 +181,7 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
     });
 
     return feature_collection;
-}
+};
 
 void Network::printPlainText() const {
     std::cout << "Network Information:" << std::endl;
@@ -213,7 +217,7 @@ void Network::printJSON() const {
 };
 
 void Network::print(global::PRINT_TYPE format) {
-    assignDevices();
+    connect();
     switch (format) {
         case global::PLAIN_TEXT:
             printPlainText();
@@ -224,6 +228,6 @@ void Network::print(global::PRINT_TYPE format) {
         default:
             throw std::runtime_error("Unknown output format.");
     }
-}
+};
 
 } // namespace network

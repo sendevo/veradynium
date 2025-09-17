@@ -207,7 +207,7 @@ double ElevationGrid::distance(double lat1, double lon1, double lat2, double lon
 }
 
 double ElevationGrid::getMaxAltitude() const {
-    double maxAlt = -std::numeric_limits<double>::infinity();
+    double maxAlt = -INF;
     for(const auto& row : elevationGrid) {
         double rowMax = *std::max_element(row.begin(), row.end());
         if(rowMax > maxAlt) {
@@ -218,7 +218,7 @@ double ElevationGrid::getMaxAltitude() const {
 }
 
 double ElevationGrid::getMinAltitude() const {
-    double minAlt = std::numeric_limits<double>::infinity();
+    double minAlt = INF;
     for(const auto& row : elevationGrid) {
         double rowMin = *std::min_element(row.begin(), row.end());
         if(rowMin < minAlt) {
