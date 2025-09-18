@@ -17,7 +17,7 @@ class KMeansOptimizer {
 public:
     KMeansOptimizer(network::Network& net) : network(net) {}
 
-    void optimize(int maxIterations = 500, double minSpeed = 0.01, double acceleration = 0.02);
+    void optimize(int maxIterations = 500, double minSpeed = 1e-5, double acceleration = 0.05);
 
 private:
     terrain::LatLngAlt computeCentroid(const network::Gateway& gw, double fallbackLat = 0.0, double fallbackLng = 0.0);    

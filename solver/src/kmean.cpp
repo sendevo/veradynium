@@ -24,78 +24,106 @@ terrain::LatLngAlt KMeansOptimizer::computeCentroid(const network::Gateway& gw, 
 };
 
 void KMeansOptimizer::optimize(int maxIterations, double minSpeed, double acceleration) {
-  
-    // Begin with a disconnected list of end-devices
-    network.gateways.clear();
-
-    // Random generator
-    static std::random_device              rd;
-    static std::mt19937                    gen(rd());
-    static std::uniform_int_distribution<> dis(0, network.end_devices.size()-1);
+    // bounding box of all end-devices
     std::vector<double> bbox = network.getBoundingBox();
-    
-    unsigned int connected_eds = 0;
-    std::vector<double> speeds;
-    while(connected_eds < network.end_devices.size() && network.gateways.size() < network.end_devices.size()) {
-        // Pick a random position within the bounding box
-        double lat = bbox[1] + static_cast<double>(rand()) / (static_cast<double>(RAND_MAX/(bbox[3]-bbox[1])));
-        double lng = bbox[0] + static_cast<double>(rand()) / (static_cast<double>(RAND_MAX/(bbox[2]-bbox[0])));
 
-        network::Gateway gw(std::to_string(network.gateways.size()), lat, lng, 2.0);
-        network.gateways.push_back(gw);
-        speeds.push_back(INF);
-        connected_eds = network.connect();
+    // random generator
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_real_distribution<> disLat(bbox[1], bbox[3]);
+    static std::uniform_real_distribution<> disLng(bbox[0], bbox[2]);
 
-        global::dbg << "Added gateway at: " << lat << ", " << lng << " - Connected devices: " << connected_eds << "/" << network.end_devices.size() << std::endl;
-        global::dbg << "Total gateways: " << network.gateways.size() << std::endl;
-        
-        for(unsigned int i = 0; i < network.gateways.size(); i++) {
-            auto& gw = network.gateways[i];
-            // Pick closest end-device as fallback position
-            double fallbackLat = 0.0;
-            double fallbackLng = 0.0;
-            if(!gw.connected_devices.empty()) {
-                double minDist = std::numeric_limits<double>::max();
-                for(auto d : gw.connected_devices) {
-                    double dist = network.elevation_grid.haversine(gw.lat, gw.lng, d->lat, d->lng);
-                    if(dist < minDist) {
-                        minDist = dist;
-                        fallbackLat = d->lat;
-                        fallbackLng = d->lng;
+    const int maxGateways = network.end_devices.size(); // safe upper bound
+
+    global::dbg << "type,id,lat,lng,iter\n";
+    for (size_t j = 0; j < network.end_devices.size(); ++j) {
+        auto& ed = network.end_devices[j];
+        global::dbg << "ed," << j << "," << ed.lat << "," << ed.lng << "," << 0 << "\n";
+    }
+
+    // Try with k = 1, 2, ... until all devices are connected
+    for (int k = 1; k <= maxGateways; ++k) {
+        // reset
+        network.gateways.clear();
+
+        // place k random gateways
+        for (int i = 0; i < k; i++) {
+            double lat = disLat(gen);
+            double lng = disLng(gen);
+            network.gateways.emplace_back(std::to_string(i), lat, lng, 2.0);
+        }
+
+        unsigned int connected_eds = network.connect();
+        if (connected_eds == network.end_devices.size()) {
+            //global::dbg << "All devices connected with " << k << " gateways (no optimization)." << std::endl;
+            return;
+        }
+
+        // per-gateway speeds
+        std::vector<double> speeds(k, INF);
+
+        // iterate centroid updates
+        for (int iter = 0; iter < maxIterations; ++iter) {
+            bool allStable = true;
+
+            for (int i = 0; i < k; i++) { // for each gateway
+                auto& gw = network.gateways[i];
+
+                // fallback: nearest device
+                double fallbackLat = 0.0, fallbackLng = 0.0;
+                if (!network.end_devices.empty()) {
+                    double best = INF;
+                    for (auto& ed : network.end_devices) {
+                        //double dist = network.elevation_grid.distance(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
+                        double dist = network.elevation_grid.haversine(gw.lat, gw.lng, ed.lat, ed.lng);
+                        if (dist < best) {
+                            best = dist;
+                            fallbackLat = ed.lat;
+                            fallbackLng = ed.lng;
+                        }
                     }
                 }
-            } else {
-                if(!network.end_devices.empty()) {
-                    // If no connected devices, pick a random end-device
-                    int idx = dis(gen);
-                    fallbackLat = network.end_devices[idx].lat;
-                    fallbackLng = network.end_devices[idx].lng;
-                }
-            }
-            global::dbg << "Optimizing gateway: " << gw.id << " - Connected devices: " << gw.connected_devices.size() << std::endl;
-            terrain::LatLngAlt cent = computeCentroid(gw, fallbackLat, fallbackLng);
-            while(speeds[i] > minSpeed) {
-                // Move gateway slightly towards centroid
-                const double newLat = gw.lat + acceleration * (cent.lat - gw.lat);
-                const double newLng = gw.lng + acceleration * (cent.lng - gw.lng);
-                const double latDiff = newLat - gw.lat;
-                const double lngDiff = newLng - gw.lng;
-                speeds[i] = latDiff*latDiff + lngDiff*lngDiff;
+
+                terrain::LatLngAlt cent = computeCentroid(gw, fallbackLat, fallbackLng);
+
+                if (gw.connected_devices.empty()) continue;
+
+                double newLat = gw.lat + acceleration * (cent.lat - gw.lat);
+                double newLng = gw.lng + acceleration * (cent.lng - gw.lng);
+                double latDiff = newLat - gw.lat;
+                double lngDiff = newLng - gw.lng;
+                double sqmove = latDiff*latDiff + lngDiff*lngDiff;
+
                 gw.lat = newLat;
                 gw.lng = newLng;
-                unsigned int prev_connected_eds = gw.connected_devices.size();
-                network.connect();
-                if(gw.connected_devices.size() < prev_connected_eds){ // If we lost connections, revert movement and add a new gateway
-                    gw.lat -= latDiff;
-                    gw.lng -= lngDiff;
-                    network.connect();
-                    global::dbg << "Lost connections, reverting movement and adding new gateway." << std::endl;
-                    break;
-                }
+
+                connected_eds = network.connect();
+
+                speeds[i] = sqmove;
+                if (speeds[i] > minSpeed) allStable = false;
+
+                // debug output
+                global::dbg << "gw," << gw.id << "," << gw.lat << "," << gw.lng << "," << iterations << "\n";
+                // Compile and test using:
+                // (before -->) source ../server/venv/bin/activate
+                // make && ./bin/solver -f ../data/topography/data/topography_nasa.csv -g ../data/network/network_20x16.json --dbg >> ./tests/movs.csv && cd tests && python3 test.py && cd ..
+                // (after -->) deactivate
+
+
             }
+
+            if (allStable) break;
+        }
+
+        connected_eds = network.connect();
+        if (connected_eds == network.end_devices.size()) {
+            //global::dbg << "All devices connected with " << k << " gateways." << std::endl;
+            return;
         }
     }
-    
+
+    //global::dbg << "Warning: Could not connect all devices even with max gateways." << std::endl;
 };
+
 
 } // namespace kmean
