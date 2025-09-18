@@ -14,8 +14,9 @@ int main(int argc, char **argv) {
 
     std::string em_filename; // Terrain elevation model file (csv)
     std::string nw_filename; // Network file (geojson)
-    int max_iterations = 50; // Max iterations for the optimizer
-    double epsilon = 1e-6;   // Convergence threshold
+    int max_iterations = 500; // Max iterations for the optimizer
+    double epsilon = 0.01;   // Convergence threshold
+    double acceleration = 0.02; // Acceleration factor for the optimizer
 
     global::PRINT_TYPE outputFormat = global::PLAIN_TEXT;
 
@@ -85,7 +86,7 @@ int main(int argc, char **argv) {
     auto network = network::Network::fromGeoJSON(nw_filename);
     network.setElevationGrid(grid);
 
-    kmean::KMeansOptimizer(network).optimize(max_iterations, epsilon);
+    kmean::KMeansOptimizer(network).optimize(max_iterations, epsilon, acceleration);
 
     //network.print(outputFormat);
 

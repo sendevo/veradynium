@@ -52,18 +52,18 @@ FeatureCollection FeatureCollection::fromGeoJSON(const std::string& filename) {
         fc.bbox = data["bbox"].get<std::vector<double>>();
     } else {
         if(!fc.features.empty()) {
-            double minX = std::get<Position>(fc.features[0].coords)[0];
-            double minY = std::get<Position>(fc.features[0].coords)[1];
-            double maxX = minX;
-            double maxY = minY;
+            double minLng = std::get<Position>(fc.features[0].coords)[0]; // lng
+            double minLat = std::get<Position>(fc.features[0].coords)[1]; // lat
+            double maxLng = minLng;
+            double maxLat = minLat;
             for(const auto& feat : fc.features) {
                 const auto& pos = std::get<Position>(feat.coords);
-                if(pos[0] < minX) minX = pos[0];
-                if(pos[1] < minY) minY = pos[1];
-                if(pos[0] > maxX) maxX = pos[0];
-                if(pos[1] > maxY) maxY = pos[1];
+                if(pos[0] < minLng) minLng = pos[0];
+                if(pos[1] < minLat) minLat = pos[1];
+                if(pos[0] > maxLng) maxLng = pos[0];
+                if(pos[1] > maxLat) maxLat = pos[1];
             }
-            fc.bbox = {minX, minY, maxX, maxY};
+            fc.bbox = {minLng, minLat, maxLng, maxLat};
         }
     }
 

@@ -39,6 +39,8 @@ Network Network::fromFeatureCollection(const geojson::FeatureCollection& fc) {
         }
     }
 
+    network.bbox = fc.getBBox();
+
     return network;
 }
 
@@ -49,7 +51,7 @@ Network Network::fromGeoJSON(const std::string& filepath) {
 };
 
 
-void Network::connect() {
+unsigned int Network::connect() {
     // Parallelized version of connect using OpenMP
     // This function assigns each end device to the closest reachable gateway
 
@@ -59,7 +61,7 @@ void Network::connect() {
         for (auto& ed : end_devices) {
             ed.assigned_gateway = nullptr;
         }
-        return;
+        return 0;
     }
 
     const size_t num_eds = end_devices.size();
@@ -87,13 +89,16 @@ void Network::connect() {
             }
         }
 
-        best_gw_idx[j] = best;
-        best_dist[j] = minDist;
+        if(minDist < MAX_DISTANCE){ // Only consider connections within MAX_DISTANCE
+            best_gw_idx[j] = best;
+            best_dist[j] = minDist;
+        }
     }
 
     // Phase 2: clear and populate connections (sequential)
     disconnect();
 
+    unsigned int connected_count = 0;
     total_distance = 0.0;
     for (size_t j = 0; j < num_eds; ++j) {
         int best = best_gw_idx[j];
@@ -102,8 +107,11 @@ void Network::connect() {
             end_devices[j].distance_to_gateway = best_dist[j];
             gateways[best].connected_devices.push_back(&end_devices[j]);
             total_distance += best_dist[j];
+            connected_count++;
         }
     }
+
+    return connected_count;
 };
 
 void Network::disconnect() {
@@ -177,7 +185,21 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
     feature_collection.setProperties({
         {"num_gateways", gateways.size()},
         {"num_end_devices", end_devices.size()},
-        {"total_distance", total_distance}
+        {"total_distance", total_distance},
+        {"connected_end_devices", static_cast<int>(end_devices.size() - std::count_if(end_devices.begin(), end_devices.end(), [](const EndDevice& ed){ return ed.assigned_gateway == nullptr; }))},
+        {"disconnected_end_devices", static_cast<int>(std::count_if(end_devices.begin(), end_devices.end(), [](const EndDevice& ed){ return ed.assigned_gateway == nullptr; }))},
+        {"elevation_grid", {
+            {"bounding_box", {
+                {"upper_right", {elevation_grid.getBoundingBox()[0].lat, elevation_grid.getBoundingBox()[0].lng}},
+                {"bottom_left", {elevation_grid.getBoundingBox()[2].lat, elevation_grid.getBoundingBox()[2].lng}}
+            }},
+            {"altitude_range", {elevation_grid.getMinAltitude(), elevation_grid.getMaxAltitude()}}
+        }},
+        {"max_connection_distance", MAX_DISTANCE},
+        {"network_bbox", {
+            {"upper_right", {maxLat, maxLng}},
+            {"bottom_left", {minLat, minLng}}
+        }}
     });
 
     return feature_collection;

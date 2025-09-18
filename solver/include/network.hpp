@@ -17,6 +17,8 @@
  */
 namespace network {
 
+const double MAX_DISTANCE = 2000; // Maximum distance (in meters) for a valid connection = 2km
+
 class Node {
 public:
     Node() = default;
@@ -87,8 +89,9 @@ public:
     static Network fromGeoJSON(const std::string& filepath);
     static Network fromFeatureCollection(const geojson::FeatureCollection& fc);
     geojson::FeatureCollection toFeatureCollection() const;
+    inline std::vector<double> getBoundingBox() const { return bbox; };
     
-    void connect();
+    unsigned int connect();
     void disconnect();
 
     std::vector<Gateway> gateways;
@@ -99,6 +102,7 @@ public:
 
 private:
     double total_distance;
+    std::vector<double> bbox; // Bbox of features
     void printPlainText() const;
     void printJSON() const;
 };
