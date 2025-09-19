@@ -17,22 +17,29 @@
  */
 namespace network {
 
-const double MAX_DISTANCE = 2000; // Maximum distance (in meters) for a valid connection = 2km
+constexpr double MAX_DISTANCE = 2000; // Maximum distance (in meters) for a valid connection = 2km
 
 class Node {
 public:
     Node() = default;
-    Node(const std::string& id, double lat, double lng, double height = 0.0)
-        : id(id), lat(lat), lng(lng), height(height) {}
+    Node(const std::string& id, terrain::LatLngAlt pos) : id(id), location(pos) {}
+    
     std::string id;
-    double lat;
-    double lng;
-    double height; // Height above ground in meters
+    
+    terrain::LatLngAlt location;
+    
+    static inline Node parse(const nlohmann::json& properties, double lat, double lng) {
+        std::string id = detail::require_string(properties, "id");
+        double height = detail::optional_number(properties, "height", 0.0);
+        return Node{id, {lat, lng, height}};
+    };
+
     inline double distanceTo(const Node& other, const terrain::ElevationGrid& grid) const {
-        return grid.distance(lat, lng, other.lat, other.lng, height, other.height);
+        return grid.distance(location, other.location);
     }
+    
     inline bool lineOfSightTo(const Node& other, const terrain::ElevationGrid& grid) const {
-        return grid.lineOfSight(lat, lng, other.lat, other.lng, height, other.height);
+        return grid.lineOfSight(location, other.location);
     }
 };
 
@@ -46,15 +53,7 @@ class EndDevice;
 class EndDevice : public Node {
 public:
     EndDevice() = default;
-    EndDevice(const std::string& id, double lat, double lng, double height = 0.0)
-        : Node(id, lat, lng, height) {}
-    
-    static inline EndDevice parse_end_device(const nlohmann::json& properties, double lat, double lng) {
-        std::string id = detail::require_string(properties, "id");
-        double height = detail::optional_number(properties, "height", 0.0);
-        return EndDevice{id, lat, lng, height};
-    };
-
+    EndDevice(const std::string& id, terrain::LatLngAlt pos) : Node(id, pos) {}
     Gateway* assigned_gateway = nullptr; // Pointer to assigned gateway
     double distance_to_gateway = std::numeric_limits<double>::max(); // Distance to assigned gateway
 };
@@ -63,15 +62,7 @@ public:
 class Gateway : public Node {
 public:
     Gateway() = default;
-    Gateway(const std::string& id, double lat, double lng, double height)
-        : Node(id, lat, lng, height) {}
-
-    static inline Gateway parse_gateway(const nlohmann::json& properties, double lat, double lng) {
-        std::string id = detail::require_string(properties, "id");
-        double height = detail::require_number(properties, "height");
-        return Gateway{id, lat, lng, height};
-    };
-
+    Gateway(const std::string& id, terrain::LatLngAlt pos) : Node(id, pos) {}
     std::vector<EndDevice*> connected_devices; // Pointers to connected end devices
 };
 

@@ -6,9 +6,7 @@ gui/dist/
 gui/public/
 gui/package-lock.json
 
-data/venv/
-data/__pycache__
-data/.env
+data/
 
 server/venv/
 server/__pycache__

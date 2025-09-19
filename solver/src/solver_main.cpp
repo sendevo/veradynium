@@ -7,16 +7,16 @@
 #include "../include/global.hpp"
 #include "../include/terrain.hpp"
 #include "../include/network.hpp"
-#include "../include/kmean.hpp"
+#include "../include/optimizers.hpp"
 
 
 int main(int argc, char **argv) {
 
     std::string em_filename; // Terrain elevation model file (csv)
     std::string nw_filename; // Network file (geojson)
-    int max_iterations = 500; // Max iterations for the optimizer
+    int max_iterations = 500; // Max iterations for the optimizers
     double min_speed = 1e-6;   // Convergence threshold
-    double acceleration = 0.001; // Acceleration factor for the optimizer
+    double acceleration = 0.001; // Acceleration factor for the optimizers
 
     global::PRINT_TYPE outputFormat = global::PLAIN_TEXT;
 
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
     auto network = network::Network::fromGeoJSON(nw_filename);
     network.setElevationGrid(grid);
 
-    kmean::KMeansOptimizer(network).optimize(max_iterations, min_speed, acceleration);
+    optimizers::ClusteringOptimizer(network).optimize(max_iterations, min_speed, acceleration);
 
     //network.print(outputFormat);
 

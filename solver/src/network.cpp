@@ -2,6 +2,8 @@
 
 namespace network {
 
+
+
 Network Network::fromFeatureCollection(const geojson::FeatureCollection& fc) {
     
     Network network;
@@ -23,13 +25,13 @@ Network Network::fromFeatureCollection(const geojson::FeatureCollection& fc) {
             if (pos.size() < 2) {
                 throw std::runtime_error("Invalid Point: must have at least [lon, lat]");
             }
-            double lng = pos[0];
-            double lat = pos[1];
+
+            const Node node = Node::parse(properties, pos[1], pos[0]);
             if (detail::require_string(properties, "type") == "end_device"){
-                network.end_devices.push_back(EndDevice::parse_end_device(properties, lat, lng));
+                network.end_devices.push_back(EndDevice(node.id, node.location));
             }else{ 
                 if (detail::require_string(properties, "type") == "gateway"){
-                    network.gateways.push_back(Gateway::parse_gateway(properties, lat, lng));        
+                    network.gateways.push_back(Gateway(node.id, node.location));
                 } else {
                     throw std::runtime_error("Invalid GeoJSON: unknown feature type '" + detail::require_string(properties, "type") + "'");
                 }
@@ -80,8 +82,8 @@ unsigned int Network::connect() {
             const auto& ed = end_devices[j];
 
             // call combined LOS+distance (fast single call)
-            bool los = elevation_grid.lineOfSight(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
-            double distance = elevation_grid.distance(gw.lat, gw.lng, ed.lat, ed.lng, gw.height, ed.height);
+            bool los = elevation_grid.lineOfSight(gw.location, ed.location);
+            double distance = elevation_grid.distance(gw.location, ed.location);
 
             if (los && distance < minDist) {
                 minDist = distance;
@@ -135,14 +137,14 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
         gw_location.properties = nlohmann::json{
             {"type", "gateway"},
             {"id", gw.id},
-            {"height", gw.height}
+            {"height", gw.location.alt}
         };
-        gw_location.coords = geojson::Position{gw.lng, gw.lat};
+        gw_location.coords = geojson::Position{gw.location.lng, gw.location.lat};
         feature_collection.addFeature(gw_location);
-        if (gw.lat < minLat) minLat = gw.lat;
-        if (gw.lat > maxLat) maxLat = gw.lat;
-        if (gw.lng < minLng) minLng = gw.lng;
-        if (gw.lng > maxLng) maxLng = gw.lng;
+        if (gw.location.lat < minLat) minLat = gw.location.lat;
+        if (gw.location.lat > maxLat) maxLat = gw.location.lat;
+        if (gw.location.lng < minLng) minLng = gw.location.lng;
+        if (gw.location.lng > maxLng) maxLng = gw.location.lng;
     }
 
     // Add end devices and connections to assigned gateways (if any)
@@ -152,9 +154,9 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
         ed_location.properties = nlohmann::json{
             {"type", "end_device"},
             {"id", ed.id},
-            {"height", ed.height}
+            {"height", ed.location.alt}
         };
-        ed_location.coords = geojson::Position{ed.lng, ed.lat};
+        ed_location.coords = geojson::Position{ed.location.lng, ed.location.lat};
         if (ed.assigned_gateway) { // If assigned, add a line to the gateway
             ed_location.properties["assigned_gateway"] = ed.assigned_gateway->id;
             geojson::Feature connection;
@@ -166,18 +168,18 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
                 {"distance", ed.distance_to_gateway}
             };
             connection.coords = geojson::LineString{
-                geojson::Position{ed.lng, ed.lat}, 
-                geojson::Position{ed.assigned_gateway->lng, ed.assigned_gateway->lat}
+                geojson::Position{ed.location.lng, ed.location.lat}, 
+                geojson::Position{ed.assigned_gateway->location.lng, ed.assigned_gateway->location.lat}
             };
             feature_collection.addFeature(connection);
         } else {
             ed_location.properties["assigned_gateway"] = nullptr;
         }
         feature_collection.addFeature(ed_location);
-        if (ed.lat < minLat) minLat = ed.lat;
-        if (ed.lat > maxLat) maxLat = ed.lat;
-        if (ed.lng < minLng) minLng = ed.lng;
-        if (ed.lng > maxLng) maxLng = ed.lng;
+        if (ed.location.lat < minLat) minLat = ed.location.lat;
+        if (ed.location.lat > maxLat) maxLat = ed.location.lat;
+        if (ed.location.lng < minLng) minLng = ed.location.lng;
+        if (ed.location.lng > maxLng) maxLng = ed.location.lng;
     }
 
     feature_collection.setBBox({minLng, minLat, maxLng, maxLat});
@@ -210,16 +212,16 @@ void Network::printPlainText() const {
     std::cout << "Number of Gateways: " << gateways.size() << std::endl;
     for (const auto& gw : gateways) {
         std::cout << "  Gateway ID: " << gw.id 
-                  << ", Lat: " << gw.lat 
-                  << ", Lng: " << gw.lng 
-                  << ", Height: " << gw.height << "m" << std::endl;
+                  << ", Lat: " << gw.location.lat 
+                  << ", Lng: " << gw.location.lng 
+                  << ", Height: " << gw.location.alt << "m" << std::endl;
     }
     std::cout << "Number of End Devices: " << end_devices.size() << std::endl;
     for (const auto& ed : end_devices) {
         std::cout << "  End Device ID: " << ed.id 
-                  << ", Lat: " << ed.lat 
-                  << ", Lng: " << ed.lng 
-                  << ", Height: " << ed.height << "m"
+                  << ", Lat: " << ed.location.lat 
+                  << ", Lng: " << ed.location.lng 
+                  << ", Height: " << ed.location.alt << "m"
                   << ", Assigned Gateway: " 
                   << (ed.assigned_gateway ? ed.assigned_gateway->id : "None")
                   << std::endl;

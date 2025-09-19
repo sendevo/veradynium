@@ -7,18 +7,7 @@
 
 namespace terrain {
 
-static inline int clamp_index_for_cell(int n, int idx) {
-    // valid cell index range is [0, n-2] because we access [idx] and [idx+1]
-    if (n < 2) return -1;
-    if (idx < 0) return 0;
-    if (idx > n - 2) return n - 2;
-    return idx;
-}
-
-ElevationGrid::ElevationGrid(const std::vector<double>& lats_raw,
-                             const std::vector<double>& lngs_raw,
-                             const std::vector<double>& alts_raw)
-{
+ElevationGrid::ElevationGrid(const std::vector<double>& lats_raw, const std::vector<double>& lngs_raw, const std::vector<double>& alts_raw) {
     if (lats_raw.size() != lngs_raw.size() || lats_raw.size() != alts_raw.size()) {
         throw std::invalid_argument("Latitude, Longitude, and Altitude vectors must be of the same size");
     }
@@ -60,7 +49,7 @@ ElevationGrid::ElevationGrid(const std::vector<double>& lats_raw,
 
         elevationGrid[i][j] = alts_raw[k];
     }
-}
+};
 
 ElevationGrid ElevationGrid::fromCSV(const std::string& filepath) {
     std::vector<double> lats, lngs, alts;
@@ -99,7 +88,7 @@ ElevationGrid ElevationGrid::fromCSV(const std::string& filepath) {
     }
 
     return ElevationGrid(lats, lngs, alts);
-}
+};
 
 int ElevationGrid::findIndex(const std::vector<double>& arr, double value) const {
     // Returns index i such that arr[i] <= value <= arr[i+1], clamped to valid cell range.
@@ -108,7 +97,7 @@ int ElevationGrid::findIndex(const std::vector<double>& arr, double value) const
     // Convert to cell index (left neighbor), then clamp
     idx = (idx > 0 ? idx - 1 : idx);
     return clamp_index_for_cell(int(arr.size()), idx);
-}
+};
 
 double ElevationGrid::bilinearInterpolation(double lat, double lng) const {
     int i = findIndex(latitudes,  lat);
@@ -146,12 +135,9 @@ double ElevationGrid::bilinearInterpolation(double lat, double lng) const {
     const double fxy1 = Q11 * (1 - tx) + Q21 * tx;
     const double fxy2 = Q12 * (1 - tx) + Q22 * tx;
     return fxy1 * (1 - ty) + fxy2 * ty;
-}
+};
 
-std::vector<double> ElevationGrid::terrainProfile(double lat1, double lon1,
-                                                  double lat2, double lon2,
-                                                  int steps) const
-{
+std::vector<double> ElevationGrid::terrainProfile(double lat1, double lon1, double lat2, double lon2, int steps) const {
     std::vector<double> profile;
     profile.reserve(steps + 1);
 
@@ -164,7 +150,7 @@ std::vector<double> ElevationGrid::terrainProfile(double lat1, double lon1,
         profile.push_back(terrain);
     }
     return profile;
-}
+};
 
 bool ElevationGrid::lineOfSight(double lat1, double lon1,
                                 double lat2, double lon2,
@@ -185,7 +171,11 @@ bool ElevationGrid::lineOfSight(double lat1, double lon1,
         if (terrain > los) return false; // blocked
     }
     return true; // clear
-}
+};
+
+bool ElevationGrid::lineOfSight(LatLngAlt pos1, LatLngAlt pos2) const {
+    return lineOfSight(pos1.lat, pos1.lng, pos2.lat, pos2.lng, pos1.alt, pos2.alt);
+};
 
 double ElevationGrid::haversine(double lat1, double lon1, double lat2, double lon2) const {
     const double R = 6371000.0; // Earth radius in meters
@@ -196,15 +186,39 @@ double ElevationGrid::haversine(double lat1, double lon1, double lat2, double lo
                      std::sin(dlon/2) * std::sin(dlon/2);
     const double c = 2 * std::atan2(std::sqrt(a), std::sqrt(1-a));
     return R * c;
-}
+};
 
-double ElevationGrid::distance(double lat1, double lon1, double lat2, double lon2, double h1, double h2) const 
-{
+double ElevationGrid::haversine(LatLngAlt pos1, LatLngAlt pos2) const {
+    return haversine(pos1.lat, pos1.lng, pos2.lat, pos2.lng);
+};
+
+Vec3 toECEF(double lat, double lng, double h) {
+    double phi = lat * M_PI / 180.0;
+    double lambda = lng * M_PI / 180.0;
+    double sinphi = std::sin(phi);
+    double cosphi = std::cos(phi);
+    double sinlambda = std::sin(lambda);
+    double coslambda = std::cos(lambda);
+
+    double N = a / sqrt(1 - e2 * sinphi * sinphi);
+
+    double x = (N + h) * cosphi * coslambda;
+    double y = (N + h) * cosphi * sinlambda;
+    double z = (N * (1 - e2) + h) * sinphi;
+
+    return {x, y, z};
+};
+
+double ElevationGrid::distance(double lat1, double lon1, double lat2, double lon2, double h1, double h2) const  {
     Vec3 p1 = toECEF(lat1, lon1, h1);
     Vec3 p2 = toECEF(lat2, lon2, h2);
     double dx = p2.x - p1.x, dy = p2.y - p1.y, dz = p2.z - p1.z;
     return std::sqrt(dx*dx + dy*dy + dz*dz);
-}
+};
+
+double ElevationGrid::distance(LatLngAlt pos1, LatLngAlt pos2) const {
+    return distance(pos1.lat, pos1.lng, pos2.lat, pos2.lng, pos1.alt, pos2.alt);
+};
 
 double ElevationGrid::getMaxAltitude() const {
     double maxAlt = -INF;
@@ -215,7 +229,7 @@ double ElevationGrid::getMaxAltitude() const {
         }
     }
     return maxAlt;
-}
+};
 
 double ElevationGrid::getMinAltitude() const {
     double minAlt = INF;
@@ -226,6 +240,25 @@ double ElevationGrid::getMinAltitude() const {
         }
     }
     return minAlt;
-}
+};
+
+LatLngAlt getCentroid(const std::vector<LatLngAlt>& points) {
+    if(points.empty()) 
+        return {0.0, 0.0, 0.0};
+
+    double sumLat{}, sumLng{}, sumAlt{};
+    for (auto n : points) {
+        sumLat += n.lat;
+        sumLng += n.lng;
+        sumAlt += n.alt;
+    }
+
+    return { // centroid position
+        sumLat / points.size(), 
+        sumLng / points.size(),
+        sumAlt / points.size()
+    };
+};
+
 
 } // namespace terrain
