@@ -241,7 +241,6 @@ void Network::printJSON() const {
 };
 
 void Network::print(global::PRINT_TYPE format) {
-    connect();
     switch (format) {
         case global::PLAIN_TEXT:
             printPlainText();

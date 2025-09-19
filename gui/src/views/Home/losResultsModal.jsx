@@ -1,9 +1,4 @@
-import { useState } from "react";
-import { 
-    Typography,
-    Modal as MuiModal,
-    Box, 
-} from "@mui/material";
+import { Typography, Modal, Box } from "@mui/material";
 import LineChart from "./lineChart";
 
 const style = {
@@ -20,27 +15,24 @@ const style = {
 
 const requiredProps = ["point1", "point2", "distance_m", "line_of_sight", "terrain_profile_m"];
 
-const ResultsModal = props => {
+const LOSResultsModal = props => {
     
-    const { result } = props;
-
-    const [open, setOpen] = useState(true);
-    const handleClose = () => setOpen(false);
+    const { result, open, onClose } = props;
 
     if(!result){
-        console.warn("ResultsModal: No result provided");
+        console.warn("LOSResultsModal: No result provided");
         return null;
     }
 
     for(const prop of requiredProps){
         if(!(prop in result)){
-            console.warn(`ResultsModal: Missing required prop '${prop}' in result`);
+            console.warn(`LOSResultsModal: Missing required prop '${prop}' in result`);
             return null;
         }
     }
 
     return (
-        <MuiModal open={open} onClose={handleClose} aria-labelledby="modal-title" aria-describedby="modal-description">
+        <Modal open={open} onClose={onClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <Box sx={style}>
                 <Typography sx={{fontSize: 18, fontWeight:"bold", mb:2}}>Cálculo de línea de vista (LOS)</Typography>
 
@@ -59,8 +51,8 @@ const ResultsModal = props => {
                 <Typography sx={{fontWeight:"bold", mt:2, mb:3}}>Perfil de terreno (m)</Typography>
                 <LineChart data={result.terrain_profile_m}/>
             </Box>
-        </MuiModal>
+        </Modal>
     );
 };
 
-export default ResultsModal;
+export default LOSResultsModal;

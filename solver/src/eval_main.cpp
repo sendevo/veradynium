@@ -66,23 +66,12 @@ int main(int argc, char **argv) {
         global::printHelp(MANUAL, "Error in argument -f (--em_file). A filename must be provided.");
     }
 
-    auto grid = terrain::ElevationGrid::fromCSV(em_filename);
     auto network = network::Network::fromGeoJSON(nw_filename);
+    auto grid = terrain::ElevationGrid::fromCSV(em_filename);
     
     network.setElevationGrid(grid);
-    
+    network.connect();
     network.print(outputFormat);
-
-    switch(outputFormat) {
-        case global::PLAIN_TEXT:
-            
-            break;
-        case global::JSON:
-            
-            break;
-        default:
-            break;
-    }
 
     return 0;
 }

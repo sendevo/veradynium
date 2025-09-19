@@ -98,7 +98,7 @@ private:
     int findIndex(const std::vector<double>& vec, double value) const;
 };
 
-inline int clamp_index_for_cell(int n, int idx) {
+inline int clampIndexForCell(int n, int idx) {
     // valid cell index range is [0, n-2] because we access [idx] and [idx+1]
     if (n < 2) return -1;
     if (idx < 0) return 0;

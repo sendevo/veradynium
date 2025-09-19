@@ -43,8 +43,8 @@ ElevationGrid::ElevationGrid(const std::vector<double>& lats_raw, const std::vec
         int i = int(it_i - latitudes.begin());
         int j = int(it_j - longitudes.begin());
         // We want indices of the *cell*, not the upper bound; shift back one step unless already 0
-        i = clamp_index_for_cell(int(latitudes.size()),  (i > 0 ? i - 1 : i));
-        j = clamp_index_for_cell(int(longitudes.size()), (j > 0 ? j - 1 : j));
+        i = clampIndexForCell(int(latitudes.size()),  (i > 0 ? i - 1 : i));
+        j = clampIndexForCell(int(longitudes.size()), (j > 0 ? j - 1 : j));
         if (i < 0 || j < 0) continue; // can't place (too small grid), but we checked earlier
 
         elevationGrid[i][j] = alts_raw[k];
@@ -96,7 +96,7 @@ int ElevationGrid::findIndex(const std::vector<double>& arr, double value) const
     int idx = int(it - arr.begin());
     // Convert to cell index (left neighbor), then clamp
     idx = (idx > 0 ? idx - 1 : idx);
-    return clamp_index_for_cell(int(arr.size()), idx);
+    return clampIndexForCell(int(arr.size()), idx);
 };
 
 double ElevationGrid::bilinearInterpolation(double lat, double lng) const {

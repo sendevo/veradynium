@@ -3,7 +3,8 @@ import { Grid, Typography } from "@mui/material";
 import MainView from "../../components/MainView";
 import Map from "../../components/Map";
 import DropZone from "../../components/DropZone";
-import ResultsModal from "./resultsModal";
+import LOSResultsModal from "./losResultsModal";
+import NetworkResultsModal from "./networkResultsModal";
 import MenuButtons from "./menuButtons";
 import useToast from "../../hooks/useToast";
 import { useFilesContext } from "../../context/Files";
@@ -17,6 +18,9 @@ const initialZoom = 13;
 
 const View = () => {
     const [points, setPoints] = useState([]); // Points for LOS calculation
+    // Modals state
+    const [losResultModalOpen, setLosResultModalOpen] = useState(false);
+    const [networkResultModalOpen, setNetworkResultModalOpen] = useState(false);
 
     const toast = useToast();
 
@@ -36,6 +40,16 @@ const View = () => {
         resetNetworkConnection,
         resetSolverResults
     } = useAnalysis();
+
+    useEffect(() => {
+        if(losResult)
+            setLosResultModalOpen(true);
+    }, [losResult]);
+
+    useEffect(() => {
+        if(networkResult)
+            setNetworkResultModalOpen(true);
+    }, [networkResult]);
 
     const elevationData = files.elevation_map.content || [];
     const featureCollection = networkResult || files.features.content || { features: [] };
@@ -74,13 +88,8 @@ const View = () => {
         setPoints([]); 
     };
 
-    const handleResetConnections = () => {
-        setFeatureCollection(files.features.content || {features: []});
-    };
-
     const hasElevation = elevationData && elevationData.length > 0;
     const hasFeatures = featureCollection && featureCollection.features && featureCollection.features.length > 0;
-    const hasConnections = featureCollection.features.filter(f => f.geometry.type === "LineString").length > 0;
 
     return(
         <MainView background={background}>
@@ -129,8 +138,9 @@ const View = () => {
                             handleComputeLOS={handleComputeLOS}
                             handleRunSolver={runSolverAction}/>
 
-                        {losResult && <ResultsModal result={losResult}/>}
+                        <LOSResultsModal result={losResult} open={losResultModalOpen} onClose={() => setLosResultModalOpen(false)}/>
 
+                        <NetworkResultsModal result={networkResult} open={networkResultModalOpen} onClose={() => setNetworkResultModalOpen(false)}/>
                         
                     </Grid>
                 </Grid>
