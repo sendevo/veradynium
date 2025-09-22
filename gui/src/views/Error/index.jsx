@@ -5,6 +5,7 @@ import {
     TextField,
     Grid
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import useToast from "../../hooks/useToast";
 import MainView from "../../components/MainView";
 import image from "../../assets/working_monkey.jpg";
@@ -26,6 +27,8 @@ const View = ({errorMessage, onReset, onReport}) => {
 
     const toast = useToast();
 
+    const { t } = useTranslation("error");
+
     const handleReport = () => {
         toast("Error reportado", "success");
         onReport();
@@ -37,9 +40,9 @@ const View = ({errorMessage, onReset, onReport}) => {
     };
 
     return(
-        <MainView title={"Ocurrió un error crítico"} >
+        <MainView title={t("critical_error")} >
             <Typography sx={messageStyle} mb={2}>
-                La aplicación ha detectado un error crítico y no puede continuar ejecutándose. Nuestro equipo está trabajando para resolverlo lo antes posible.
+                {t("error_msg_1")}
             </Typography>
             <img src={image} style={{
                 width: "100%",
@@ -47,7 +50,7 @@ const View = ({errorMessage, onReset, onReport}) => {
                 borderRadius: "10%"
             }}/>
             <Typography sx={messageStyle} mt={2}>
-                Vuelva a intentarlo nuevamente reiniciando la aplicación o envíe un reporte para ayudarnos a encontrar el problema.
+                {t("error_msg_2")}
             </Typography>
             <Grid 
                 container 
@@ -61,7 +64,7 @@ const View = ({errorMessage, onReset, onReport}) => {
                         onClick={handleReport}
                         variant={"contained"}
                         color={"primary"}>
-                            Enviar reporte
+                            {t("send_report")}
                     </Button>
                 </Grid>
                 <Grid item>
@@ -69,7 +72,7 @@ const View = ({errorMessage, onReset, onReport}) => {
                         onClick={handleReset}
                         variant={"contained"}
                         color={"primary"}>
-                            Reiniciar aplicación
+                            {t("restart_app")}
                     </Button>
                 </Grid>
             </Grid>

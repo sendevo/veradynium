@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import i18next from 'i18next';
+import { initReactI18next } from 'react-i18next';
 import { CssBaseline, GlobalStyles } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles"; 
 import theme, { globalStyles } from "./themes";
@@ -8,7 +10,14 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Navigation from "./components/Navigation";
 import { FilesProvider } from './context/Files';
 import UIUtilsProvider from './context/UIFeedback';
+import dictionary from './model/dictionary';
 
+i18next.use(initReactI18next).init({
+    resources: dictionary,
+    lng: 'es',
+    fallbackLng: 'es',
+    interpolation: { escapeValue: false }
+});
 
 const App = () =>(
     <ThemeProvider theme={theme}>

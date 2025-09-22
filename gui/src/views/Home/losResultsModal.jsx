@@ -1,4 +1,5 @@
 import { Typography, Modal, Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import LineChart from "./lineChart";
 
 const style = {
@@ -19,6 +20,8 @@ const LOSResultsModal = props => {
     
     const { result, open, onClose } = props;
 
+    const { t } = useTranslation("los_results_modal");
+
     if(!result){
         console.warn("LOSResultsModal: No result provided");
         return null;
@@ -34,21 +37,21 @@ const LOSResultsModal = props => {
     return (
         <Modal open={open} onClose={onClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <Box sx={style}>
-                <Typography sx={{fontSize: 18, fontWeight:"bold", mb:2}}>Cálculo de línea de vista (LOS)</Typography>
+                <Typography sx={{fontSize: 18, fontWeight:"bold", mb:2}}>{t("title")}</Typography>
 
-                <Typography sx={{fontWeight:"bold"}}>Punto 1</Typography>
-                <Typography>lat: {result.point1.lat}, lon: {result.point1.lng}</Typography>
-                <Typography>elev.: {result.point1.height_m} m</Typography>
+                <Typography sx={{fontWeight:"bold"}}>{t("point_1")}</Typography>
+                <Typography>{t("lat")}: {result.point1.lat}, {t("lon")}: {result.point1.lng}</Typography>
+                <Typography>{t("elev")}: {result.point1.height_m} m</Typography>
 
-                <Typography sx={{fontWeight:"bold", mt:1}}>Punto 2</Typography>
-                <Typography>lat: {result.point2.lat}, lon: {result.point2.lng}</Typography>
-                <Typography>elev: {result.point2.height_m} m</Typography>
+                <Typography sx={{fontWeight:"bold", mt:1}}>{t("point_2")}</Typography>
+                <Typography>{t("lat")}: {result.point2.lat}, {t("lon")}: {result.point2.lng}</Typography>
+                <Typography>{t("elev")}: {result.point2.height_m} m</Typography>
                 
-                <Typography sx={{mt:1}}><b>Distancia:</b> {result.distance_m} m</Typography>
+                <Typography sx={{mt:1}}><b>{t("distance")}:</b> {result.distance_m} m</Typography>
 
-                <Typography sx={{mt:1}}><b>Línea de vista:</b> {result.line_of_sight ? "Si" : "No"}</Typography>
+                <Typography sx={{mt:1}}><b>{t("line_of_sight")}:</b> {result.line_of_sight ? t("yes") : t("no")}</Typography>
 
-                <Typography sx={{fontWeight:"bold", mt:2, mb:3}}>Perfil de terreno (m)</Typography>
+                <Typography sx={{fontWeight:"bold", mt:2, mb:3}}>{t("terrain_profile")} (m)</Typography>
                 <LineChart data={result.terrain_profile_m}/>
             </Box>
         </Modal>

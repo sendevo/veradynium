@@ -1,30 +1,30 @@
 import Home from "./Home";
 import Data from "./Data";
 import About from "./About";
-import Help from "./Help";
+//import Help from "./Help";
 import Error from "./Error";
 
 const views = [
     {
         path: "/home",
-        name: "Inicio",
+        name: "home",
         component: <Home />
     },
     {
         path: "/data",
-        name: "Detalles",
+        name: "details",
         component: <Data />
     },
     {
         path: "/about",
-        name: "Acerca de",
+        name: "about",
         component: <About />
     },
-    {
+    /*{
         path: "/help",
-        name: "Ayuda",
+        name: "help",
         component: <Help />
-    },
+    },*/
     {
         path: "/error",
         component: <Error />

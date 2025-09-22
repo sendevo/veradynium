@@ -1,4 +1,5 @@
 import { Typography, Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const tableContainerStyle = {
     maxHeight: "65vh",
@@ -32,6 +33,8 @@ const getCoordinate = (feature, coord) => feature.geometry.coordinates[ coord ==
 
 const NodesTable = ({ featureCollection }) => {
 
+    const { t } = useTranslation("nodes_table");
+
     const hasFeatures = Array.isArray(featureCollection.features) && featureCollection.features.length > 0;
 
     return (
@@ -43,6 +46,7 @@ const NodesTable = ({ featureCollection }) => {
                             <th>Tipo</th>
                             <th>Id</th>
                             <th>Pos.</th>
+                            <th>Conexión</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -64,7 +68,7 @@ const NodesTable = ({ featureCollection }) => {
                 :
                 <Box sx={{height:"65vh", display:"flex", justifyContent:"center", alignItems:"center"}}>
                     <Typography variant="h6" align="center" color="white" sx={{mt:2}}>
-                        No hay nodos para mostrar. <br/> Cargue un archivo de puntos o agregue nodos en el mapa.
+                        {t("empty_table_1")} <br/> {t("empty_table_2")}
                     </Typography>
                 </Box>
             }

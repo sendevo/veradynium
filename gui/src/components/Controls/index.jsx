@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { Grid, Box, Typography } from '@mui/material';
+import { useTranslation } from "react-i18next";
 import { useDropzone } from 'react-dropzone';
 import MenuButtons from "./menuButtons";
 import { useFilesContext } from "../../context/Files";
@@ -24,6 +25,8 @@ const dropzoneStyle = {
 
 const DropZoneArea = ({ onDrop, onError }) => {
 
+    const { t } = useTranslation("controls");
+
     const onDropAccepted = useCallback((acceptedFiles) => {
         const file = acceptedFiles[0];
         if (!file) return;
@@ -43,7 +46,7 @@ const DropZoneArea = ({ onDrop, onError }) => {
     return (
         <Box {...getRootProps()} style={dropzoneStyle}>
             <input {...getInputProps()} />
-            <Typography style={{fontSize: 18}}>Arrastrar y soltar archivos aquí o seleccione desde su directorio</Typography>
+            <Typography style={{fontSize: 18}}>{t("dropzone_text")}</Typography>
         </Box>
     );
 };
@@ -87,23 +90,23 @@ const Controls = ({
             </Grid>
             {(hasElevation || hasFeatures) && 
                 <Grid>
-                    <Typography>Estado de los archivos:</Typography>
+                    <Typography>{t("files_status")}:</Typography>
                 
                     {hasElevation && 
                         <>
                             {files.elevation_map.id ? 
-                                <Typography sx={{fontSize: 12}}>Mapa de elevación cargado</Typography>
+                                <Typography sx={{fontSize: 12}}>{t("elevation_map_uploaded")}</Typography>
                                 :
-                                <Typography sx={{fontSize: 12}}>Mapa de elevación en modo local</Typography>
+                                <Typography sx={{fontSize: 12}}>{t("elevation_map_local")}</Typography>
                             }
                         </>
                     }
                     {hasFeatures &&  
                         <>
                             {files.features.id ?
-                                <Typography sx={{fontSize: 12}}>Geometrías cargadas</Typography>
+                                <Typography sx={{fontSize: 12}}>{t("features_uploaded")}</Typography>
                                 :
-                                <Typography sx={{fontSize: 12}}>Geometrías en modo local</Typography>
+                                <Typography sx={{fontSize: 12}}>{t("features_local")}</Typography>
                             }
                         </>
                     }
