@@ -106,17 +106,21 @@ const translations = {
     nodes_table: {
         en: {
             type: "Type",
+            end_device: "End device",
+            gateway: "Gateway",
             id: "Id",
             position: "Pos.",
-            connection: "Connection",
+            connections: "Connections",
             empty_table_1: "No nodes to display.",
             empty_table_2: "Upload a points file or add nodes on the map."
         },
         es: {
             type: "Tipo",
+            end_device: "Disp. final",
+            gateway: "Gateway",
             id: "Id",
             position: "Pos.",
-            connection: "Conexión",
+            connections: "Conexiones",
             empty_table_1: "No hay nodos para mostrar.",
             empty_table_2: "Cargue un archivo de puntos o agregue nodos en el mapa."
         }

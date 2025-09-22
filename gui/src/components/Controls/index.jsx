@@ -60,6 +60,8 @@ const Controls = ({
     points
 }) => {
 
+    const { t } = useTranslation("controls");
+
     const {
         files,
         uploadFile,

@@ -43,10 +43,10 @@ const NodesTable = ({ featureCollection }) => {
                 <table style={tableStyle}>
                     <thead>
                         <tr>
-                            <th>Tipo</th>
-                            <th>Id</th>
-                            <th>Pos.</th>
-                            <th>Conexión</th>
+                            <th>{t("type")}</th>
+                            <th>{t("id")}</th>
+                            <th>{t("position")}</th>
+                            <th>{t("connections")}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -54,12 +54,15 @@ const NodesTable = ({ featureCollection }) => {
                             .filter(feature => feature.geometry.type === "Point")
                             .map((feature, index) => (
                                 <tr key={index} style={feature.properties.selected ? highlightedRowStyle : {}}>
-                                    <Cell content={feature.properties.type === "end_device" ? "Disp. final" : "Gateway"}/>
+                                    <Cell content={feature.properties.type === "end_device" ? t("end_device") : t("gateway")}/>
                                     <Cell content={feature.properties.id}/>
+                                    <Cell content={`(${getCoordinate(feature, "lat")},${getCoordinate(feature, "lng")})`}/>
                                     <Cell content={
-                                        `(${getCoordinate(feature, "lat")},
-                                        ${getCoordinate(feature, "lng")})`
-                                        }/>
+                                        feature.properties.type === "end_device" ? 
+                                        (feature.properties.assigned_gateway ? feature.properties.assigned_gateway : "-")
+                                        :
+                                        (feature.properties.connected_devices ? feature.properties.connected_devices.length : "0")
+                                    }/>
                                 </tr>
                             )
                         )}
