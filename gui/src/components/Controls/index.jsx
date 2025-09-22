@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Grid, Box, Typography } from '@mui/material';
+import { Grid, Box, Typography } from '@mui/material';
 import { useDropzone } from 'react-dropzone';
 import MenuButtons from "./menuButtons";
 import { useFilesContext } from "../../context/Files";
@@ -50,10 +50,6 @@ const DropZoneArea = ({ onDrop, onError }) => {
 
 
 const Controls = ({
-    onAddElevation,
-    onAddFeatures,
-    onRemoveElevation,
-    onRemoveFeatures,
     handleResetPoints,
     handleComputeLOS,
     evalNetworkAction,
@@ -67,33 +63,19 @@ const Controls = ({
         removeFile
     } = useFilesContext();
 
-    const [hasElevation, setHasElevation] = useState(false);
-    const [hasFeatures, setHasFeatures] = useState(false);
-
-    useEffect(() => { // On files uploaded
-        const elevationData = files.elevation_map.content || [];
-        const featureCollection = files.features.content || { features: [] };
-        onAddElevation(elevationData, false);
-        onAddFeatures(featureCollection);
-        setHasFeatures(featureCollection.features && featureCollection.features.length > 0);
-        setHasElevation(elevationData.length > 0);
-    }, [files]);
+    const hasElevation = files.elevation_map.content && files.elevation_map.content.length > 0;
+    const hasFeatures = files.features.content && files.features.content.features && files.features.content.features.length > 0;
 
     const handleUploadFile = file => {
-        const extension = "." + file.name.split(".").pop().toLowerCase();
-        if(extension === ".json")
-            onAddElevation(null, true); // Reset network connections
         uploadFile(file);
     };
 
     const handleRemoveElevation = () => {
         removeFile(files.elevation_map.id, ".csv");
-        onRemoveElevation();
     };
 
     const handleRemoveFeatures = () => {
         removeFile(files.features.id, ".geojson");
-        onRemoveFeatures();
     };
 
     return (

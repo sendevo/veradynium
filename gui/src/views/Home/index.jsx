@@ -5,6 +5,7 @@ import Map from "../../components/Map";
 import Controls from "../../components/Controls";
 import LOSResultsModal from "./losResultsModal";
 import NetworkResultsModal from "./networkResultsModal";
+import { useFilesContext } from "../../context/Files";
 import useAnalysis from "../../hooks/useAnalysis";
 import background from "../../assets/backgrounds/background3.jpg";
 
@@ -19,9 +20,6 @@ const View = () => {
     const [losResultModalOpen, setLosResultModalOpen] = useState(false);
     const [networkResultModalOpen, setNetworkResultModalOpen] = useState(false);
 
-    const [elevationData, setElevationData] = useState(null);
-    const [features, setFeatures] = useState(null);
-
     const {
         losResult,
         networkResult,
@@ -33,8 +31,24 @@ const View = () => {
         resetSolverResults
     } = useAnalysis();
 
-    // When network connections are available, use them as features, else use uploaded features
-    const featureCollection = networkResult || features;
+    const { files } = useFilesContext();
+
+    const elevationData = files.elevation_map.content || [];
+    const featureCollection = networkResult || files.features.content || { features: [] };
+
+    useEffect(() => { // On files uploaded
+        if(!elevationData){
+            resetLOS();
+            resetNetworkConnection();
+            setPoints([]);
+        }
+        if(!featureCollection){
+            resetNetworkConnection();
+            resetSolverResults(); 
+        }else{
+            resetSolverResults();
+        }
+    }, [files]);
 
     useEffect(() => {
         if(losResult)
@@ -46,14 +60,6 @@ const View = () => {
             setNetworkResultModalOpen(true);
     }, [networkResult]);
 
-    const handleAddElevation = (data, resetConnections = false) => {
-        setElevationData(data);
-        if(resetConnections){
-            resetNetworkConnection();
-            resetSolverResults();
-        }
-    };
-
     const handleNewPoints = newPoints => {
         resetLOS();
         setPoints(newPoints);
@@ -61,17 +67,6 @@ const View = () => {
 
     const handleComputeLOS = async () => {
         computeLOSAction(points);
-    };
-
-    const handleRemoveElevation = () => {
-        resetLOS();
-        resetNetworkConnection();
-        setPoints([]);
-    };
-
-    const handleRemoveFeatures = () => {
-        resetNetworkConnection();
-        resetSolverResults(); 
     };
 
     const handleResetPoints = () => { 
@@ -86,10 +81,6 @@ const View = () => {
                     <Grid container direction={"column"} spacing={2} sx={{height:"100%"}}>
                         <Grid size={"grow"}>
                             <Controls 
-                                onAddElevation={handleAddElevation}
-                                onAddFeatures={setFeatures}
-                                onRemoveElevation={handleRemoveElevation}
-                                onRemoveFeatures={handleRemoveFeatures}
                                 handleResetPoints={handleResetPoints}
                                 handleComputeLOS={handleComputeLOS}
                                 evalNetworkAction={evalNetworkAction}

@@ -32,11 +32,11 @@ const getCoordinate = (feature, coord) => feature.geometry.coordinates[ coord ==
 
 const NodesTable = ({ featureCollection }) => {
 
-    const hasFeatures = Array.isArray(featureCollection.features);
+    const hasFeatures = Array.isArray(featureCollection.features) && featureCollection.features.length > 0;
 
     return (
         <Box style={tableContainerStyle}>
-            {hasFeatures &&
+            {hasFeatures ?
                 <table style={tableStyle}>
                     <thead>
                         <tr>
@@ -61,6 +61,12 @@ const NodesTable = ({ featureCollection }) => {
                         )}
                     </tbody>
                 </table>
+                :
+                <Box sx={{height:"65vh", display:"flex", justifyContent:"center", alignItems:"center"}}>
+                    <Typography variant="h6" align="center" color="white" sx={{mt:2}}>
+                        No hay nodos para mostrar. <br/> Cargue un archivo de puntos o agregue nodos en el mapa.
+                    </Typography>
+                </Box>
             }
         </Box>
     );

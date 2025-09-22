@@ -13,7 +13,7 @@ const MenuButtons = ({
     points
 }) => (
     <>
-        {hasFeatures && hasElevation && hasUploadedFiles &&
+        {hasFeatures && hasElevation && hasUploadedFiles && typeof evalNetworkAction === "function" &&
             <Grid>
                 <Button 
                     fullWidth
@@ -24,7 +24,7 @@ const MenuButtons = ({
             </Grid>
         }
 
-        {hasFeatures && hasElevation && hasUploadedFiles &&
+        {hasFeatures && hasElevation && hasUploadedFiles && typeof runSolverAction === "function" &&
             <Grid>
                 <Button 
                     fullWidth
@@ -35,9 +35,9 @@ const MenuButtons = ({
             </Grid>
         }
 
-        {points.length === 2 && hasElevation &&
+        {points?.length === 2 &&
             <>
-                {hasUploadedFiles &&
+                {hasUploadedFiles && typeof handleComputeLOS === "function" &&
                     <Grid>
                         <Button 
                             fullWidth
@@ -47,18 +47,20 @@ const MenuButtons = ({
                         </Button>
                     </Grid>
                 }
-                <Grid>
-                    <Button 
-                        fullWidth
-                        color="secondary"
-                        onClick={handleResetPoints}
-                        variant="contained">
-                            Restablecer puntos
-                    </Button>
-                </Grid>
+                { typeof handleResetPoints === "function" &&
+                    <Grid>
+                        <Button 
+                            fullWidth
+                            color="secondary"
+                            onClick={handleResetPoints}
+                            variant="contained">
+                                Restablecer puntos
+                        </Button>
+                    </Grid>
+                }
             </>
         }
-        {hasFeatures > 0 &&
+        {hasFeatures > 0 && typeof handleRemoveFeatures === "function" &&
             <Grid>
                 <Button 
                     fullWidth
@@ -70,7 +72,7 @@ const MenuButtons = ({
             </Grid>
         }
 
-        {hasElevation > 0 &&
+        {hasElevation > 0 && typeof handleRemoveElevation === "function" &&
             <Grid>
                 <Button 
                     fullWidth
