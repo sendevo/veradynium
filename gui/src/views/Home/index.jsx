@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
-import { Grid, Typography } from "@mui/material";
+import { Grid } from "@mui/material";
 import MainView from "../../components/MainView";
 import Map from "../../components/Map";
-import DropZone from "../../components/DropZone";
+import Controls from "../../components/Controls";
 import LOSResultsModal from "./losResultsModal";
 import NetworkResultsModal from "./networkResultsModal";
-import MenuButtons from "./menuButtons";
-import useToast from "../../hooks/useToast";
-import { useFilesContext } from "../../context/Files";
 import useAnalysis from "../../hooks/useAnalysis";
 import background from "../../assets/backgrounds/background3.jpg";
 
@@ -22,13 +19,8 @@ const View = () => {
     const [losResultModalOpen, setLosResultModalOpen] = useState(false);
     const [networkResultModalOpen, setNetworkResultModalOpen] = useState(false);
 
-    const toast = useToast();
-
-    const {
-        files,
-        uploadFile,
-        removeFile
-    } = useFilesContext();
+    const [elevationData, setElevationData] = useState(null);
+    const [features, setFeatures] = useState(null);
 
     const {
         losResult,
@@ -41,6 +33,9 @@ const View = () => {
         resetSolverResults
     } = useAnalysis();
 
+    // When network connections are available, use them as features, else use uploaded features
+    const featureCollection = networkResult || features;
+
     useEffect(() => {
         if(losResult)
             setLosResultModalOpen(true);
@@ -51,15 +46,13 @@ const View = () => {
             setNetworkResultModalOpen(true);
     }, [networkResult]);
 
-    const elevationData = files.elevation_map.content || [];
-    const featureCollection = networkResult || files.features.content || { features: [] };
-    
-    const handleUploadFile = file => {
-        const extension = "." + file.name.split(".").pop().toLowerCase();
-        if(extension === ".json")
+    const handleAddElevation = (data, resetConnections = false) => {
+        setElevationData(data);
+        if(resetConnections){
             resetNetworkConnection();
-        uploadFile(file);
-    }
+            resetSolverResults();
+        }
+    };
 
     const handleNewPoints = newPoints => {
         resetLOS();
@@ -71,14 +64,12 @@ const View = () => {
     };
 
     const handleRemoveElevation = () => {
-        removeFile(files.elevation_map.id, ".csv");
         resetLOS();
         resetNetworkConnection();
         setPoints([]);
     };
 
     const handleRemoveFeatures = () => {
-        removeFile(files.features.id, ".geojson");
         resetNetworkConnection();
         resetSolverResults(); 
     };
@@ -88,55 +79,23 @@ const View = () => {
         setPoints([]); 
     };
 
-    const hasElevation = elevationData && elevationData.length > 0;
-    const hasFeatures = featureCollection && featureCollection.features && featureCollection.features.length > 0;
-
     return(
         <MainView background={background}>
             <Grid container spacing={2} direction="row" sx={{height:"75vh"}}>
                 <Grid size={3}>
                     <Grid container direction={"column"} spacing={2} sx={{height:"100%"}}>
                         <Grid size={"grow"}>
-                            <DropZone 
-                                onDrop={handleUploadFile} 
-                                onError={message => toast(message, "error")}/>
+                            <Controls 
+                                onAddElevation={handleAddElevation}
+                                onAddFeatures={setFeatures}
+                                onRemoveElevation={handleRemoveElevation}
+                                onRemoveFeatures={handleRemoveFeatures}
+                                handleResetPoints={handleResetPoints}
+                                handleComputeLOS={handleComputeLOS}
+                                evalNetworkAction={evalNetworkAction}
+                                runSolverAction={runSolverAction}
+                                points={points}/>
                         </Grid>
-
-                        {(hasElevation || hasFeatures) && 
-                            <Grid>
-                                <Typography>Estado de los archivos:</Typography>
-                            
-                                {hasElevation && 
-                                    <>
-                                        {files.elevation_map.id ? 
-                                            <Typography sx={{fontSize: 12}}>Mapa de elevación cargado</Typography>
-                                            :
-                                            <Typography sx={{fontSize: 12}}>Mapa de elevación en modo local</Typography>
-                                        }
-                                    </>
-                                }
-                                {hasFeatures &&  
-                                    <>
-                                        {files.features.id ?
-                                            <Typography sx={{fontSize: 12}}>Geometrías cargadas</Typography>
-                                            :
-                                            <Typography sx={{fontSize: 12}}>Geometrías en modo local</Typography>
-                                        }
-                                    </>
-                                }
-                            </Grid>
-                        }
-
-                        <MenuButtons
-                            hasFeatures={hasFeatures}
-                            hasElevation={hasElevation}
-                            points={points}
-                            handleRemoveFeatures={handleRemoveFeatures}
-                            handleRemoveElevation={handleRemoveElevation}
-                            handleResetPoints={handleResetPoints}
-                            handleEvalNetwork={evalNetworkAction}
-                            handleComputeLOS={handleComputeLOS}
-                            handleRunSolver={runSolverAction}/>
 
                         <LOSResultsModal result={losResult} open={losResultModalOpen} onClose={() => setLosResultModalOpen(false)}/>
 

@@ -3,15 +3,61 @@ import { Button, Grid } from '@mui/material';
 const MenuButtons = ({
     hasFeatures,
     hasElevation,
-    points,
+    hasUploadedFiles,
+    handleComputeLOS,
+    evalNetworkAction,
+    runSolverAction,
     handleRemoveFeatures,
     handleRemoveElevation,
     handleResetPoints,
-    handleEvalNetwork,
-    handleComputeLOS,
-    handleRunSolver
+    points
 }) => (
     <>
+        {hasFeatures && hasElevation && hasUploadedFiles &&
+            <Grid>
+                <Button 
+                    fullWidth
+                    onClick={evalNetworkAction}
+                    variant="contained">
+                        Test conectividad
+                </Button>
+            </Grid>
+        }
+
+        {hasFeatures && hasElevation && hasUploadedFiles &&
+            <Grid>
+                <Button 
+                    fullWidth
+                    onClick={runSolverAction}
+                    variant="contained">
+                        Ejecutar solver
+                </Button>
+            </Grid>
+        }
+
+        {points.length === 2 && hasElevation &&
+            <>
+                {hasUploadedFiles &&
+                    <Grid>
+                        <Button 
+                            fullWidth
+                            onClick={handleComputeLOS}
+                            variant="contained">
+                                Evaluar LOS
+                        </Button>
+                    </Grid>
+                }
+                <Grid>
+                    <Button 
+                        fullWidth
+                        color="secondary"
+                        onClick={handleResetPoints}
+                        variant="contained">
+                            Restablecer puntos
+                    </Button>
+                </Grid>
+            </>
+        }
         {hasFeatures > 0 &&
             <Grid>
                 <Button 
@@ -32,50 +78,6 @@ const MenuButtons = ({
                     onClick={handleRemoveElevation}
                     variant="contained">
                         Quitar altimetría
-                </Button>
-            </Grid>
-        }
-
-        {points.length === 2 && hasElevation &&
-            <>
-                <Grid>
-                    <Button 
-                        fullWidth
-                        color="secondary"
-                        onClick={handleResetPoints}
-                        variant="contained">
-                            Restablecer puntos
-                    </Button>
-                </Grid>
-                <Grid>
-                    <Button 
-                        fullWidth
-                        onClick={handleComputeLOS}
-                        variant="contained">
-                            Evaluar LOS
-                    </Button>
-                </Grid>
-            </>
-        }
-
-        {hasFeatures && hasElevation && 
-            <Grid>
-                <Button 
-                    fullWidth
-                    onClick={handleEvalNetwork}
-                    variant="contained">
-                        Test conectividad
-                </Button>
-            </Grid>
-        }
-
-        {hasFeatures && hasElevation &&
-            <Grid>
-                <Button 
-                    fullWidth
-                    onClick={handleRunSolver}
-                    variant="contained">
-                        Ejecutar solver
                 </Button>
             </Grid>
         }

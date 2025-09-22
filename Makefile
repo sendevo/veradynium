@@ -1,5 +1,3 @@
-# Makefile for LOS project
-
 # Variables
 SOLVER_DIR=solver
 GUI_DIR=gui
@@ -12,7 +10,7 @@ PIP=pip
 all: solver gui server
 
 # -------------------------
-# Build the solver
+# Build the solver binaries
 solver:
 	@echo "Building solver..."
 	cd $(SOLVER_DIR) && make
