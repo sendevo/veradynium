@@ -10,9 +10,9 @@ import background from "../../assets/backgrounds/background3.jpg";
 
 const View = () => {
 
-    const { files } = useModelContext();
+    const { model } = useModelContext();
 
-    const featureCollection = files.features.content || { features: [] };
+    const featureCollection = model.features.content || { features: [] };
 
     return (
         <MainView background={background}>

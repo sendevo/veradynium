@@ -63,24 +63,24 @@ const Controls = ({
     const { t } = useTranslation("controls");
 
     const {
-        files,
+        model,
         uploadFile,
         removeFile
     } = useModelContext();
 
-    const hasElevation = files.elevation_map.content && files.elevation_map.content.length > 0;
-    const hasFeatures = files.features.content && files.features.content.features && files.features.content.features.length > 0;
+    const hasElevation = model.elevation_map.content && model.elevation_map.content.length > 0;
+    const hasFeatures = model.features.content && model.features.content.features && model.features.content.features.length > 0;
 
     const handleUploadFile = file => {
         uploadFile(file);
     };
 
     const handleRemoveElevation = () => {
-        removeFile(files.elevation_map.id, ".csv");
+        removeFile(model.elevation_map.id, ".csv");
     };
 
     const handleRemoveFeatures = () => {
-        removeFile(files.features.id, ".geojson");
+        removeFile(model.features.id, ".geojson");
     };
 
     return (
@@ -96,7 +96,7 @@ const Controls = ({
                 
                     {hasElevation && 
                         <>
-                            {files.elevation_map.id ? 
+                            {model.elevation_map.id ? 
                                 <Typography sx={{fontSize: 12}}>{t("elevation_map_uploaded")}</Typography>
                                 :
                                 <Typography sx={{fontSize: 12}}>{t("elevation_map_local")}</Typography>
@@ -105,7 +105,7 @@ const Controls = ({
                     }
                     {hasFeatures &&  
                         <>
-                            {files.features.id ?
+                            {model.features.id ?
                                 <Typography sx={{fontSize: 12}}>{t("features_uploaded")}</Typography>
                                 :
                                 <Typography sx={{fontSize: 12}}>{t("features_local")}</Typography>
@@ -118,7 +118,7 @@ const Controls = ({
             <MenuButtons
                 hasFeatures={hasFeatures}
                 hasElevation={hasElevation}
-                hasUploadedFiles={files.elevation_map.id && files.features.id}
+                hasUploadedFiles={model.elevation_map.id && model.features.id}
                 handleComputeLOS={handleComputeLOS}
                 evalNetworkAction={evalNetworkAction}
                 runSolverAction={runSolverAction}
