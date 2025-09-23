@@ -1,4 +1,6 @@
 #pragma once
+#ifndef GLOBAL_HPP
+#define GLOBAL_HPP
 
 #include <iostream>
 #include <fstream>
@@ -50,3 +52,5 @@ inline std::ostream null_stream(&null_buffer);
 inline std::ostream& dbg = null_stream;
 
 } // namespace global
+
+#endif // GLOBAL_HPP

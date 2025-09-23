@@ -1,4 +1,6 @@
 #pragma once
+#ifndef FEATURE_COLLECTION_HPP
+#define FEATURE_COLLECTION_HPP
 
 #include <iostream>
 #include <string>
@@ -80,3 +82,5 @@ private:
 };
 
 } // namespace geojson
+
+#endif // FEATURE_COLLECTION_HPP

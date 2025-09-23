@@ -1,4 +1,6 @@
 #pragma once
+#ifndef DETAIL_HPP
+#define DETAIL_HPP
 
 #include "json.hpp"
 
@@ -16,7 +18,7 @@ inline std::string require_string(const nlohmann::json& obj, const std::string& 
         throw std::runtime_error("Invalid JSON: missing or incorrect string field '" + key + "'");
     }
     return obj[key];
-}
+};
 
 // Mandatory number field
 inline double require_number(const nlohmann::json& obj, const std::string& key) {
@@ -24,7 +26,7 @@ inline double require_number(const nlohmann::json& obj, const std::string& key) 
         throw std::runtime_error("Invalid JSON: missing or incorrect numeric field '" + key + "'");
     }
     return obj[key];
-}
+};
 
 // Optional number field with default
 inline double optional_number(const nlohmann::json& obj, const std::string& key, double def = 0.0) {
@@ -33,6 +35,8 @@ inline double optional_number(const nlohmann::json& obj, const std::string& key,
         throw std::runtime_error("Invalid JSON: incorrect numeric field '" + key + "'");
     }
     return obj[key];
-}
+};
 
-}
+} // namespace detail
+
+#endif // DETAIL_HPP

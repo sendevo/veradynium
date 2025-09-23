@@ -1,4 +1,6 @@
 #pragma once
+#ifndef NETWORK_HPP
+#define NETWORK_HPP
 
 #include <string>
 #include <vector>
@@ -99,3 +101,5 @@ private:
 };
 
 } // namespace network
+
+#endif // NETWORK_HPP

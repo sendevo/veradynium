@@ -103,5 +103,78 @@ void ClusteringOptimizer::optimize(int maxIterations, double minSpeed, double ac
     //global::dbg << "Warning: Could not connect all devices even with max gateways." << std::endl;
 };
 
+void SimulatedAnnealingOptimizer::optimize(double initialTemp, double finalTemp, double alpha, int iterationsPerTemp) {
+    // bounding box of all end-devices
+    std::vector<double> bbox = network.getBoundingBox();
+
+    // random generator
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_real_distribution<> disLat(bbox[1], bbox[3]);
+    static std::uniform_real_distribution<> disLng(bbox[0], bbox[2]);
+    static std::uniform_real_distribution<> disProb(0.0, 1.0);
+
+    // initial solution: 1 gateway at random position
+    network.gateways.clear();
+    terrain::LatLngAlt location = {disLat(gen), disLng(gen), 2.0};
+    network.gateways.emplace_back("0", location);
+    unsigned int connected_eds = network.connect();
+    unsigned int best_connected_eds = connected_eds;
+    auto best_gateways = network.gateways;
+
+    double temp = initialTemp;
+
+    global::dbg << "type,id,lat,lng,iter,temp,connected\n";
+    for (size_t j = 0; j < network.end_devices.size(); ++j) {
+        auto& ed = network.end_devices[j];
+        global::dbg << "ed," << j << "," << ed.location.lat << "," << ed.location.lng << "," << 0 << "," << temp << "," << connected_eds << "\n";
+    }
+    for (size_t j = 0; j < network.gateways.size(); ++j) {
+        auto& gw = network.gateways[j];
+        global::dbg << "gw," << gw.id << "," << gw.location.lat << "," << gw.location.lng << "," << 0 << "," << temp << "," << connected_eds << "\n";
+    }
+
+    int iter = 0;
+    while (temp > finalTemp) {
+        for (int iters = 0; iters < iterationsPerTemp; ++iters) {
+            iter++;
+            // create neighbor solution by moving one gateway to a random position
+            int gw_to_move = gen() % network.gateways.size();
+            terrain::LatLngAlt old_location = network.gateways[gw_to_move].location;
+            terrain::LatLngAlt new_location = {disLat(gen), disLng(gen), 2.0};
+            network.gateways[gw_to_move].location = new_location;
+            connected_eds = network.connect();
+            // if better, accept
+            if (connected_eds > best_connected_eds) {
+                best_connected_eds = connected_eds;
+                best_gateways = network.gateways;
+            }
+            // if worse, accept with probability
+            else if (connected_eds < best_connected_eds) {
+                double prob = exp((connected_eds - best_connected_eds) / temp);
+                double rnd = disProb(gen);
+                if (rnd >= prob) {
+                    // reject, revert change
+                    network.gateways[gw_to_move].location = old_location;
+                    connected_eds = network.connect();
+                }
+            }
+            // debug output
+            for (size_t j = 0; j < network.gateways.size(); ++j) {
+                auto& gw = network.gateways[j];
+                global::dbg << "gw," << gw.id << "," << gw.location.lat << "," << gw.location.lng << "," << iter << "," << temp << "," << connected_eds << "\n";
+            }
+        }
+        temp *= alpha;
+    }
+    network.gateways = best_gateways;
+    connected_eds = network.connect();
+    if (connected_eds == network.end_devices.size()) {
+        //global::dbg << "All devices connected with " << network.gateways.size() << " gateways." << std::endl;
+        return;
+    } else {
+        //global::dbg << "Warning: Could not connect all devices even with max gateways." << std::endl;
+    }
+};
 
 } // namespace optimizers

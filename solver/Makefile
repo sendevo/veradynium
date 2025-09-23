@@ -1,5 +1,5 @@
 CPP      = g++
-CFLAGS   = -Wall -pthread -fopenmp -O3
+CFLAGS   = -Wall -pthread -fopenmp -O3 -std=c++17
 LDFLAGS  = -lgsl -lgslcblas -lm
 
 SRCDIR   = src
