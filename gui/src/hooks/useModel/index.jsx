@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { api } from '../../model/constants';
 import { 
     fetchWithTimeout,
@@ -10,7 +11,7 @@ import useToast from "../useToast";
 import usePreloader from "../usePreloader";
 
 
-const initialFiles = { // System uses elevation map and FeatureCollection files
+const defaultModel = { // System uses elevation map and FeatureCollection files
   elevation_map: { id: null, content: null },
   features: { id: null, content: null },
 };
@@ -22,13 +23,14 @@ const extensionToType = {
     ".json": "features"
 };
 
-const useFiles = () => {
+const useModel = () => {
     const toast = useToast();
     const preloader = usePreloader();
+    const { t } = useTranslation("model");
     
-    const [files, setFiles] = useState(initialFiles);
+    const [model, setModel] = useState(defaultModel);
 
-    const setFile = (type, id, content) => setFiles(prev => ({ 
+    const setModelContent = (type, id, content) => setModel(prev => ({ 
         ...prev, 
         [type]: { id, content } 
     }));
@@ -38,7 +40,7 @@ const useFiles = () => {
             return JSON.parse(fileContent);
         } catch (err) {
             console.error("Error parsing GeoJSON:", err);
-            toast("Error al parsear GeoJSON", "error");
+            toast(t("geojson_parsing_error"), "error");
             return null;
         }
     };
@@ -61,16 +63,16 @@ const useFiles = () => {
                     content: csvToElevation(content) 
                 };
             } else {
-                toast("Formato de archivo no soportado", "error");
+                toast(t("unsupported_file"), "error");
             }
 
             if (result?.content) {
                 toast(`Archivo ${file.name} cargado exitosamente`, "success");
-                setFile(result.type, upload_id, result.content);
+                setModelContent(result.type, upload_id, result.content);
             }
         } catch (err) {
             console.error("File read error:", err);
-            toast("Error al leer el archivo", "error");
+            toast(t("file_read_error"), "error");
         }
     };
 
@@ -81,13 +83,13 @@ const useFiles = () => {
             // Check if valid file format
             const extension = "." + file.name.split(".").pop().toLowerCase();
             if (!Object.keys(extensionToType).includes(extension)) {
-                toast("Formato de archivo no soportado", "error");
+                toast(t("unsupported_file"), "error");
                 preloader(false);
                 return;
             }
 
             // If there is an existing file of the same type, remove it first
-            const existingId = files[extensionToType[extension]].id;
+            const existingId = model[extensionToType[extension]].id;
             if(existingId) {
                 await removeFile(existingId, extension);
             }
@@ -108,7 +110,7 @@ const useFiles = () => {
             }else{ // If successful upload -> set upload_id (and content for .nc files)
                 ({ upload_id, data } = await res.json());
                 if (extension === ".nc") {
-                    setFile("elevation_map", upload_id, data);
+                    setModelContent("elevation_map", upload_id, data);
                     toast(`Archivo ${file.name} cargado exitosamente`, "success");
                     return; // No need to handle client file for .nc
                 }
@@ -141,19 +143,19 @@ const useFiles = () => {
                     }),
                 });
                 if (!res.ok) {
-                    toast("No se pudo eliminar el archivo del servidor", "error");
+                    toast(t("cannot_delete_file"), "error");
                     //throw new Error("Failed to delete file from server");
                 }
 
                 if ([".csv", ".nc"].includes(format)) {
-                    setFile("elevation_map", null, null);
+                    setModelContent("elevation_map", null, null);
                 } else if (format === ".geojson") {
-                    setFile("features", null, null);
+                    setModelContent("features", null, null);
                 } else {
-                    toast("Formato de archivo no soportado", "error");
+                    toast(t("unsupported_file"), "error");
                     return;
                 }
-                toast("Archivo eliminado exitosamente", "success");
+                toast(t("file_deletion_success"), "success");
             } catch (err) {
                 console.error("Delete error:", err);
             }
@@ -161,7 +163,7 @@ const useFiles = () => {
         [toast]
     );
 
-    return { files, setFiles, uploadFile, removeFile  };
+    return { model, setModel, uploadFile, removeFile  };
 }
 
-export default useFiles;
+export default useModel;

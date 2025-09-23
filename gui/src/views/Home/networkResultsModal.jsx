@@ -1,5 +1,5 @@
-
 import { Typography, Modal, Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const style = {
   position: 'absolute',
@@ -18,6 +18,7 @@ const requiredProps = ["num_end_devices", "num_gateways", "connected_end_devices
 const NetworkResultsModal = props => {
     
     const { result, open, onClose } = props;
+    const { t } = useTranslation("network_result_modal");
 
     if(!result){
         console.warn("NetworkResultsModal: No result provided");
@@ -38,14 +39,14 @@ const NetworkResultsModal = props => {
     return (
         <Modal open={open} onClose={onClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <Box sx={style}>
-                <Typography sx={{fontSize: 18, fontWeight:"bold", mb:2}}>Test de conectividad</Typography>
+                <Typography sx={{fontSize: 18, fontWeight:"bold", mb:2}}>{t("title")}</Typography>
 
-                <Typography>Dispositivos totales: {result.num_end_devices}</Typography>
-                <Typography>Gateways: {result.num_gateways}</Typography>
-                <Typography>Dispositivos conectados: {result.connected_end_devices}</Typography>
-                <Typography>Dispositivos no conectados: {result.disconnected_end_devices}</Typography>
-                <Typography>Porcentaje de conectividad: {connectivityProportion} %</Typography>
-                <Typography>Distancia total de enlaces: {result.total_distance.toFixed(2)} m</Typography>
+                <Typography>{t("total_devices")}: {result.num_end_devices}</Typography>
+                <Typography>{t("gateways")}: {result.num_gateways}</Typography>
+                <Typography>{t("connected_devices")}: {result.connected_end_devices}</Typography>
+                <Typography>{t("disconnected_devices")}: {result.disconnected_end_devices}</Typography>
+                <Typography>{t("connectivity_percentage")}: {connectivityProportion} %</Typography>
+                <Typography>{t("total_link_distance")}: {result.total_distance.toFixed(2)} m</Typography>
                 
             </Box>
         </Modal>

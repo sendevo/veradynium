@@ -3,7 +3,7 @@ import { Grid, Box, Typography } from '@mui/material';
 import { useTranslation } from "react-i18next";
 import { useDropzone } from 'react-dropzone';
 import MenuButtons from "./menuButtons";
-import { useFilesContext } from "../../context/Files";
+import { useModelContext } from "../../context/Model";
 
 const dropzoneStyle = {
     verticalAlign: 'middle',
@@ -66,7 +66,7 @@ const Controls = ({
         files,
         uploadFile,
         removeFile
-    } = useFilesContext();
+    } = useModelContext();
 
     const hasElevation = files.elevation_map.content && files.elevation_map.content.length > 0;
     const hasFeatures = files.features.content && files.features.content.features && files.features.content.features.length > 0;

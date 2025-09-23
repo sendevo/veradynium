@@ -2,7 +2,7 @@ import { useState } from "react";
 import useComputations from "../useComputations";
 import useToast from "../useToast";
 import usePreloader from "../usePreloader";
-import { useFilesContext } from "../../context/Files";
+import { useModelContext } from "../../context/Model";
 
 
 const useAnalysis = () => {
@@ -13,22 +13,22 @@ const useAnalysis = () => {
     
     const { computeLOS, evalNetwork, runSolver } = useComputations();
 
-    // files is used to get the uploaded files and their IDs
-    // setFiles is used to set the result of computations in the features content
-    const { files, setFiles } = useFilesContext();
+    // model is used to get the uploaded model and their IDs
+    // setModel is used to set the result of computations in the features content
+    const { model, setModel } = useModelContext();
 
     const computeLOSAction = async (points) => {
         if (points.length < 2) {
             toast("Coordenadas de prueba no definidas", "error");
             return;
         }
-        if (!files.elevation_map.id) {
+        if (!model.elevation_map.id) {
             toast("El mapa de elevación no está disponible", "error");
             return;
         }
 
         const params = {
-            em_file_id: files.elevation_map.id,
+            em_file_id: model.elevation_map.id,
             p1: points[0],
             p2: points[1],
         };
@@ -46,31 +46,31 @@ const useAnalysis = () => {
     };
 
     const solverAction = async solver => {
-        if (!files.elevation_map.id) {
+        if (!model.elevation_map.id) {
             toast("El mapa de elevación no está disponible", "error");
             return;
         }
-        if (!files.features.id) {
+        if (!model.features.id) {
             toast("El archivo de geometrías no está disponible", "error");
             return;
         }
 
         const params = {
-            em_file_id: files.elevation_map.id,
-            features_file_id: files.features.id
+            em_file_id: model.elevation_map.id,
+            features_file_id: model.features.id
         };
 
         preloader(true);
         const result = await solver(params);
         if(!result.error){
-            const nextFiles = {
-                ...files,
+            const nextModel = {
+                ...model,
                 features: {
-                    id: files.features.id,
+                    id: model.features.id,
                     content: result
                 }
             }
-            setFiles(nextFiles);
+            setModel(nextModel);
         }else{
             toast(result.error, "error");
         }
@@ -88,14 +88,14 @@ const useAnalysis = () => {
     const resetLOS = () => setLosResult(null);
 
     const resetNetworkConnection = () => {
-        const nextFiles = {
-            ...files,
+        const nextModel = {
+            ...model,
             features: {
-                id: files.features.id,
+                id: model.features.id,
                 content: null
             }
         };
-        setFiles(nextFiles);
+        setModel(nextModel);
     }
 
     return {

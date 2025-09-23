@@ -19,7 +19,9 @@ const translations = {
             error_msg_1: "The application has detected a critical error and cannot continue running. Our team is working to resolve it as soon as possible.",
             error_msg_2: "Please try again by restarting the application or submit a report to help us identify the issue.",
             send_report: "Send report",
-            restart_app: "Restart application"
+            restart_app: "Restart application",
+            los_error: "An error occurred while computing LOS",
+            request_error: "An error occurred while processing the request"
         },
         es: {
             app_restarted: "Aplicación reiniciada",
@@ -28,7 +30,25 @@ const translations = {
             error_msg_1: "La aplicación ha detectado un error crítico y no puede continuar ejecutándose. Nuestro equipo está trabajando para resolverlo lo antes posible.",
             error_msg_2: "Vuelva a intentarlo nuevamente reiniciando la aplicación o envíe un reporte para ayudarnos a encontrar el problema.",
             send_report: "Enviar reporte",
-            restart_app: "Reiniciar aplicación"
+            restart_app: "Reiniciar aplicación",
+            los_error: "Ocurrió un error al calcular LOS",
+            request_error: "Ocurrió un error al procesar la solicitud",
+            geojeson_parsing_error: "Error al parsear GeoJSON"
+        }
+    },
+    model: {
+        en: {
+            unsupported_file: "Unsupported file format",
+            file_read_error: "Error reading file",
+            geojson_parsing_error: "Error parsing GeoJSON",
+            cannot_delete_file: "Cannot delete file from server",
+            file_deletion_success: "File deleted successfully"
+        },
+        es: {
+            unsupported_file: "Formato de archivo no soportado",
+            file_read_error: "Error al leer el archivo",
+            cannot_delete_file: "No se pudo eliminar el archivo del servidor",
+            file_deletion_success: "Archivo eliminado exitosamente"
         }
     },
     help: {
@@ -65,6 +85,26 @@ const translations = {
             yes: "Si",
             no: "No",
             terrain_profile: "Perfil de terreno (m)"
+        }
+    },
+    network_result_modal: {
+        en: {
+            title: "Connectivity Test",
+            total_devices: "Total devices",
+            gateways: "Gateways",
+            connected_devices: "Connected devices",
+            disconnected_devices: "Disconnected devices",
+            connectivity_percentage: "Connectivity percentage",
+            total_link_distance: "Total link distance"
+        },
+        es: {
+            title: "Test de conectividad",
+            total_devices: "Dispositivos totales",
+            gateways: "Gateways",
+            connected_devices: "Dispositivos conectados",
+            disconnected_devices: "Dispositivos no conectados",
+            connectivity_percentage: "Porcentaje de conectividad",
+            total_link_distance: "Distancia total de enlaces"
         }
     },
     controls: {

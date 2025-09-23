@@ -8,7 +8,7 @@ import views from "./views";
 import Home from "./views/Home";
 import ErrorBoundary from './components/ErrorBoundary';
 import Navigation from "./components/Navigation";
-import { FilesProvider } from './context/Files';
+import { ModelProvider } from './context/Model';
 import UIUtilsProvider from './context/UIFeedback';
 import dictionary from './model/dictionary';
 
@@ -24,7 +24,7 @@ const App = () =>(
         <CssBaseline />
         <GlobalStyles styles={globalStyles}/>
         <UIUtilsProvider>
-            <FilesProvider>
+            <ModelProvider>
                 <BrowserRouter>
                     <ErrorBoundary>
                         <Navigation/>
@@ -39,7 +39,7 @@ const App = () =>(
                         </Routes>
                     </ErrorBoundary>
                 </BrowserRouter>
-            </FilesProvider>
+            </ModelProvider>
         </UIUtilsProvider>
     </ThemeProvider>
 );

@@ -1,9 +1,12 @@
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { api } from '../../model/constants';
 import { fetchWithTimeout } from "../../model/utils";
 
 
 const useComputations = () => {
+
+    const { t } = useTranslation("error");
 
     const computeLOS = useCallback( async params => { 
         // params format: {em_file_id, p1: {lat, lng, height_m}, p2: {lat, lng, height_m}}
@@ -25,7 +28,7 @@ const useComputations = () => {
                 return { error: errorMessage };
             }catch{
                 console.error("Error response:", res.status, text);
-                return { error: "Ocurrió un error al calcular LOS" };
+                return { error: t("los_error") };
             }
         }
 
@@ -61,7 +64,7 @@ const useComputations = () => {
                 return { error: errorMessage };
             }catch{
                 console.error("Error response:", res.status, text);
-                return { error: "Ocurrió un error al procesar la solicitud" };
+                return { error: t("request_error") };
             }
         }
 
@@ -89,7 +92,7 @@ const useComputations = () => {
                 return { error: errorMessage };
             }catch{
                 console.error("Error response:", res.status, text);
-                return { error: "Ocurrió un error al procesar la solicitud" };
+                return { error: t("request_error") };
             }
         }
 

@@ -5,7 +5,7 @@ import Map from "../../components/Map";
 import Controls from "../../components/Controls";
 import LOSResultsModal from "./losResultsModal";
 import NetworkResultsModal from "./networkResultsModal";
-import { useFilesContext } from "../../context/Files";
+import { useModelContext } from "../../context/Model";
 import useAnalysis from "../../hooks/useAnalysis";
 import background from "../../assets/backgrounds/background3.jpg";
 
@@ -29,12 +29,12 @@ const View = () => {
         resetNetworkConnection
     } = useAnalysis();
 
-    const { files } = useFilesContext();
+    const { model } = useModelContext();
 
-    const elevationData = files.elevation_map.content || [];
-    const featureCollection = files.features.content || { features: [] };
+    const elevationData = model.elevation_map.content || [];
+    const featureCollection = model.features.content || { features: [] };
 
-    useEffect(() => { // On files uploaded
+    useEffect(() => { // On model updated
         if(!elevationData){
             resetLOS();
             resetNetworkConnection();
@@ -44,9 +44,9 @@ const View = () => {
             resetNetworkConnection();
         }
 
-        if(files.features.content?.properties)
+        if(model.features.content?.properties)
             setNetworkResultModalOpen(true);
-    }, [files]);
+    }, [model]);
 
     useEffect(() => {
         if(losResult)

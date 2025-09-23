@@ -4,13 +4,13 @@ import {
 import MainView from "../../components/MainView";
 import Controls from "../../components/Controls";
 import NodesTable from "../../components/NodesTable";
-import { useFilesContext } from "../../context/Files";
+import { useModelContext } from "../../context/Model";
 import background from "../../assets/backgrounds/background3.jpg";
 
 
 const View = () => {
 
-    const { files } = useFilesContext();
+    const { files } = useModelContext();
 
     const featureCollection = files.features.content || { features: [] };
 
