@@ -161,7 +161,7 @@ const useFiles = () => {
         [toast]
     );
 
-    return { files, uploadFile, removeFile  };
+    return { files, setFiles, uploadFile, removeFile  };
 }
 
 export default useFiles;

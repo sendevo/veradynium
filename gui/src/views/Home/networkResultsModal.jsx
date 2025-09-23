@@ -24,20 +24,15 @@ const NetworkResultsModal = props => {
         return null;
     }
 
-    if(!result.properties){
-        console.warn("NetworkResultsModal: Missing 'properties' in result");
-        return null;
-    }
-
     for(const prop of requiredProps){
-        if(!(prop in result.properties)){
-            console.warn(`NetworkResultsModal: Missing required prop '${prop}' in result.properties`);
+        if(!(prop in result)){
+            console.warn(`NetworkResultsModal: Missing required prop '${prop}' in result`);
             return null;
         }
     }
 
-    const connectivityProportion = (result.properties.num_end_devices > 0 
-        ? (result.properties.connected_end_devices / result.properties.num_end_devices) * 100 
+    const connectivityProportion = (result.num_end_devices > 0 
+        ? (result.connected_end_devices / result.num_end_devices) * 100 
         : 0).toFixed(2);
 
     return (
@@ -45,12 +40,12 @@ const NetworkResultsModal = props => {
             <Box sx={style}>
                 <Typography sx={{fontSize: 18, fontWeight:"bold", mb:2}}>Test de conectividad</Typography>
 
-                <Typography>Dispositivos totales: {result.properties.num_end_devices}</Typography>
-                <Typography>Gateways: {result.properties.num_gateways}</Typography>
-                <Typography>Dispositivos conectados: {result.properties.connected_end_devices}</Typography>
-                <Typography>Dispositivos no conectados: {result.properties.disconnected_end_devices}</Typography>
+                <Typography>Dispositivos totales: {result.num_end_devices}</Typography>
+                <Typography>Gateways: {result.num_gateways}</Typography>
+                <Typography>Dispositivos conectados: {result.connected_end_devices}</Typography>
+                <Typography>Dispositivos no conectados: {result.disconnected_end_devices}</Typography>
                 <Typography>Porcentaje de conectividad: {connectivityProportion} %</Typography>
-                <Typography>Distancia total de enlaces: {result.properties.total_distance.toFixed(2)} m</Typography>
+                <Typography>Distancia total de enlaces: {result.total_distance.toFixed(2)} m</Typography>
                 
             </Box>
         </Modal>

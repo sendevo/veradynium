@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import useFiles from "../../hooks/useFiles";
 
-const FilesContext = createContext();
+const FilesContext = createContext(null);
 
 export const FilesProvider = ({ children }) => {
     const fileOps = useFiles();

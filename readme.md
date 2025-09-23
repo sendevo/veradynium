@@ -22,21 +22,31 @@ Compile executables
 cd solver
 make
 ```
-#### Tests
-Check if two points are in Line-Of-Sight (LOS) given the elevation map  
-```bash
-los -f elevation.csv -p1 36.733780 -91.237743 2.0 -p2 36.712818 -91.221097 2.5
-```
-Test end-devices to gateways allocation given elevation map and nodes location:
-```bash
-compute_allocation -f elevation.csv -g network.json -o json
-```
-Run the solver to compute the optimal placement of gateways
+This will build the following programs:  
+* ```solver``` -> computes the optimal placement for the gateways from the network topology (specified by a geojson file) and the terrain elevation data (stores in a csv file).  
+* ```eval``` -> connects every end device of the network to their nearest gateway, if in range and line of sight.  
+* ```los``` -> given two points and the terrain elevation data, it determines if they are in line of sight.  
+
+#### Examples
+
+Run the solver to compute the optimal placement of gateways and print the result using json format:  
 ```bash
 solver -f elevation.csv -g network.json -o json  
 ```
+Test end-devices to gateways allocation given elevation map and nodes location:  
+```bash
+eval -f elevation.csv -g network.json -o json
+```
+Check if two points are in line of sight (LOS) given the elevation map:  
+```bash
+los -f elevation.csv -p1 36.733780 -91.237743 2.0 -p2 36.712818 -91.221097 2.5
+```
+
 
 ### GUI
+The GUI runs in the browser. It displays the map with the heatmap of the terrain elevation (once uploaded in ```.csv``` of ```.nc``` format) and the locations of end devices and gateways (once loaded ```.geojson``` format). The terrain elevation and network topology can be previewed in offline mode, this is, without a running backend.    
+It allows to compute the line of sight between two selected points on the map, and visualize the connections between these nodes, once computed in the backend.  
+
 Build GUI
 ```bash
 cd gui

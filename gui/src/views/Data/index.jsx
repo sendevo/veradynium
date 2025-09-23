@@ -5,16 +5,14 @@ import MainView from "../../components/MainView";
 import Controls from "../../components/Controls";
 import NodesTable from "../../components/NodesTable";
 import { useFilesContext } from "../../context/Files";
-import useAnalysis from "../../hooks/useAnalysis";
 import background from "../../assets/backgrounds/background3.jpg";
 
 
 const View = () => {
 
     const { files } = useFilesContext();
-    const { networkResult } = useAnalysis();
 
-    const featureCollection = networkResult || files.features.content || { features: [] };
+    const featureCollection = files.features.content || { features: [] };
 
     return (
         <MainView background={background}>

@@ -10,11 +10,12 @@ const useAnalysis = () => {
     const preloader = usePreloader();
     
     const [losResult, setLosResult] = useState(null);
-    const [networkResult, setNetworkResult] = useState(null);
-
+    
     const { computeLOS, evalNetwork, runSolver } = useComputations();
 
-    const { files } = useFilesContext();
+    // files is used to get the uploaded files and their IDs
+    // setFiles is used to set the result of computations in the features content
+    const { files, setFiles } = useFilesContext();
 
     const computeLOSAction = async (points) => {
         if (points.length < 2) {
@@ -62,8 +63,14 @@ const useAnalysis = () => {
         preloader(true);
         const result = await solver(params);
         if(!result.error){
-            console.log(result);
-            setNetworkResult(result);
+            const nextFiles = {
+                ...files,
+                features: {
+                    id: files.features.id,
+                    content: result
+                }
+            }
+            setFiles(nextFiles);
         }else{
             toast(result.error, "error");
         }
@@ -80,19 +87,24 @@ const useAnalysis = () => {
 
     const resetLOS = () => setLosResult(null);
 
-    const resetNetworkConnection = () => setNetworkResult(null);
-
-    const resetSolverResults = () => setNetworkResult(null);
+    const resetNetworkConnection = () => {
+        const nextFiles = {
+            ...files,
+            features: {
+                id: files.features.id,
+                content: null
+            }
+        };
+        setFiles(nextFiles);
+    }
 
     return {
         losResult,
-        networkResult,
         computeLOSAction,
         evalNetworkAction,
         runSolverAction,
         resetLOS,
-        resetNetworkConnection,
-        resetSolverResults
+        resetNetworkConnection
     };
 };
 

@@ -132,12 +132,17 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
 
     // Add gateways
     for (const auto& gw : gateways) {
+        std::vector<std::string> connected_device_ids;
+        for(const auto& dev : gw.connected_devices) {
+            connected_device_ids.push_back(dev->id);
+        }
         geojson::Feature gw_location;
         gw_location.geometry_type = geojson::POINT;
         gw_location.properties = nlohmann::json{
             {"type", "gateway"},
             {"id", gw.id},
-            {"height", gw.location.alt}
+            {"height", gw.location.alt},
+            {"connected_devices", connected_device_ids}
         };
         gw_location.coords = geojson::Position{gw.location.lng, gw.location.lat};
         feature_collection.addFeature(gw_location);

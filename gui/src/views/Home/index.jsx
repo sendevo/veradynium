@@ -22,19 +22,17 @@ const View = () => {
 
     const {
         losResult,
-        networkResult,
         evalNetworkAction,
         computeLOSAction,
         runSolverAction,
         resetLOS,
-        resetNetworkConnection,
-        resetSolverResults
+        resetNetworkConnection
     } = useAnalysis();
 
     const { files } = useFilesContext();
 
     const elevationData = files.elevation_map.content || [];
-    const featureCollection = networkResult || files.features.content || { features: [] };
+    const featureCollection = files.features.content || { features: [] };
 
     useEffect(() => { // On files uploaded
         if(!elevationData){
@@ -44,21 +42,16 @@ const View = () => {
         }
         if(!featureCollection){
             resetNetworkConnection();
-            resetSolverResults(); 
-        }else{
-            resetSolverResults();
         }
+
+        if(files.features.content?.properties)
+            setNetworkResultModalOpen(true);
     }, [files]);
 
     useEffect(() => {
         if(losResult)
             setLosResultModalOpen(true);
     }, [losResult]);
-
-    useEffect(() => {
-        if(networkResult)
-            setNetworkResultModalOpen(true);
-    }, [networkResult]);
 
     const handleNewPoints = newPoints => {
         resetLOS();
@@ -90,7 +83,7 @@ const View = () => {
 
                         <LOSResultsModal result={losResult} open={losResultModalOpen} onClose={() => setLosResultModalOpen(false)}/>
 
-                        <NetworkResultsModal result={networkResult} open={networkResultModalOpen} onClose={() => setNetworkResultModalOpen(false)}/>
+                        <NetworkResultsModal result={featureCollection.properties} open={networkResultModalOpen} onClose={() => setNetworkResultModalOpen(false)}/>
                         
                     </Grid>
                 </Grid>
