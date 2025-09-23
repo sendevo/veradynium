@@ -86,16 +86,28 @@ public:
     
     unsigned int connect();
     void disconnect();
+    inline const std::size_t getConnectedEdCount() const { return connected_eds_cnt; };
 
+    void print(global::PRINT_TYPE format = global::PLAIN_TEXT);
+
+    inline std::vector<Gateway>& getGateways() { return gateways; };
+    inline const std::vector<EndDevice>& getEndDevices() const { return end_devices; };
+    inline const terrain::ElevationGrid& getElevationGrid() const { return elevation_grid; };
+
+
+    inline void addGatewayFront(const Gateway gateway){ gateways.push_back(gateway); }
+    inline void addEndDeviceBack(const EndDevice ed){ end_devices.push_back(ed); }
+
+private:
     std::vector<Gateway> gateways;
     std::vector<EndDevice> end_devices;
     terrain::ElevationGrid elevation_grid;
 
-    void print(global::PRINT_TYPE format = global::PLAIN_TEXT);
-
-private:
     double total_distance;
-    std::vector<double> bbox; // Bbox of features
+    std::size_t connected_eds_cnt;
+    
+    std::vector<double> bbox; // Bbox of network
+    
     void printPlainText() const;
     void printJSON() const;
 };

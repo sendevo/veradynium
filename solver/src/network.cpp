@@ -100,7 +100,6 @@ unsigned int Network::connect() {
     // Phase 2: clear and populate connections (sequential)
     disconnect();
 
-    unsigned int connected_count = 0;
     total_distance = 0.0;
     for (size_t j = 0; j < num_eds; ++j) {
         int best = best_gw_idx[j];
@@ -109,16 +108,17 @@ unsigned int Network::connect() {
             end_devices[j].distance_to_gateway = best_dist[j];
             gateways[best].connected_devices.push_back(&end_devices[j]);
             total_distance += best_dist[j];
-            connected_count++;
+            connected_eds_cnt++;
         }
     }
 
-    return connected_count;
+    return connected_eds_cnt;
 };
 
 void Network::disconnect() {
     for (auto& gw : gateways) gw.connected_devices.clear();
     for (auto& dev : end_devices) dev.assigned_gateway = nullptr;
+    connected_eds_cnt = 0;
 };
 
 geojson::FeatureCollection Network::toFeatureCollection() const {

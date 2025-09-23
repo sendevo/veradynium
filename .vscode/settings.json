@@ -93,6 +93,7 @@
         "source_location": "cpp",
         "queue": "cpp",
         "stack": "cpp",
-        "typeindex": "cpp"
+        "typeindex": "cpp",
+        "*.inc": "cpp"
     }
 }

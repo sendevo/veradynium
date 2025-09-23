@@ -1,5 +1,6 @@
 CPP      = g++
-CFLAGS   = -Wall -pthread -fopenmp -O3 -std=c++17
+#CFLAGS   = -Wall -pthread -fopenmp -O3 -std=c++17 # Uncomment to optimize
+CFLAGS   = -Wall -pthread -fopenmp -std=c++17
 LDFLAGS  = -lgsl -lgslcblas -lm
 
 SRCDIR   = src

@@ -4,7 +4,7 @@
 
 ## LoRaWAN gateways placement problem: solver and network analysis
 
-This project provides a set of programs and utilities to design and analyze a LoRaWAN deployments with energy and terrain elevation (topography) considerations. The [solver](solver) contains a set of tools to compute the optimal placement of the gateways based on end-devices locations and the terrain elevation map, allowing the user to choose between solutions that prioritizes energy consumption or number of gateways to place.
+This project provides a set of programs and utilities to design and analyze LoRaWAN deployments with energy and terrain elevation (topography) considerations. The [solver](solver) contains a set of tools to compute the optimal placement of the gateways based on end-devices locations and the terrain elevation map, allowing the user to choose between solutions that prioritizes energy consumption or number of gateways to place.
 
 A Python [API](server) is provided to expose the set of solver programs and access them via HTTP. It also allows to upload terrain elevation files (.csv or .nc) and network configuration (.geojson).
 
@@ -13,8 +13,15 @@ The [GUI](GUI) was implemented with React.js, MUI and Leaflet.js, between other 
 ## Installation
 Run ```build.sh``` or ```make all``` to set up the project.  
 
-## Build step by step
-To build the project step by step, follow these instructions:
+### System Requirements
+
+- **C++17 compliant compiler** (GCC ≥ 7, Clang ≥ 5, MSVC ≥ 2017)  
+- **Python 3.10 or later**  
+- **pip** ≥ 25  
+- **Node.js** ≥ 24  
+- **npm** ≥ 11  
+
+## Step-by-step compilation
 
 ### Binaries
 Compile executables  
@@ -65,4 +72,4 @@ pip3 install -r requirements.txt
 uvicorn main:app --reload 
 deactivate
 ```
-The GUI will be available at ```localhost:8080``` (if previously compiled).
+The GUI will be available at ```localhost:8080``` (if previously compiled).  

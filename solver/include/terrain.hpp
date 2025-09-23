@@ -22,9 +22,39 @@
 namespace terrain {
 
 struct LatLngAlt {
-    double lat;
-    double lng;
-    double alt;
+    double lat = 0.0;
+    double lng = 0.0;
+    double alt = 0.0;
+
+    LatLngAlt operator+(const LatLngAlt& other) const {
+        return { lat + other.lat, lng + other.lng, alt + other.alt };
+    }
+
+    LatLngAlt& operator+=(const LatLngAlt& other) {
+        lat += other.lat;
+        lng += other.lng;
+        alt += other.alt;
+        return *this;
+    }
+
+    LatLngAlt operator-(const LatLngAlt& other) const {
+        return { lat - other.lat, lng - other.lng, alt - other.alt };
+    }
+
+    LatLngAlt operator-=(const LatLngAlt& other) {
+        lat -= other.lat;
+        lng -= other.lng;
+        alt -= other.alt;
+        return *this;
+    }
+
+    LatLngAlt operator*(double scalar) const {
+        return { lat * scalar, lng * scalar, alt * scalar };
+    }
+
+    LatLngAlt operator/(double scalar) const {
+        return { lat / scalar, lng / scalar, alt / scalar };
+    }
 };
 
 class FeatureCollection {
