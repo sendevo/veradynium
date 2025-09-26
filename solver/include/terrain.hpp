@@ -26,34 +26,33 @@ struct LatLngAlt {
     double lng = 0.0;
     double alt = 0.0;
 
+    // Operators for vector arithmetic (ignoring altitude changes)
     LatLngAlt operator+(const LatLngAlt& other) const {
-        return { lat + other.lat, lng + other.lng, alt + other.alt };
+        return { lat + other.lat, lng + other.lng, alt};
     }
 
     LatLngAlt& operator+=(const LatLngAlt& other) {
         lat += other.lat;
         lng += other.lng;
-        alt += other.alt;
         return *this;
     }
 
     LatLngAlt operator-(const LatLngAlt& other) const {
-        return { lat - other.lat, lng - other.lng, alt - other.alt };
+        return { lat - other.lat, lng - other.lng, alt};
     }
 
     LatLngAlt operator-=(const LatLngAlt& other) {
         lat -= other.lat;
         lng -= other.lng;
-        alt -= other.alt;
         return *this;
     }
 
     LatLngAlt operator*(double scalar) const {
-        return { lat * scalar, lng * scalar, alt * scalar };
+        return { lat * scalar, lng * scalar, alt};
     }
 
     LatLngAlt operator/(double scalar) const {
-        return { lat / scalar, lng / scalar, alt / scalar };
+        return { lat / scalar, lng / scalar, alt};
     }
 };
 

@@ -53,7 +53,7 @@ Network Network::fromGeoJSON(const std::string& filepath) {
 };
 
 
-unsigned int Network::connect() {
+void Network::connect() {
     // Parallelized version of connect using OpenMP
     // This function assigns each end device to the closest reachable gateway
 
@@ -63,12 +63,12 @@ unsigned int Network::connect() {
         for (auto& ed : end_devices) {
             ed.assigned_gateway = nullptr;
         }
-        return 0;
+        return;
     }
 
     const size_t num_eds = end_devices.size();
 
-    // Phase 1: parallel per-device search for best gateway
+    // Parallel per-device search for best gateway
     std::vector<int> best_gw_idx(num_eds, -1);
     std::vector<double> best_dist(num_eds, INF);
 
@@ -97,10 +97,9 @@ unsigned int Network::connect() {
         }
     }
 
-    // Phase 2: clear and populate connections (sequential)
+    // Reset pointers, total_distance and connected_eds_cnt
     disconnect();
 
-    total_distance = 0.0;
     for (size_t j = 0; j < num_eds; ++j) {
         int best = best_gw_idx[j];
         if (best >= 0) {
@@ -111,14 +110,13 @@ unsigned int Network::connect() {
             connected_eds_cnt++;
         }
     }
-
-    return connected_eds_cnt;
 };
 
 void Network::disconnect() {
     for (auto& gw : gateways) gw.connected_devices.clear();
     for (auto& dev : end_devices) dev.assigned_gateway = nullptr;
     connected_eds_cnt = 0;
+    total_distance = 0.0;
 };
 
 geojson::FeatureCollection Network::toFeatureCollection() const {

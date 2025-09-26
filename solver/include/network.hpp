@@ -84,7 +84,7 @@ public:
     geojson::FeatureCollection toFeatureCollection() const;
     inline std::vector<double> getBoundingBox() const { return bbox; };
     
-    unsigned int connect();
+    void connect();
     void disconnect();
     inline const std::size_t getConnectedEdCount() const { return connected_eds_cnt; };
 
@@ -92,11 +92,18 @@ public:
 
     inline std::vector<Gateway>& getGateways() { return gateways; };
     inline const std::vector<EndDevice>& getEndDevices() const { return end_devices; };
-    inline const terrain::ElevationGrid& getElevationGrid() const { return elevation_grid; };
-
-
     inline void addGatewayFront(const Gateway gateway){ gateways.push_back(gateway); }
     inline void addEndDeviceBack(const EndDevice ed){ end_devices.push_back(ed); }
+    
+    inline const terrain::ElevationGrid& getElevationGrid() const { return elevation_grid; };
+
+    // The following functions do not check bounds
+    inline const terrain::LatLngAlt getEndDeviceLocation(size_t index) const { return end_devices[index].location; }
+    inline const terrain::LatLngAlt getGatewayLocation(size_t index) const { return gateways[index].location; }
+    inline void setEndDeviceLocation(size_t index, terrain::LatLngAlt pos) { end_devices[index].location = pos; }
+    inline void setGatewayLocation(size_t index, terrain::LatLngAlt pos) { gateways[index].location = pos; }
+    inline void translateEndDevice(size_t index, terrain::LatLngAlt delta) { end_devices[index].location += delta; }
+    inline void translateGateway(size_t index, terrain::LatLngAlt delta) { gateways[index].location += delta; }
 
 private:
     std::vector<Gateway> gateways;
