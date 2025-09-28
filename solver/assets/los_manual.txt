@@ -33,7 +33,8 @@ EXAMPLE:
       "point2": {"lat": 36.7128, "lng": -91.2211, "height_m": 2.5},
       "distance_m": 2762.97,
       "line_of_sight": true,
-      "terrain_profile_m": [12.34, 12.53, 13.54, ....]
+      "terrain_profile_elev_m": [12.34, 12.53, 13.54, ....],
+      "terrain_profile_dist_m": [0.0, 1.2, 3.8, 5.1, ....]
    }
 
 

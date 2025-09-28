@@ -94,7 +94,6 @@ async def delete_file(data: dict):
         raise HTTPException(status_code=404, detail="File not found.")
 
 
-
 @api.post("/los")
 async def compute_los(data: dict):
     # Data should contain:

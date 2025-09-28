@@ -102,30 +102,42 @@ int main(int argc, char **argv) {
     }
 
     const bool los = grid.lineOfSight(lat1, lon1, lat2, lon2, h1, h2);
-    const double distance = grid.distance(lat1, lon1, lat2, lon2, h1, h2);
-    const std::vector<double> profile = grid.terrainProfile(lat1, lon1, lat2, lon2);
+    const double totalDistance = grid.distance(lat1, lon1, lat2, lon2, h1, h2);
+
+    std::vector<double> profile;
+    std::vector<double> distances;
+    grid.terrainProfile(lat1, lon1, lat2, lon2, profile, distances);
 
     switch(outputFormat) {
         case global::PLAIN_TEXT:
             std::cout << "Line of sight from (" 
                 << lat1 << ", " << lon1 << ", " << h1 << "m) to (" 
                 << lat2 << ", " << lon2 << ", " << h2 << "m), ";
-            std::cout << "distance of " << distance << " m: ";
+            std::cout << "distance of " << totalDistance << " m: ";
             if (los) std::cout << "CLEAR\n"; else std::cout << "BLOCKED\n";
             break;
         case global::JSON:
             std::cout << "{\n"
-                    << "  \"point1\": {\"lat\": " << lat1 << ", \"lng\": " << lon1 << ", \"height_m\": " << h1 << "},\n"
-                    << "  \"point2\": {\"lat\": " << lat2 << ", \"lng\": " << lon2 << ", \"height_m\": " << h2 << "},\n"
-                    << "  \"distance_m\": " << distance << ",\n"
-                    << "  \"line_of_sight\": " << (los ? "true" : "false") << ",\n"
-                    << "  \"terrain_profile_m\": [";
-            for (size_t i = 0; i < profile.size(); ++i) {
-                std::cout << profile[i];
-                if (i < profile.size() - 1) 
-                    std::cout << ", ";
-            }
-            std::cout << "]\n";
+                << "  \"point1\": {\"lat\": " << lat1 << ", \"lng\": " << lon1 << ", \"height_m\": " << h1 << "},\n"
+                << "  \"point2\": {\"lat\": " << lat2 << ", \"lng\": " << lon2 << ", \"height_m\": " << h2 << "},\n"
+                << "  \"distance_m\": " << totalDistance << ",\n"
+                << "  \"line_of_sight\": " << (los ? "true" : "false") << ",\n";
+                
+                std::cout << "  \"terrain_profile_elev_m\": [";
+                    for (size_t i = 0; i < profile.size(); ++i) {
+                        std::cout << profile[i];
+                        if (i < profile.size() - 1) 
+                            std::cout << ", ";
+                    }
+                    std::cout << "],\n"
+                
+                std::cout << "  \"terrain_profile_dist_m\": [";
+                for (size_t i = 0; i < distances.size(); ++i) {
+                    std::cout << distances[i];
+                    if (i < distances.size() - 1) 
+                        std::cout << ", ";
+                }
+                std::cout << "],\n"
             std::cout << "}\n";
             break;
         default:

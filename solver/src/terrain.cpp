@@ -137,19 +137,29 @@ double ElevationGrid::bilinearInterpolation(double lat, double lng) const {
     return fxy1 * (1 - ty) + fxy2 * ty;
 };
 
-std::vector<double> ElevationGrid::terrainProfile(double lat1, double lon1, double lat2, double lon2, int steps) const {
-    std::vector<double> profile;
+void ElevationGrid::terrainProfile(double lat1, double lon1, 
+                                   double lat2, double lon2, 
+                                   std::vector<double>& profile,
+                                   std::vector<double>& distances,
+                                   int steps) const {
     profile.reserve(steps + 1);
+    distances.reserve(steps + 1);
 
+    double dist = 0; // cumulative distance
+    const double latDiff = lat2 - lat1;
+    const double lonDiff = lon2 - lon1;
     for (int k = 0; k <= steps; ++k) {
         const double t   = double(k) / steps;
-        const double lat = lat1 + t * (lat2 - lat1);
-        const double lng = lon1 + t * (lon2 - lon1);
-
+        // Next position
+        const double lat = lat1 + t * latDiff;
+        const double lng = lon1 + t * lonDiff;
+        // Compute and add elevation at current position
         const double terrain = bilinearInterpolation(lat, lng);
         profile.push_back(terrain);
+        // Compute and add accumulated distance
+        const double dist += haversine(lat1, lon1, lat, lon)
+        distances.push_back(dist);
     }
-    return profile;
 };
 
 bool ElevationGrid::lineOfSight(double lat1, double lon1,
@@ -209,7 +219,9 @@ Vec3 toECEF(double lat, double lng, double h) {
     return {x, y, z};
 };
 
-double ElevationGrid::distance(double lat1, double lon1, double lat2, double lon2, double h1, double h2) const  {
+double ElevationGrid::distance(double lat1, double lon1, 
+                               double lat2, double lon2, 
+                               double h1, double h2) const  {
     Vec3 p1 = toECEF(lat1, lon1, h1);
     Vec3 p2 = toECEF(lat2, lon2, h2);
     double dx = p2.x - p1.x, dy = p2.y - p1.y, dz = p2.z - p1.z;

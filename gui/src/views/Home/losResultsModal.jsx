@@ -14,7 +14,7 @@ const style = {
   p: 4
 };
 
-const requiredProps = ["point1", "point2", "distance_m", "line_of_sight", "terrain_profile_m"];
+const requiredProps = ["point1", "point2", "distance_m", "line_of_sight", "terrain_profile_elev_m", "terrain_profile_dist_m"];
 
 const LOSResultsModal = props => {
     
@@ -52,7 +52,7 @@ const LOSResultsModal = props => {
                 <Typography sx={{mt:1}}><b>{t("line_of_sight")}:</b> {result.line_of_sight ? t("yes") : t("no")}</Typography>
 
                 <Typography sx={{fontWeight:"bold", mt:2, mb:3}}>{t("terrain_profile")} (m)</Typography>
-                <LineChart data={result.terrain_profile_m}/>
+                <LineChart data={result.terrain_profile_elev_m}/>
             </Box>
         </Modal>
     );
