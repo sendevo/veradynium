@@ -42,7 +42,7 @@ const MenuButtons = ({
 
             {points?.length === 2 &&
                 <>
-                    {hasUploadedFiles && typeof handleComputeLOS === "function" &&
+                    {hasElevation && typeof handleComputeLOS === "function" &&
                         <Grid>
                             <Button 
                                 fullWidth

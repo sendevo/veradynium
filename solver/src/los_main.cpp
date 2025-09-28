@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
                         if (i < profile.size() - 1) 
                             std::cout << ", ";
                     }
-                    std::cout << "],\n"
+                    std::cout << "],\n";
                 
                 std::cout << "  \"terrain_profile_dist_m\": [";
                 for (size_t i = 0; i < distances.size(); ++i) {
@@ -137,7 +137,7 @@ int main(int argc, char **argv) {
                     if (i < distances.size() - 1) 
                         std::cout << ", ";
                 }
-                std::cout << "],\n"
+                std::cout << "]\n";
             std::cout << "}\n";
             break;
         default:

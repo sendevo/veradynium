@@ -137,7 +137,7 @@ double ElevationGrid::bilinearInterpolation(double lat, double lng) const {
     return fxy1 * (1 - ty) + fxy2 * ty;
 };
 
-void ElevationGrid::terrainProfile(double lat1, double lon1, 
+void ElevationGrid::terrainProfile(double lat1, double lng1, 
                                    double lat2, double lon2, 
                                    std::vector<double>& profile,
                                    std::vector<double>& distances,
@@ -145,35 +145,34 @@ void ElevationGrid::terrainProfile(double lat1, double lon1,
     profile.reserve(steps + 1);
     distances.reserve(steps + 1);
 
-    double dist = 0; // cumulative distance
     const double latDiff = lat2 - lat1;
-    const double lonDiff = lon2 - lon1;
+    const double lonDiff = lon2 - lng1;
     for (int k = 0; k <= steps; ++k) {
         const double t   = double(k) / steps;
         // Next position
         const double lat = lat1 + t * latDiff;
-        const double lng = lon1 + t * lonDiff;
+        const double lng = lng1 + t * lonDiff;
         // Compute and add elevation at current position
         const double terrain = bilinearInterpolation(lat, lng);
         profile.push_back(terrain);
         // Compute and add accumulated distance
-        const double dist += haversine(lat1, lon1, lat, lon)
+        const double dist = haversine(lat1, lng1, lat, lng);
         distances.push_back(dist);
     }
 };
 
-bool ElevationGrid::lineOfSight(double lat1, double lon1,
+bool ElevationGrid::lineOfSight(double lat1, double lng1,
                                 double lat2, double lon2,
                                 double observerHeight,
                                 double targetHeight) const
 {
-    const double elev1 = bilinearInterpolation(lat1, lon1) + observerHeight;
+    const double elev1 = bilinearInterpolation(lat1, lng1) + observerHeight;
     const double elev2 = bilinearInterpolation(lat2, lon2) + targetHeight;
 
     for (int k = 1; k < SAMPLES_STEPS; ++k) {
         const double t   = double(k) / SAMPLES_STEPS;
         const double lat = lat1 + t * (lat2 - lat1);
-        const double lng = lon1 + t * (lon2 - lon1);
+        const double lng = lng1 + t * (lon2 - lng1);
 
         const double terrain = bilinearInterpolation(lat, lng);
         const double los     = elev1 + t * (elev2 - elev1);
@@ -187,10 +186,10 @@ bool ElevationGrid::lineOfSight(LatLngAlt pos1, LatLngAlt pos2) const {
     return lineOfSight(pos1.lat, pos1.lng, pos2.lat, pos2.lng, pos1.alt, pos2.alt);
 };
 
-double ElevationGrid::haversine(double lat1, double lon1, double lat2, double lon2) const {
+double ElevationGrid::haversine(double lat1, double lng1, double lat2, double lon2) const {
     const double R = 6371000.0; // Earth radius in meters
     const double dlat = global::toRadians(lat2 - lat1);
-    const double dlon = global::toRadians(lon2 - lon1);
+    const double dlon = global::toRadians(lon2 - lng1);
     const double a = std::sin(dlat/2) * std::sin(dlat/2) +
                      std::cos(global::toRadians(lat1)) * std::cos(global::toRadians(lat2)) *
                      std::sin(dlon/2) * std::sin(dlon/2);
@@ -219,10 +218,10 @@ Vec3 toECEF(double lat, double lng, double h) {
     return {x, y, z};
 };
 
-double ElevationGrid::distance(double lat1, double lon1, 
+double ElevationGrid::distance(double lat1, double lng1, 
                                double lat2, double lon2, 
                                double h1, double h2) const  {
-    Vec3 p1 = toECEF(lat1, lon1, h1);
+    Vec3 p1 = toECEF(lat1, lng1, h1);
     Vec3 p2 = toECEF(lat2, lon2, h2);
     double dx = p2.x - p1.x, dy = p2.y - p1.y, dz = p2.z - p1.z;
     return std::sqrt(dx*dx + dy*dy + dz*dz);

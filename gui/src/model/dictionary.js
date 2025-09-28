@@ -71,7 +71,7 @@ const translations = {
             line_of_sight: "Line of sight",
             yes: "Yes",
             no: "No",
-            terrain_profile: "Terrain profile (m)"
+            terrain_profile: "Terrain profile"
         },
         es: {
             title: "Cálculo de línea de vista (LOS)",
@@ -84,7 +84,7 @@ const translations = {
             line_of_sight: "Línea de vista",
             yes: "Si",
             no: "No",
-            terrain_profile: "Perfil de terreno (m)"
+            terrain_profile: "Perfil de terreno"
         }
     },
     network_result_modal: {

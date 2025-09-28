@@ -91,11 +91,11 @@ public:
     bool lineOfSight(LatLngAlt pos1, LatLngAlt pos2) const;
 
     // Haversine distance between two lat/lng points in meters
-    double haversine(double lat1, double lon1, double lat2, double lon2) const;
+    double haversine(double lat1, double lng1, double lat2, double lon2) const;
     double haversine(LatLngAlt pos1, LatLngAlt pos2) const;
 
     // Compute straight line distance between two lat/lng/alt points in meters
-    double distance(double lat1, double lon1, 
+    double distance(double lat1, double lng1, 
                      double lat2, double lon2,
                      double h1, double h2) const; 
     double distance(LatLngAlt pos1, LatLngAlt pos2) const;

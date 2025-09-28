@@ -125,8 +125,8 @@ async def compute_los(data: dict):
         return JSONResponse(status_code=500, content={"error": result.stderr})
 
     try: # Parse JSON output
-        #print("LOS command output:")
-        #print(result.stdout)
+        print("LOS command output:")
+        print(result.stdout)
         return json.loads(result.stdout)
     except json.JSONDecodeError:
         return JSONResponse(status_code=500, content={"error": "Invalid output from LOS program."})
