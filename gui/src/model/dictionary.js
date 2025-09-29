@@ -36,6 +36,18 @@ const translations = {
             geojeson_parsing_error: "Error al parsear GeoJSON"
         }
     },
+    charts: {
+        en: {
+            distance: "Distance (m)",
+            elevation: "Elevation (m)",
+            reference: "Reference"
+        },
+        es: {
+            distance: "Distancia (m)",
+            elevation: "Elevación (m)",
+            reference: "Referencia"
+        }
+    },
     model: {
         en: {
             unsupported_file: "Unsupported file format",
@@ -69,6 +81,7 @@ const translations = {
             elev: "elev",
             distance: "Distance",
             line_of_sight: "Line of sight",
+            line_of_sight_fresnel_60pct: "Line of sight (Fresnel 60%)",
             yes: "Yes",
             no: "No",
             terrain_profile: "Terrain profile"
@@ -82,6 +95,7 @@ const translations = {
             elev: "elev.",
             distance: "Distancia",
             line_of_sight: "Línea de vista",
+            line_of_sight_fresnel_60pct: "Línea de vista (Fresnel 60%)",
             yes: "Si",
             no: "No",
             terrain_profile: "Perfil de terreno"

@@ -12,6 +12,13 @@
 #include "global.hpp"
 
 #define SAMPLES_STEPS 100 // Number of samples along the line of sight. Must be >= 2
+#define EARTH_RADIUS 6371000.0 // in meters
+#define US915_LORA_LAMBDA 0.327642031 // in meters (for 915 MHz)
+#define EU860_LORA_LAMBDA 0.345383016 // in meters (for 868 MHz)
+#define FRESNEL_CLEARANCE_FACTOR 0.6 // 60% clearance
+// WGS-84 constants
+#define SEMI_MAJOR_AXIS 6378137.0 // semi-major axis
+#define EARTH_ECCENTRICITY 0.00669437999 // eccentricity^2
 
 /**
  * 
@@ -56,6 +63,8 @@ struct LatLngAlt {
     }
 };
 
+struct Vec3 { double x, y, z; };
+
 class FeatureCollection {
 public:
     FeatureCollection() = default;
@@ -87,18 +96,23 @@ public:
     bool lineOfSight(double lat1, double lng1,
                      double lat2, double lng2,
                      double observerHeight = 2.0,
-                     double targetHeight   = 2.0) const;
-    bool lineOfSight(LatLngAlt pos1, LatLngAlt pos2) const;
+                     double targetHeight   = 2.0,
+                     bool fresnelClearance = false) const;
+    bool lineOfSight(LatLngAlt pos1, LatLngAlt pos2, bool fresnelClearance = false) const;
 
     // Haversine distance between two lat/lng points in meters
-    double haversine(double lat1, double lng1, double lat2, double lon2) const;
-    double haversine(LatLngAlt pos1, LatLngAlt pos2) const;
+    double haversineDistance(double lat1, double lng1, double lat2, double lon2) const;
+    double haversineDistance(LatLngAlt pos1, LatLngAlt pos2) const;
 
     // Compute straight line distance between two lat/lng/alt points in meters
-    double distance(double lat1, double lng1, 
+    double straightLineDistance(double lat1, double lng1, 
                      double lat2, double lon2,
                      double h1, double h2) const; 
-    double distance(LatLngAlt pos1, LatLngAlt pos2) const;
+    double straightLineDistance(LatLngAlt pos1, LatLngAlt pos2) const;
+
+    // Equirectangular approximation distance between two lat/lng points in meters
+    double equirectangularDistance(double lat1, double lng1, double lat2, double lon2) const;
+    double equirectangularDistance(LatLngAlt pos1, LatLngAlt pos2) const;
 
     // Check if a lat/lng is within the grid bounds
     inline bool inElevationGrid(double lat, double lng) const {
@@ -136,13 +150,6 @@ inline int clampIndexForCell(int n, int idx) {
     if (idx > n - 2) return n - 2;
     return idx;
 }
-
-// WGS-84 constants
-constexpr double a  = 6378137.0;           // semi-major axis
-constexpr double f  = 1.0 / 298.257223563; // flattening
-constexpr double e2 = f * (2 - f);         // eccentricity^2
-
-struct Vec3 { double x, y, z; };
 
 // Convert geodetic coordinates to ECEF (Earth-Centered, Earth-Fixed)
 Vec3 toECEF(double lat, double lng, double h);

@@ -5,9 +5,10 @@ import {
     YAxis, 
     CartesianGrid, 
     Tooltip, 
-    ResponsiveContainer,
-    ReferenceLine 
+    ResponsiveContainer
 } from "recharts";
+import { useTranslation } from "react-i18next";
+import { US915_LORA_LAMBDA } from "../../model/constants";
 
 const toolTipStyle = { backgroundColor: "#333", border: "1px solid #ccc" };
 
@@ -16,18 +17,32 @@ const LineChart = ({elev_data, dist_data}) => {
         console.warn("LineChart: Invalid or missing elev_data or dist_data prop");
         return null;
     }
+
+    const { t } = useTranslation("charts");
     
     const firstPoint = { distance: dist_data[0], altura: elev_data[0] };
     const lastPoint = { distance: dist_data[dist_data.length - 1], altura: elev_data[elev_data.length - 1] };
   
-    // Include dist_data in your values array
     const values = elev_data.map((_, i) => {
         const progress = (dist_data[i] - firstPoint.distance) / (lastPoint.distance - firstPoint.distance);
         const referenceValue = firstPoint.altura + progress * (lastPoint.altura - firstPoint.altura);
+
+        // distances from point to each end
+        const d1 = dist_data[i] - firstPoint.distance;
+        const d2 = lastPoint.distance - dist_data[i];
+
+        // first Fresnel radius
+        const r1 = Math.sqrt((US915_LORA_LAMBDA * d1 * d2) / (d1 + d2));
+
+        // 60% clearance
+        const clearance = 0.6 * r1;
+
         return {
             distance: dist_data[i],
             elev: elev_data[i],
-            reference: referenceValue
+            reference: referenceValue,
+            fresnelUpper: referenceValue + clearance,
+            fresnelLower: referenceValue - clearance
         };
     });
 
@@ -41,7 +56,12 @@ const LineChart = ({elev_data, dist_data}) => {
                 <YAxis />
                 
                 <Tooltip 
-                    labelFormatter={() => ""} 
+                    labelFormatter={d => `${t("distance")}: ${d} m`} 
+                    formatter={(value, name) => {
+                        if(name === "elev") return [`${value} m`, t("elevation")];
+                        if(name === "reference") return [`${value.toFixed(2)} m`, t("reference")];
+                        return [value, name];
+                    }}
                     contentStyle={toolTipStyle} 
                     itemStyle={{ color: "white" }} 
                     labelStyle={{ color: "white" }}/>
@@ -53,6 +73,20 @@ const LineChart = ({elev_data, dist_data}) => {
                     dataKey="reference" 
                     stroke="#ff0000" 
                     strokeWidth={2}
+                    dot={false}/>
+
+                <Line 
+                    type="linear" 
+                    dataKey="fresnelUpper" 
+                    stroke="#00ff00" 
+                    strokeDasharray="5 5"
+                    dot={false}/>
+
+                <Line 
+                    type="linear" 
+                    dataKey="fresnelLower" 
+                    stroke="#00ff00" 
+                    strokeDasharray="5 5"
                     dot={false}/>
             </Chart>
         </ResponsiveContainer>

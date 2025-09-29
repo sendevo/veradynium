@@ -156,7 +156,7 @@ void ElevationGrid::terrainProfile(double lat1, double lng1,
         const double terrain = bilinearInterpolation(lat, lng);
         profile.push_back(terrain);
         // Compute and add accumulated distance
-        const double dist = haversine(lat1, lng1, lat, lng);
+        const double dist = haversineDistance(lat1, lng1, lat, lng);
         distances.push_back(dist);
     }
 };
@@ -164,10 +164,16 @@ void ElevationGrid::terrainProfile(double lat1, double lng1,
 bool ElevationGrid::lineOfSight(double lat1, double lng1,
                                 double lat2, double lon2,
                                 double observerHeight,
-                                double targetHeight) const
+                                double targetHeight,
+                                bool fresnelClearance) const
 {
     const double elev1 = bilinearInterpolation(lat1, lng1) + observerHeight;
     const double elev2 = bilinearInterpolation(lat2, lon2) + targetHeight;
+
+    double totalDistance;
+    double clearance = 0.0;
+    if(fresnelClearance) // only compute if needed
+        totalDistance = equirectangularDistance(lat1, lng1, lat2, lon2);
 
     for (int k = 1; k < SAMPLES_STEPS; ++k) {
         const double t   = double(k) / SAMPLES_STEPS;
@@ -177,48 +183,54 @@ bool ElevationGrid::lineOfSight(double lat1, double lng1,
         const double terrain = bilinearInterpolation(lat, lng);
         const double los     = elev1 + t * (elev2 - elev1);
 
-        if (terrain > los) return false; // blocked
+        if(fresnelClearance) {
+            const double d1 = totalDistance * t;
+            const double d2 = totalDistance * (1.0 - t);
+            const double r1 = std::sqrt(US915_LORA_LAMBDA * d1 * d2 / (d1 + d2));
+            clearance = FRESNEL_CLEARANCE_FACTOR * r1;
+        }
+
+        if (terrain > los - clearance) return false; // blocked
     }
     return true; // clear
 };
 
-bool ElevationGrid::lineOfSight(LatLngAlt pos1, LatLngAlt pos2) const {
-    return lineOfSight(pos1.lat, pos1.lng, pos2.lat, pos2.lng, pos1.alt, pos2.alt);
+bool ElevationGrid::lineOfSight(LatLngAlt pos1, LatLngAlt pos2, bool fesnelClearance) const {
+    return lineOfSight(pos1.lat, pos1.lng, pos2.lat, pos2.lng, pos1.alt, pos2.alt, fesnelClearance);
 };
 
-double ElevationGrid::haversine(double lat1, double lng1, double lat2, double lon2) const {
-    const double R = 6371000.0; // Earth radius in meters
+double ElevationGrid::haversineDistance(double lat1, double lng1, double lat2, double lon2) const {
     const double dlat = global::toRadians(lat2 - lat1);
     const double dlon = global::toRadians(lon2 - lng1);
     const double a = std::sin(dlat/2) * std::sin(dlat/2) +
                      std::cos(global::toRadians(lat1)) * std::cos(global::toRadians(lat2)) *
                      std::sin(dlon/2) * std::sin(dlon/2);
     const double c = 2 * std::atan2(std::sqrt(a), std::sqrt(1-a));
-    return R * c;
+    return EARTH_RADIUS * c;
 };
 
-double ElevationGrid::haversine(LatLngAlt pos1, LatLngAlt pos2) const {
-    return haversine(pos1.lat, pos1.lng, pos2.lat, pos2.lng);
+double ElevationGrid::haversineDistance(LatLngAlt pos1, LatLngAlt pos2) const {
+    return haversineDistance(pos1.lat, pos1.lng, pos2.lat, pos2.lng);
 };
 
 Vec3 toECEF(double lat, double lng, double h) {
-    double phi = lat * M_PI / 180.0;
-    double lambda = lng * M_PI / 180.0;
+    double phi = global::toRadians(lat);
+    double lambda = global::toRadians(lng);
     double sinphi = std::sin(phi);
     double cosphi = std::cos(phi);
     double sinlambda = std::sin(lambda);
     double coslambda = std::cos(lambda);
 
-    double N = a / sqrt(1 - e2 * sinphi * sinphi);
+    double N = SEMI_MAJOR_AXIS / sqrt(1 - EARTH_ECCENTRICITY * sinphi * sinphi);
 
     double x = (N + h) * cosphi * coslambda;
     double y = (N + h) * cosphi * sinlambda;
-    double z = (N * (1 - e2) + h) * sinphi;
+    double z = (N * (1 - EARTH_ECCENTRICITY) + h) * sinphi;
 
     return {x, y, z};
 };
 
-double ElevationGrid::distance(double lat1, double lng1, 
+double ElevationGrid::straightLineDistance(double lat1, double lng1, 
                                double lat2, double lon2, 
                                double h1, double h2) const  {
     Vec3 p1 = toECEF(lat1, lng1, h1);
@@ -227,8 +239,18 @@ double ElevationGrid::distance(double lat1, double lng1,
     return std::sqrt(dx*dx + dy*dy + dz*dz);
 };
 
-double ElevationGrid::distance(LatLngAlt pos1, LatLngAlt pos2) const {
-    return distance(pos1.lat, pos1.lng, pos2.lat, pos2.lng, pos1.alt, pos2.alt);
+double ElevationGrid::straightLineDistance(LatLngAlt pos1, LatLngAlt pos2) const {
+    return straightLineDistance(pos1.lat, pos1.lng, pos2.lat, pos2.lng, pos1.alt, pos2.alt);
+};
+
+double ElevationGrid::equirectangularDistance(double lat1, double lng1, double lat2, double lon2) const {
+    const double x = global::toRadians(lon2 - lng1) * std::cos(global::toRadians((lat1 + lat2) / 2));
+    const double y = global::toRadians(lat2 - lat1);
+    return EARTH_RADIUS * std::sqrt(x*x + y*y);
+};
+
+double ElevationGrid::equirectangularDistance(LatLngAlt pos1, LatLngAlt pos2) const {
+    return equirectangularDistance(pos1.lat, pos1.lng, pos2.lat, pos2.lng);
 };
 
 double ElevationGrid::getMaxAltitude() const {

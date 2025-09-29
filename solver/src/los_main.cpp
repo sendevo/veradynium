@@ -102,7 +102,9 @@ int main(int argc, char **argv) {
     }
 
     const bool los = grid.lineOfSight(lat1, lon1, lat2, lon2, h1, h2);
-    const double totalDistance = grid.distance(lat1, lon1, lat2, lon2, h1, h2);
+    const bool losFresnel = grid.lineOfSight(lat1, lon1, lat2, lon2, h1, h2, true);
+
+    const double totalDistance = grid.equirectangularDistance(lat1, lon1, lat2, lon2);
 
     std::vector<double> profile;
     std::vector<double> distances;
@@ -115,13 +117,19 @@ int main(int argc, char **argv) {
                 << lat2 << ", " << lon2 << ", " << h2 << "m), ";
             std::cout << "distance of " << totalDistance << " m: ";
             if (los) std::cout << "CLEAR\n"; else std::cout << "BLOCKED\n";
+            if (los != losFresnel) {
+                std::cout << "  (Note: with Fresnel zone clearance, the link is ";
+                if (losFresnel) std::cout << "CLEAR\n"; else std::cout << "BLOCKED\n";
+                std::cout << "  assuming 60% Fresnel zone clearance)\n";
+            }
             break;
         case global::JSON:
             std::cout << "{\n"
                 << "  \"point1\": {\"lat\": " << lat1 << ", \"lng\": " << lon1 << ", \"height_m\": " << h1 << "},\n"
                 << "  \"point2\": {\"lat\": " << lat2 << ", \"lng\": " << lon2 << ", \"height_m\": " << h2 << "},\n"
                 << "  \"distance_m\": " << totalDistance << ",\n"
-                << "  \"line_of_sight\": " << (los ? "true" : "false") << ",\n";
+                << "  \"line_of_sight\": " << (los ? "true" : "false") << ",\n"
+                << "  \"line_of_sight_fresnel_60pct\": " << (losFresnel ? "true" : "false") << ",\n";
                 
                 std::cout << "  \"terrain_profile_elev_m\": [";
                     for (size_t i = 0; i < profile.size(); ++i) {

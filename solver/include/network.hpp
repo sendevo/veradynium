@@ -37,7 +37,7 @@ public:
     };
 
     inline double distanceTo(const Node& other, const terrain::ElevationGrid& grid) const {
-        return grid.distance(location, other.location);
+        return grid.equirectangularDistance(location, other.location);
     }
     
     inline bool lineOfSightTo(const Node& other, const terrain::ElevationGrid& grid) const {

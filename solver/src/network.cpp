@@ -81,9 +81,8 @@ void Network::connect() {
             const auto& gw = gateways[i];
             const auto& ed = end_devices[j];
 
-            // call combined LOS+distance (fast single call)
-            bool los = elevation_grid.lineOfSight(gw.location, ed.location);
-            double distance = elevation_grid.distance(gw.location, ed.location);
+            bool los = gw.lineOfSightTo(ed, elevation_grid);
+            double distance = gw.distanceTo(ed, elevation_grid);
 
             if (los && distance < minDist) {
                 minDist = distance;
