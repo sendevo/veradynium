@@ -1,14 +1,14 @@
-# Veradynium
+# Veradynium <img src="gui/logo/logo.png" width="20" />
 
-<img src="gui/logo/logo.png" width="100" />
+![screenshot](doc/screenshot.png)
 
 ## LoRaWAN gateways placement problem: solver and network analysis
 
 This project provides a set of programs and utilities to design and analyze LoRaWAN deployments with energy and terrain elevation (topography) considerations. The [solver](solver) contains a set of tools to compute the optimal placement of the gateways based on end-devices locations and the terrain elevation map, allowing the user to choose between solutions that prioritizes energy consumption or number of gateways to place.
 
-A Python [API](server) is provided to expose the set of solver programs and access them via HTTP. It also allows to upload terrain elevation files (.csv or .nc) and network configuration (.geojson).
+A Python [API](server) is provided to expose the set of programs and access them via HTTP. It also allows to upload terrain elevation files (.csv or .nc) and network configuration (.geojson).
 
-The [GUI](GUI) was implemented with React.js, MUI and Leaflet.js, between other libraries.
+The [GUI](GUI) was implemented with React.js, MUI and Leaflet.js, between other libraries. It allows to upload files of terrain elevation and network topology. LocalStorage is used to store metadata of uploaded files, so they are fetched from the server on app load. Once the files are uploaded, the user can run the solver to compute the optimal placement of gateways, and visualize the results on the map. The GUI also allows to compute the line of sight between two points on the map, and visualize the connections between end-devices and gateways once computed in the backend.
 
 ## Installation
 Run ```build.sh``` or ```make all``` to set up the project.  
@@ -36,6 +36,8 @@ This will build the following programs:
 
 #### Examples
 
+Manuals can be found using the ```-h``` flag. They are also available in the [solver/assets](solver/assets) folder. After compiling the binaries, these files are moved to the ```solver/bin/assets``` folder.
+```bash
 Run the solver to compute the optimal placement of gateways and print the result using json format:  
 ```bash
 solver -f elevation.csv -g network.json -o json  
@@ -72,4 +74,4 @@ pip3 install -r requirements.txt
 uvicorn main:app --reload 
 deactivate
 ```
-The GUI will be available at ```localhost:8080``` (if previously compiled).  
+The GUI will be available at ```localhost:8080``` or ```localhost:5173``` (depending on configuration, if previously compiled).  
