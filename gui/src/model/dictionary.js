@@ -40,12 +40,16 @@ const translations = {
         en: {
             distance: "Distance (m)",
             elevation: "Elevation (m)",
-            reference: "Reference"
+            reference: "Reference",
+            fresnelUpper: "Fresnel upper",
+            fresnelLower: "Fresnel lower"
         },
         es: {
             distance: "Distancia (m)",
             elevation: "Elevación (m)",
-            reference: "Referencia"
+            reference: "Referencia",
+            fresnelUpper: "Fresnel sup.",
+            fresnelLower: "Fresnel inf."
         }
     },
     model: {

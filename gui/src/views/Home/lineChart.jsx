@@ -57,8 +57,10 @@ const LineChart = ({elev_data, dist_data}) => {
                 <Tooltip 
                     labelFormatter={d => `${t("distance")}: ${d} m`} 
                     formatter={(value, name) => {
-                        if(name === "elev") return [`${value} m`, t("elevation")];
+                        if(name === "elev") return [`${value.toFixed(2)} m`, t("elevation")];
                         if(name === "reference") return [`${value.toFixed(2)} m`, t("reference")];
+                        if(name === "fresnelUpper") return [`${value.toFixed(2)} m`, t("fresnelUpper")];
+                        if(name === "fresnelLower") return [`${value.toFixed(2)} m`, t("fresnelLower")];
                         return [value, name];
                     }}
                     contentStyle={toolTipStyle} 

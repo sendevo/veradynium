@@ -75,7 +75,19 @@ async def upload_file(file: UploadFile = File(...)):
         return {"upload_id": upload_id, "extension": ".csv", "data": data_array}
     
     return {"upload_id": upload_id, "extension": extension}
-    
+
+
+@api.get("/download/{upload_id}/{extension}")
+async def download_file(upload_id: str, extension: str):
+    if extension not in [".csv", ".json"]:
+        raise HTTPException(status_code=400, detail="Invalid extension. Only CSV and JSON are allowed.")
+
+    file_path = os.path.join(upload_dir, upload_id) + extension
+    if os.path.exists(file_path):
+        return FileResponse(file_path, filename=f"{upload_id}{extension}", media_type="application/octet-stream")
+    else:
+        raise HTTPException(status_code=404, detail="File not found.")
+
 
 @api.post("/delete")
 async def delete_file(data: dict):

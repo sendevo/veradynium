@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, use } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from '../../model/constants';
 import { 
@@ -7,6 +7,7 @@ import {
     csvToElevation,
     readFile
 } from "../../model/utils";
+import useLocalStorage from "../useLocalStorage";
 import useToast from "../useToast";
 import usePreloader from "../usePreloader";
 
@@ -14,6 +15,11 @@ import usePreloader from "../usePreloader";
 const defaultModel = { // System uses elevation map and FeatureCollection files
   elevation_map: { id: null, content: null },
   features: { id: null, content: null },
+};
+
+const defaultMetadata = { // To keep track of uploaded file IDs
+    elevation_map_id: null,
+    features_id: null
 };
 
 const extensionToType = {
@@ -29,11 +35,52 @@ const useModel = () => {
     const { t } = useTranslation("model");
     
     const [model, setModel] = useState(defaultModel);
+    const [metadata, setMetadata] = useLocalStorage("model-metadata", defaultMetadata);
 
-    const setModelContent = (type, id, content) => setModel(prev => ({ 
-        ...prev, 
-        [type]: { id, content } 
-    }));
+    useEffect(() => { // On mount, fetch existing files based on stored IDs in metadata
+        const fetchExistingFiles = async () => {
+            for (const [key, id] of Object.entries(metadata)) {
+                if (id) {
+                    const type = key.replace("_id", "");
+                    const extension = type === "features" ? ".json" : ".csv";
+                    try {
+                        const res = await fetchWithTimeout(api(`/api/download/${id}/${extension}`), {method: "GET"});
+                        if (res.ok) {
+                            const content = await res.text();
+                            let parsedContent = null;
+                            if (extension === ".json") {
+                                parsedContent = JSON.parse(content);
+                            } else if (extension === ".csv") {
+                                parsedContent = csvToElevation(content);
+                            }
+                            setModel(prev => ({
+                                ...prev,
+                                [type]: { id, content: parsedContent }
+                            }));
+                        } else {
+                            console.warn(`Failed to fetch file with ID ${id}`);
+                        }
+                    } catch (err) {
+                        console.error(`Error fetching file with ID ${id}:`, err);
+                    }
+                }
+            }
+            preloader(false);
+        };
+        preloader(true);
+        fetchExistingFiles();
+    }, [metadata]);
+
+    const setModelContent = (type, id, content) => {
+        setModel(prev => ({ 
+            ...prev, 
+            [type]: { id, content } 
+        }));
+        setMetadata(prev => ({
+            ...prev, 
+            [`${type}_id`]: id
+        }));
+    };
 
     const parseGeoJSON = (fileContent) => {
         try {
