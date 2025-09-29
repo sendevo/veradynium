@@ -8,7 +8,7 @@ import {
     ResponsiveContainer
 } from "recharts";
 import { useTranslation } from "react-i18next";
-import { US915_LORA_LAMBDA } from "../../model/constants";
+import { US915_LORA_LAMBDA, FRESNEL_ZONE_CLEARANCE } from "../../model/constants";
 
 const toolTipStyle = { backgroundColor: "#333", border: "1px solid #ccc" };
 
@@ -34,8 +34,7 @@ const LineChart = ({elev_data, dist_data}) => {
         // first Fresnel radius
         const r1 = Math.sqrt((US915_LORA_LAMBDA * d1 * d2) / (d1 + d2));
 
-        // 60% clearance
-        const clearance = 0.6 * r1;
+        const clearance = FRESNEL_ZONE_CLEARANCE * r1;
 
         return {
             distance: dist_data[i],
