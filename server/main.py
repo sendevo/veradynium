@@ -156,6 +156,7 @@ async def solve(data: dict):
         "../solver/bin/solver",
         "-f", em_file_path,
         "-g", geojson_file_path,
+        "-i", "5000",
         "-o", "json"
     ]
 

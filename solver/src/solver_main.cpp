@@ -7,7 +7,7 @@
 #include "../include/global.hpp"
 #include "../include/terrain.hpp"
 #include "../include/network.hpp"
-#include "../include/optimizers.hpp"
+#include "../include/attractor_optimizer.h"
 
 
 int main(int argc, char **argv) {
@@ -80,11 +80,10 @@ int main(int argc, char **argv) {
     }
     
     auto grid = terrain::ElevationGrid::fromCSV(em_filename);
-    
     auto network = network::Network::fromGeoJSON(nw_filename);
     network.setElevationGrid(grid);
 
-    optimizers::AttractorOptimizer(network).optimize(max_iterations);
+    AttractorOptimizer(network).optimize(max_iterations);
 
     network.print(outputFormat);
 

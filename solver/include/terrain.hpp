@@ -98,21 +98,25 @@ public:
                      double observerHeight = 2.0,
                      double targetHeight   = 2.0,
                      bool fresnelClearance = false) const;
-    bool lineOfSight(LatLngAlt pos1, LatLngAlt pos2, bool fresnelClearance = false) const;
+    bool lineOfSight(const LatLngAlt pos1, const LatLngAlt pos2, bool fresnelClearance = false) const;
 
     // Haversine distance between two lat/lng points in meters
-    double haversineDistance(double lat1, double lng1, double lat2, double lon2) const;
-    double haversineDistance(LatLngAlt pos1, LatLngAlt pos2) const;
+    double haversineDistance(double lat1, double lng1, double lat2, double lng2) const;
+    double haversineDistance(const LatLngAlt pos1, const LatLngAlt pos2) const;
 
     // Compute straight line distance between two lat/lng/alt points in meters
     double straightLineDistance(double lat1, double lng1, 
-                     double lat2, double lon2,
+                     double lat2, double lng2,
                      double h1, double h2) const; 
-    double straightLineDistance(LatLngAlt pos1, LatLngAlt pos2) const;
+    double straightLineDistance(const LatLngAlt pos1, const LatLngAlt pos2) const;
+
+    // Squared distance between two lat/lng points (for comparison purposes)
+    double squaredDistance(double lat1, double lng1, double lat2, double lng2) const;
+    double squaredDistance(const LatLngAlt pos1, const LatLngAlt pos2) const;
 
     // Equirectangular approximation distance between two lat/lng points in meters
-    double equirectangularDistance(double lat1, double lng1, double lat2, double lon2) const;
-    double equirectangularDistance(LatLngAlt pos1, LatLngAlt pos2) const;
+    double equirectangularDistance(double lat1, double lng1, double lat2, double lng2) const;
+    double equirectangularDistance(const LatLngAlt pos1, const LatLngAlt pos2) const;
 
     // Check if a lat/lng is within the grid bounds
     inline bool inElevationGrid(double lat, double lng) const {
@@ -134,6 +138,9 @@ public:
 
     double getMaxAltitude() const;
     double getMinAltitude() const;
+
+    inline size_t getNumLatitudes() const { return latitudes.size(); };
+    inline size_t getNumLongitudes() const { return longitudes.size(); };
 
 private:
     std::vector<double> latitudes;

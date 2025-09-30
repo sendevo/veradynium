@@ -138,7 +138,7 @@ double ElevationGrid::bilinearInterpolation(double lat, double lng) const {
 };
 
 void ElevationGrid::terrainProfile(double lat1, double lng1, 
-                                   double lat2, double lon2, 
+                                   double lat2, double lng2, 
                                    std::vector<double>& profile,
                                    std::vector<double>& distances,
                                    int steps) const {
@@ -146,7 +146,7 @@ void ElevationGrid::terrainProfile(double lat1, double lng1,
     distances.reserve(steps + 1);
 
     const double latDiff = lat2 - lat1;
-    const double lonDiff = lon2 - lng1;
+    const double lonDiff = lng2 - lng1;
     for (int k = 0; k <= steps; ++k) {
         const double t   = double(k) / steps;
         // Next position
@@ -162,23 +162,23 @@ void ElevationGrid::terrainProfile(double lat1, double lng1,
 };
 
 bool ElevationGrid::lineOfSight(double lat1, double lng1,
-                                double lat2, double lon2,
+                                double lat2, double lng2,
                                 double observerHeight,
                                 double targetHeight,
                                 bool fresnelClearance) const
 {
     const double elev1 = bilinearInterpolation(lat1, lng1) + observerHeight;
-    const double elev2 = bilinearInterpolation(lat2, lon2) + targetHeight;
+    const double elev2 = bilinearInterpolation(lat2, lng2) + targetHeight;
 
     double totalDistance;
     double clearance = 0.0;
     if(fresnelClearance) // only compute if needed
-        totalDistance = equirectangularDistance(lat1, lng1, lat2, lon2);
+        totalDistance = equirectangularDistance(lat1, lng1, lat2, lng2);
 
     for (int k = 1; k < SAMPLES_STEPS; ++k) {
         const double t   = double(k) / SAMPLES_STEPS;
         const double lat = lat1 + t * (lat2 - lat1);
-        const double lng = lng1 + t * (lon2 - lng1);
+        const double lng = lng1 + t * (lng2 - lng1);
 
         const double terrain = bilinearInterpolation(lat, lng);
         const double los     = elev1 + t * (elev2 - elev1);
@@ -195,13 +195,13 @@ bool ElevationGrid::lineOfSight(double lat1, double lng1,
     return true; // clear
 };
 
-bool ElevationGrid::lineOfSight(LatLngAlt pos1, LatLngAlt pos2, bool fesnelClearance) const {
+bool ElevationGrid::lineOfSight(const LatLngAlt pos1, const LatLngAlt pos2, bool fesnelClearance) const {
     return lineOfSight(pos1.lat, pos1.lng, pos2.lat, pos2.lng, pos1.alt, pos2.alt, fesnelClearance);
 };
 
-double ElevationGrid::haversineDistance(double lat1, double lng1, double lat2, double lon2) const {
+double ElevationGrid::haversineDistance(double lat1, double lng1, double lat2, double lng2) const {
     const double dlat = global::toRadians(lat2 - lat1);
-    const double dlon = global::toRadians(lon2 - lng1);
+    const double dlon = global::toRadians(lng2 - lng1);
     const double a = std::sin(dlat/2) * std::sin(dlat/2) +
                      std::cos(global::toRadians(lat1)) * std::cos(global::toRadians(lat2)) *
                      std::sin(dlon/2) * std::sin(dlon/2);
@@ -209,7 +209,7 @@ double ElevationGrid::haversineDistance(double lat1, double lng1, double lat2, d
     return EARTH_RADIUS * c;
 };
 
-double ElevationGrid::haversineDistance(LatLngAlt pos1, LatLngAlt pos2) const {
+double ElevationGrid::haversineDistance(const LatLngAlt pos1, const LatLngAlt pos2) const {
     return haversineDistance(pos1.lat, pos1.lng, pos2.lat, pos2.lng);
 };
 
@@ -231,30 +231,40 @@ Vec3 toECEF(double lat, double lng, double h) {
 };
 
 double ElevationGrid::straightLineDistance(double lat1, double lng1, 
-                               double lat2, double lon2, 
+                               double lat2, double lng2, 
                                double h1, double h2) const  {
     Vec3 p1 = toECEF(lat1, lng1, h1);
-    Vec3 p2 = toECEF(lat2, lon2, h2);
+    Vec3 p2 = toECEF(lat2, lng2, h2);
     double dx = p2.x - p1.x, dy = p2.y - p1.y, dz = p2.z - p1.z;
     return std::sqrt(dx*dx + dy*dy + dz*dz);
 };
 
-double ElevationGrid::straightLineDistance(LatLngAlt pos1, LatLngAlt pos2) const {
+double ElevationGrid::straightLineDistance(const LatLngAlt pos1, const LatLngAlt pos2) const {
     return straightLineDistance(pos1.lat, pos1.lng, pos2.lat, pos2.lng, pos1.alt, pos2.alt);
 };
 
-double ElevationGrid::equirectangularDistance(double lat1, double lng1, double lat2, double lon2) const {
-    const double x = global::toRadians(lon2 - lng1) * std::cos(global::toRadians((lat1 + lat2) / 2));
+double ElevationGrid::squaredDistance(double lat1, double lng1, double lat2, double lng2) const {
+    const double x = global::toRadians(lng2 - lng1) * std::cos(global::toRadians((lat1 + lat2) / 2));
+    const double y = global::toRadians(lat2 - lat1);
+    return x*x + y*y;
+};
+
+double ElevationGrid::squaredDistance(const LatLngAlt pos1, const LatLngAlt pos2) const {
+    return squaredDistance(pos1.lat, pos1.lng, pos2.lat, pos2.lng);
+};
+
+double ElevationGrid::equirectangularDistance(double lat1, double lng1, double lat2, double lng2) const {
+    const double x = global::toRadians(lng2 - lng1) * std::cos(global::toRadians((lat1 + lat2) / 2));
     const double y = global::toRadians(lat2 - lat1);
     return EARTH_RADIUS * std::sqrt(x*x + y*y);
 };
 
-double ElevationGrid::equirectangularDistance(LatLngAlt pos1, LatLngAlt pos2) const {
+double ElevationGrid::equirectangularDistance(const LatLngAlt pos1, const LatLngAlt pos2) const {
     return equirectangularDistance(pos1.lat, pos1.lng, pos2.lat, pos2.lng);
 };
 
 double ElevationGrid::getMaxAltitude() const {
-    double maxAlt = -INF;
+    double maxAlt = -DBL_MAX;
     for(const auto& row : elevationGrid) {
         double rowMax = *std::max_element(row.begin(), row.end());
         if(rowMax > maxAlt) {
@@ -265,7 +275,7 @@ double ElevationGrid::getMaxAltitude() const {
 };
 
 double ElevationGrid::getMinAltitude() const {
-    double minAlt = INF;
+    double minAlt = DBL_MAX;
     for(const auto& row : elevationGrid) {
         double rowMin = *std::min_element(row.begin(), row.end());
         if(rowMin < minAlt) {

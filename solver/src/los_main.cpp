@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
     const bool los = grid.lineOfSight(lat1, lon1, lat2, lon2, h1, h2);
     const bool losFresnel = grid.lineOfSight(lat1, lon1, lat2, lon2, h1, h2, true);
 
-    const double totalDistance = grid.equirectangularDistance(lat1, lon1, lat2, lon2);
+    const double totalDistance = grid.haversineDistance(lat1, lon1, lat2, lon2);
 
     std::vector<double> profile;
     std::vector<double> distances;

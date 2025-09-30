@@ -52,6 +52,10 @@ Network Network::fromGeoJSON(const std::string& filepath) {
     return network;
 };
 
+void Network::addGateway(terrain::LatLngAlt pos) {
+    std::string new_id = global::generate_uuid();
+    gateways.push_back(Gateway(new_id, pos, &elevation_grid));
+};
 
 void Network::connect() {
     // Parallelized version of connect using OpenMP
@@ -70,11 +74,11 @@ void Network::connect() {
 
     // Parallel per-device search for best gateway
     std::vector<int> best_gw_idx(num_eds, -1);
-    std::vector<double> best_dist(num_eds, INF);
+    std::vector<double> best_dist(num_eds, DBL_MAX);
 
     #pragma omp parallel for schedule(dynamic) // parallelize over end devices
     for (int j = 0; j < static_cast<int>(num_eds); ++j) {
-        double minDist = INF;
+        double minDist = DBL_MAX;
         int best = -1;
 
         for (int i = 0; i < static_cast<int>(num_gws); ++i) {
@@ -82,7 +86,8 @@ void Network::connect() {
             const auto& ed = end_devices[j];
 
             bool los = gw.lineOfSightTo(ed);
-            double distance = gw.distanceTo(ed);
+            //const double distance = gw.distanceTo(ed); // Equirectangular distance
+            const double distance = elevation_grid.squaredDistance(gw.location, ed.location); // Squared distance for efficiency
 
             if (los && distance < minDist) {
                 minDist = distance;
@@ -90,22 +95,20 @@ void Network::connect() {
             }
         }
 
-        if(minDist < MAX_DISTANCE){ // Only consider connections within MAX_DISTANCE
+        if(minDist < MAX_RANGE){ // Only consider connections within MAX_RANGE
             best_gw_idx[j] = best;
             best_dist[j] = minDist;
         }
     }
 
-    // Reset pointers, total_distance and connected_eds_cnt
+    // Reset pointers and connected_eds_cnt
     disconnect();
 
     for (size_t j = 0; j < num_eds; ++j) {
         int best = best_gw_idx[j];
         if (best >= 0) {
             end_devices[j].assigned_gateway = &gateways[best];
-            end_devices[j].distance_to_gateway = best_dist[j];
             gateways[best].connected_devices.push_back(&end_devices[j]);
-            total_distance += best_dist[j];
             connected_eds_cnt++;
         }
     }
@@ -115,7 +118,16 @@ void Network::disconnect() {
     for (auto& gw : gateways) gw.connected_devices.clear();
     for (auto& dev : end_devices) dev.assigned_gateway = nullptr;
     connected_eds_cnt = 0;
-    total_distance = 0.0;
+};
+
+double Network::computeTotalDistance() const {
+    double total_distance = 0.0;
+    for (const auto& ed : end_devices) {
+        if (ed.assigned_gateway) {
+            total_distance += ed.distanceTo(*ed.assigned_gateway);
+        }
+    }
+    return total_distance;
 };
 
 geojson::FeatureCollection Network::toFeatureCollection() const {
@@ -167,7 +179,7 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
                 {"type", "connection"},
                 {"from", ed.id},
                 {"to", ed.assigned_gateway->id},
-                {"distance", ed.distance_to_gateway}
+                {"distance", ed.distanceTo(*ed.assigned_gateway)}
             };
             connection.coords = geojson::LineString{
                 geojson::Position{ed.location.lng, ed.location.lat}, 
@@ -189,7 +201,7 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
     feature_collection.setProperties({
         {"num_gateways", gateways.size()},
         {"num_end_devices", end_devices.size()},
-        {"total_distance", total_distance},
+        {"total_distance", computeTotalDistance()},
         {"connected_end_devices", static_cast<int>(end_devices.size() - std::count_if(end_devices.begin(), end_devices.end(), [](const EndDevice& ed){ return ed.assigned_gateway == nullptr; }))},
         {"disconnected_end_devices", static_cast<int>(std::count_if(end_devices.begin(), end_devices.end(), [](const EndDevice& ed){ return ed.assigned_gateway == nullptr; }))},
         {"elevation_grid", {
@@ -199,7 +211,7 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
             }},
             {"altitude_range", {elevation_grid.getMinAltitude(), elevation_grid.getMaxAltitude()}}
         }},
-        {"max_connection_distance", MAX_DISTANCE},
+        {"max_connection_distance", MAX_RANGE},
         {"network_bbox", {
             {"upper_right", {maxLat, maxLng}},
             {"bottom_left", {minLat, minLng}}
@@ -210,22 +222,24 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
 };
 
 void Network::printPlainText() const {
-    std::cout << "Network Information:" << std::endl;
+    std::cout << std::endl << "Network Information:" << std::endl << "----------------------------------------" << std::endl;
     std::cout << "Number of Gateways: " << gateways.size() << std::endl;
     for (const auto& gw : gateways) {
-        std::cout << "  Gateway ID: " << gw.id 
-                  << ", Lat: " << gw.location.lat 
-                  << ", Lng: " << gw.location.lng 
-                  << ", Height: " << gw.location.alt << "m" << std::endl;
+        std::cout << "  Gateway ID: " << gw.id << std::endl
+                  << "    Lat: " << gw.location.lat << std::endl
+                  << "    Lng: " << gw.location.lng << std::endl
+                  << "    Height: " << gw.location.alt << "m" << std::endl
+                  << "    Connected End Devices: " << gw.connected_devices.size() << std::endl;
     }
     std::cout << "Number of End Devices: " << end_devices.size() << std::endl;
     for (const auto& ed : end_devices) {
-        std::cout << "  End Device ID: " << ed.id 
-                  << ", Lat: " << ed.location.lat 
-                  << ", Lng: " << ed.location.lng 
-                  << ", Height: " << ed.location.alt << "m"
-                  << ", Assigned Gateway: " 
-                  << (ed.assigned_gateway ? ed.assigned_gateway->id : "None")
+        std::cout << "  End Device ID: " << ed.id << std::endl
+                  << "    Lat: " << ed.location.lat << std::endl
+                  << "    Lng: " << ed.location.lng << std::endl 
+                  << "    Height: " << ed.location.alt << "m" << std::endl
+                  << "    Assigned Gateway: " 
+                  << (ed.assigned_gateway ? ed.assigned_gateway->id : "None") << std::endl;
+        std::cout << "    Distance to Gateway: " << (ed.assigned_gateway ? std::to_string(ed.distanceTo(*ed.assigned_gateway)) + " meters" : "N/A")
                   << std::endl;
     }
     std::cout << "Terrain Elevation Grid:" << std::endl;
@@ -233,7 +247,7 @@ void Network::printPlainText() const {
     std::cout << "      Upper right position: [" << elevation_grid.getBoundingBox()[0].lat << ", " << elevation_grid.getBoundingBox()[0].lng << "]" << std::endl;
     std::cout << "      Bottom left position: [" << elevation_grid.getBoundingBox()[2].lat << ", " << elevation_grid.getBoundingBox()[2].lng << "]" << std::endl;
     std::cout << "      Altitude range: [" << elevation_grid.getMinAltitude() << ", " << elevation_grid.getMaxAltitude() << "] meters" << std::endl;
-    std::cout << "Total distance from end devices to assigned gateways: " << total_distance << " meters" << std::endl;
+    std::cout << "Total distance from end devices to assigned gateways: " << computeTotalDistance() << " meters" << std::endl;
     std::cout << "----------------------------------------" << std::endl;
 };
 

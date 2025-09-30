@@ -12,7 +12,8 @@
 #include <string>
 #include <random>
 
-#define INF std::numeric_limits<double>::infinity()
+// Same as __DBL_MAX__ from <cfloat> but compatible with C++17
+#define DBL_MAX std::numeric_limits<double>::max()
 
 /**
  * 
@@ -26,8 +27,6 @@ namespace global { // Utility functions
 
 enum PRINT_TYPE { PLAIN_TEXT, JSON };
 
-inline constexpr const char defaultMessage[] = "Error in command line arguments. See manual or documentation.";
-
 // Get directory of the executable (to load the manual file if not specified)
 std::string getExecutableDir();
 
@@ -35,11 +34,15 @@ std::string getExecutableDir();
 std::string generate_uuid();
 
 // Print help message from file
+inline constexpr const char defaultMessage[] = "Error in command line arguments. See manual or documentation.";
 void printHelp(const char* file, const char* message = defaultMessage); 
 
 // Convert degrees to radians
 inline double toRadians(double degree) { return degree * M_PI / 180.0; }
 
+// Random number generator
+static std::random_device rd;
+static std::mt19937 gen(rd());
 
 struct NullBuffer : std::streambuf {
     int overflow(int c) override { return c; }

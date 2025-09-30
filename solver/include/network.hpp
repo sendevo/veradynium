@@ -19,7 +19,7 @@
  */
 namespace network {
 
-constexpr double MAX_DISTANCE = 2000; // Maximum distance (in meters) for a valid connection = 2km
+constexpr double MAX_RANGE = 2000; // Maximum distance (in meters) for a valid connection = 2km
 
 class Node {
 public:
@@ -41,7 +41,7 @@ public:
     };
 
     inline double distanceTo(const Node& other) const {
-        return elevation_grid->equirectangularDistance(location, other.location);
+        return elevation_grid->haversineDistance(location, other.location);
     }
     
     inline bool lineOfSightTo(const Node& other) const {
@@ -66,7 +66,6 @@ public:
         terrain::LatLngAlt pos, 
         const terrain::ElevationGrid* grid) : Node(id, pos, grid) {}
     Gateway* assigned_gateway = nullptr; // Pointer to assigned gateway
-    double distance_to_gateway = std::numeric_limits<double>::max(); // Distance to assigned gateway
 };
 
 
@@ -104,6 +103,8 @@ public:
 
     inline std::vector<Gateway>& getGateways() { return gateways; };
     inline const std::vector<EndDevice>& getEndDevices() const { return end_devices; };
+
+    void addGateway(terrain::LatLngAlt pos);
     
     inline const terrain::ElevationGrid& getElevationGrid() const { return elevation_grid; };
 
@@ -115,12 +116,13 @@ public:
     inline void translateEndDevice(size_t index, terrain::LatLngAlt delta) { end_devices[index].location += delta; }
     inline void translateGateway(size_t index, terrain::LatLngAlt delta) { gateways[index].location += delta; }
 
+    double computeTotalDistance() const;
+
 private:
     std::vector<Gateway> gateways;
     std::vector<EndDevice> end_devices;
     terrain::ElevationGrid elevation_grid;
 
-    double total_distance;
     std::size_t connected_eds_cnt;
     
     std::vector<double> bbox; // Bbox of network
