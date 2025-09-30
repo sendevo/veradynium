@@ -26,12 +26,12 @@ Network Network::fromFeatureCollection(const geojson::FeatureCollection& fc) {
                 throw std::runtime_error("Invalid Point: must have at least [lon, lat]");
             }
 
-            const Node node = Node::parse(properties, pos[1], pos[0]);
+            const Node node = Node::parse(properties, pos[1], pos[0], &network.elevation_grid); // lat, lng
             if (detail::require_string(properties, "type") == "end_device"){
-                network.end_devices.push_back(EndDevice(node.id, node.location));
+                network.end_devices.push_back(EndDevice(node.id, node.location, &network.elevation_grid));
             }else{ 
                 if (detail::require_string(properties, "type") == "gateway"){
-                    network.gateways.push_back(Gateway(node.id, node.location));
+                    network.gateways.push_back(Gateway(node.id, node.location, &network.elevation_grid));
                 } else {
                     throw std::runtime_error("Invalid GeoJSON: unknown feature type '" + detail::require_string(properties, "type") + "'");
                 }
@@ -81,8 +81,8 @@ void Network::connect() {
             const auto& gw = gateways[i];
             const auto& ed = end_devices[j];
 
-            bool los = gw.lineOfSightTo(ed, elevation_grid);
-            double distance = gw.distanceTo(ed, elevation_grid);
+            bool los = gw.lineOfSightTo(ed);
+            double distance = gw.distanceTo(ed);
 
             if (los && distance < minDist) {
                 minDist = distance;

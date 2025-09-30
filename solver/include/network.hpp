@@ -24,25 +24,31 @@ constexpr double MAX_DISTANCE = 2000; // Maximum distance (in meters) for a vali
 class Node {
 public:
     Node() = default;
-    Node(const std::string& id, terrain::LatLngAlt pos) : id(id), location(pos) {}
+    Node(
+        const std::string& id, 
+        terrain::LatLngAlt pos, 
+        const terrain::ElevationGrid* grid) 
+        : id(id), location(pos), elevation_grid(grid) {}
     
     std::string id;
     
     terrain::LatLngAlt location;
     
-    static inline Node parse(const nlohmann::json& properties, double lat, double lng) {
+    static inline Node parse(const nlohmann::json& properties, double lat, double lng, const terrain::ElevationGrid* grid) {
         std::string id = detail::require_string(properties, "id");
         double height = detail::optional_number(properties, "height", 0.0);
-        return Node{id, {lat, lng, height}};
+        return Node{id, {lat, lng, height}, grid};
     };
 
-    inline double distanceTo(const Node& other, const terrain::ElevationGrid& grid) const {
-        return grid.equirectangularDistance(location, other.location);
+    inline double distanceTo(const Node& other) const {
+        return elevation_grid->equirectangularDistance(location, other.location);
     }
     
-    inline bool lineOfSightTo(const Node& other, const terrain::ElevationGrid& grid) const {
-        return grid.lineOfSight(location, other.location);
+    inline bool lineOfSightTo(const Node& other) const {
+        return elevation_grid->lineOfSight(location, other.location);
     }
+private:
+    const terrain::ElevationGrid* elevation_grid;
 };
 
 
@@ -55,7 +61,10 @@ class EndDevice;
 class EndDevice : public Node {
 public:
     EndDevice() = default;
-    EndDevice(const std::string& id, terrain::LatLngAlt pos) : Node(id, pos) {}
+    EndDevice(
+        const std::string& id, 
+        terrain::LatLngAlt pos, 
+        const terrain::ElevationGrid* grid) : Node(id, pos, grid) {}
     Gateway* assigned_gateway = nullptr; // Pointer to assigned gateway
     double distance_to_gateway = std::numeric_limits<double>::max(); // Distance to assigned gateway
 };
@@ -64,7 +73,10 @@ public:
 class Gateway : public Node {
 public:
     Gateway() = default;
-    Gateway(const std::string& id, terrain::LatLngAlt pos) : Node(id, pos) {}
+    Gateway(
+        const std::string& id, 
+        terrain::LatLngAlt pos, 
+        const terrain::ElevationGrid* grid) : Node(id, pos, grid) {}
     std::vector<EndDevice*> connected_devices; // Pointers to connected end devices
 };
 
@@ -92,8 +104,6 @@ public:
 
     inline std::vector<Gateway>& getGateways() { return gateways; };
     inline const std::vector<EndDevice>& getEndDevices() const { return end_devices; };
-    inline void addGatewayFront(const Gateway gateway){ gateways.push_back(gateway); }
-    inline void addEndDeviceBack(const EndDevice ed){ end_devices.push_back(ed); }
     
     inline const terrain::ElevationGrid& getElevationGrid() const { return elevation_grid; };
 
