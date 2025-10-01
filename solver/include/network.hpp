@@ -20,6 +20,8 @@
 namespace network {
 
 constexpr double MAX_RANGE = 2000; // Maximum distance (in meters) for a valid connection = 2km
+constexpr double MAX_RANGE_SQUARED = // Precomputed squared range for distance comparison
+    (MAX_RANGE * MAX_RANGE) / (terrain::EARTH_RADIUS * terrain::EARTH_RADIUS); 
 
 class Node {
 public:

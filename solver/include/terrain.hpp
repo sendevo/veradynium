@@ -12,7 +12,6 @@
 #include "global.hpp"
 
 #define SAMPLES_STEPS 100 // Number of samples along the line of sight. Must be >= 2
-#define EARTH_RADIUS 6371000.0 // in meters
 #define US915_LORA_LAMBDA 0.327642031 // in meters (for 915 MHz)
 #define EU860_LORA_LAMBDA 0.345383016 // in meters (for 868 MHz)
 #define FRESNEL_CLEARANCE_FACTOR 0.6 // 60% clearance
@@ -27,6 +26,8 @@
  */
 
 namespace terrain {
+
+constexpr double EARTH_RADIUS = 6371000.0; // in meters
 
 struct LatLngAlt {
     double lat = 0.0;
