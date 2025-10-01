@@ -76,6 +76,9 @@ void Network::connect() {
     std::vector<int> best_gw_idx(num_eds, -1);
     std::vector<double> best_dist(num_eds, DBL_MAX);
 
+    // const double max_range = MAX_RANGE; -> if use equirectangular distance
+    const double max_range = (MAX_RANGE * MAX_RANGE / EARTH_RADIUS / EARTH_RADIUS); // -> if use squared distance
+
     #pragma omp parallel for schedule(dynamic) // parallelize over end devices
     for (int j = 0; j < static_cast<int>(num_eds); ++j) {
         double minDist = DBL_MAX;
@@ -95,7 +98,7 @@ void Network::connect() {
             }
         }
 
-        if(minDist < MAX_RANGE){ // Only consider connections within MAX_RANGE
+        if(minDist < max_range){ // Only consider connections within maximum range
             best_gw_idx[j] = best;
             best_dist[j] = minDist;
         }
