@@ -9,6 +9,7 @@ import {
     Popup,
     useMapEvents
 } from 'react-leaflet';
+import { useTranslation } from 'react-i18next';
 import ZoomWatcher from './zoomWatcher';
 import HeatMapLayer from './heatmapLayer';
 import { pointToLayer } from './icons';
@@ -24,7 +25,25 @@ const GeoJSONLayer = ({ data, pointToLayer }) => {
     }
   }, [data]);
 
-  return <GeoJSON ref={layerRef} data={data} pointToLayer={pointToLayer} />;
+  return (
+    <GeoJSON
+      ref={layerRef}
+      data={data}
+      pointToLayer={pointToLayer}
+      onEachFeature={(feature, layer) => {
+        layer.bindPopup(
+            feature.properties?.id
+            ? `<b>${feature.properties.id}</b>`
+            : `Lat: ${feature.geometry.coordinates[1]}<br/>Lng: ${feature.geometry.coordinates[0]}`
+        );
+
+        layer.on("mouseover", () => layer.openPopup());
+        layer.on("mouseout", () => layer.closePopup());
+        layer.on("click", (e) => {
+            layer._map.fire("click", e); 
+        });
+    }}/>
+  );
 };
 
 const PointSetter = ({ setPoints }) => {
@@ -57,6 +76,8 @@ const Map = props => {
 
     const [zoom, setZoom] = useState(initialZoom);
 
+    const { t } = useTranslation("map");
+
     return (
         <Box sx={{ height: "100%", width: "100%", m: 0 }}>
             <MapContainer 
@@ -73,17 +94,14 @@ const Map = props => {
                     }
 
                     {elevationData.length > 0 &&
-                        <HeatMapLayer
-                            zoom={zoom}
-                            points={elevationData} // [[lat, lng, intensity], ...]
-                        />
+                        <HeatMapLayer zoom={zoom} points={elevationData}/> // [[lat, lng, intensity], ...]
                     }
 
                     <PointSetter setPoints={setPoints}/>
                     
                     {points.map((pos, idx) => (
                         <Marker key={idx} position={pos}>
-                            <Popup>Punto {idx + 1}</Popup>
+                            <Popup>{t("point")} {idx + 1}</Popup>
                         </Marker>
                     ))}
                         

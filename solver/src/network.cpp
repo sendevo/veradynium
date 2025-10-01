@@ -249,6 +249,32 @@ void Network::printPlainText() const {
     std::cout << "      Altitude range: [" << elevation_grid.getMinAltitude() << ", " << elevation_grid.getMaxAltitude() << "] meters" << std::endl;
     std::cout << "Total distance from end devices to assigned gateways: " << computeTotalDistance() << " meters" << std::endl;
     std::cout << "----------------------------------------" << std::endl;
+
+    // Print distance matrix
+    std::cout << "Distance Matrix (meters):" << std::endl;
+    std::cout << "end-device-id";
+    for(size_t g = 0; g < gateways.size(); g++) {
+        std::cout << "," << gateways[g].id;
+    }
+    std::cout << std::endl;
+    for(size_t e = 0; e < end_devices.size(); e++) {
+        std::cout << end_devices[e].id;
+        for(size_t g = 0; g < gateways.size(); g++) {
+            double dist = elevation_grid.equirectangularDistance(
+                getEndDeviceLocation(e),
+                getGatewayLocation(g)
+            );
+            if(elevation_grid.lineOfSight(
+                getEndDeviceLocation(e),
+                getGatewayLocation(g)
+            )) {
+                std::cout << "," << dist;
+            } else {
+                std::cout << "," << -1.0;
+            }
+        }
+        std::cout << std::endl;
+    }
 };
 
 void Network::printJSON() const {

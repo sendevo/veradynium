@@ -161,6 +161,14 @@ const translations = {
             run_solver: "Ejecutar solver"
         }
     },
+    map: {
+        en: {
+            point: "Point"
+        },
+        es: {
+            point: "Punto"
+        }
+    },
     nodes_table: {
         en: {
             type: "Type",

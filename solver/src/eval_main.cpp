@@ -71,6 +71,7 @@ int main(int argc, char **argv) {
     
     network.setElevationGrid(grid);
     network.connect();
+    
     network.print(outputFormat);
 
     return 0;
