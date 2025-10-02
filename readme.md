@@ -1,6 +1,6 @@
 # Veradynium <img src="gui/logo/logo.png" width="20" />
 
-![screenshot](doc/screenshot.png)
+![screenshot](doc/screenshot_los1.png)
 
 ## LoRaWAN gateways placement problem: solver and network analysis
 
@@ -9,6 +9,8 @@ This project provides a set of programs and utilities to design and analyze LoRa
 A Python [API](server) is provided to expose the set of programs and access them via HTTP. It also allows to upload terrain elevation files (.csv or .nc) and network configuration (.geojson).
 
 The [GUI](GUI) was implemented with React.js, MUI and Leaflet.js, between other libraries. It allows to upload files of terrain elevation and network topology. LocalStorage is used to store metadata of uploaded files, so they are fetched from the server on app load. Once the files are uploaded, the user can run the solver to compute the optimal placement of gateways, and visualize the results on the map. The GUI also allows to compute the line of sight between two points on the map, and visualize the connections between end-devices and gateways once computed in the backend.
+
+![block diagram](doc/block_diagram.png)
 
 ## Installation
 Run ```build.sh``` or ```make all``` to set up the project.  
