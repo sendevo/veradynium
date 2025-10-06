@@ -22,6 +22,7 @@ namespace network {
 constexpr double MAX_RANGE = 2000; // Maximum distance (in meters) for a valid connection = 2km
 constexpr double MAX_RANGE_SQUARED = // Precomputed squared range for distance comparison
     (MAX_RANGE * MAX_RANGE) / (terrain::EARTH_RADIUS * terrain::EARTH_RADIUS); 
+constexpr int DISTANCE_HISTOGRAM_BIN_SIZE = 100; // Bin size for distance histogram in meters
 
 class Node {
 public:
@@ -119,6 +120,7 @@ public:
     inline void translateGateway(size_t index, terrain::LatLngAlt delta) { gateways[index].location += delta; }
 
     double computeTotalDistance() const;
+    std::vector<size_t> computeDistanceHistogram() const;
 
 private:
     std::vector<Gateway> gateways;

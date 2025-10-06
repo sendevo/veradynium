@@ -42,14 +42,18 @@ const translations = {
             elevation: "Elevation (m)",
             reference: "Reference",
             fresnelUpper: "Fresnel upper",
-            fresnelLower: "Fresnel lower"
+            fresnelLower: "Fresnel lower",
+            count: "Count",
+            range: "Range"
         },
         es: {
             distance: "Distancia (m)",
             elevation: "Elevación (m)",
             reference: "Referencia",
             fresnelUpper: "Fresnel sup.",
-            fresnelLower: "Fresnel inf."
+            fresnelLower: "Fresnel inf.",
+            count: "Cantidad",
+            range: "Rango"
         }
     },
     model: {
@@ -113,7 +117,8 @@ const translations = {
             connected_devices: "Connected devices",
             disconnected_devices: "Disconnected devices",
             connectivity_percentage: "Connectivity percentage",
-            total_link_distance: "Total link distance"
+            total_link_distance: "Total link distance",
+            distance_histogram: "Distance histogram"
         },
         es: {
             title: "Test de conectividad",
@@ -122,7 +127,8 @@ const translations = {
             connected_devices: "Dispositivos conectados",
             disconnected_devices: "Dispositivos no conectados",
             connectivity_percentage: "Porcentaje de conectividad",
-            total_link_distance: "Distancia total de enlaces"
+            total_link_distance: "Distancia total de enlaces",
+            distance_histogram: "Histograma de distancias"
         }
     },
     controls: {

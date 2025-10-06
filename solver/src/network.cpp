@@ -132,6 +132,20 @@ double Network::computeTotalDistance() const {
     return total_distance;
 };
 
+std::vector<size_t> Network::computeDistanceHistogram() const {
+    std::vector<size_t> histogram((MAX_RANGE / DISTANCE_HISTOGRAM_BIN_SIZE) + 1, 0);
+    for (const auto& ed : end_devices) {
+        if (ed.assigned_gateway) {
+            double distance = ed.distanceTo(*ed.assigned_gateway);
+            size_t bin = static_cast<size_t>(distance / DISTANCE_HISTOGRAM_BIN_SIZE);
+            if (bin < histogram.size()) {
+                histogram[bin] += 1;
+            }
+        }
+    }
+    return histogram;
+};
+
 geojson::FeatureCollection Network::toFeatureCollection() const {
     geojson::FeatureCollection feature_collection = geojson::FeatureCollection(); 
 
@@ -204,6 +218,8 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
         {"num_gateways", gateways.size()},
         {"num_end_devices", end_devices.size()},
         {"total_distance", computeTotalDistance()},
+        {"distance_histogram_bin_size", DISTANCE_HISTOGRAM_BIN_SIZE},
+        {"distance_histogram", computeDistanceHistogram()},
         {"connected_end_devices", static_cast<int>(end_devices.size() - std::count_if(end_devices.begin(), end_devices.end(), [](const EndDevice& ed){ return ed.assigned_gateway == nullptr; }))},
         {"disconnected_end_devices", static_cast<int>(std::count_if(end_devices.begin(), end_devices.end(), [](const EndDevice& ed){ return ed.assigned_gateway == nullptr; }))},
         {"elevation_grid", {

@@ -1,5 +1,6 @@
 import { Typography, Modal, Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import BarChart from "./barChart";
 
 const style = {
   position: 'absolute',
@@ -13,7 +14,7 @@ const style = {
   p: 4
 };
 
-const requiredProps = ["num_end_devices", "num_gateways", "connected_end_devices", "disconnected_end_devices", "total_distance"];
+const requiredProps = ["num_end_devices", "num_gateways", "connected_end_devices", "disconnected_end_devices", "total_distance", "distance_histogram_bin_size", "distance_histogram"];
 
 const NetworkResultsModal = props => {
     
@@ -47,6 +48,10 @@ const NetworkResultsModal = props => {
                 <Typography>{t("disconnected_devices")}: {result.disconnected_end_devices}</Typography>
                 <Typography>{t("connectivity_percentage")}: {connectivityProportion} %</Typography>
                 <Typography>{t("total_link_distance")}: {result.total_distance.toFixed(2)} m</Typography>
+                <Typography sx={{fontWeight:"bold", mt:2, mb:3}}>{t("distance_histogram")}:</Typography>
+                <BarChart 
+                    binSize={result.distance_histogram_bin_size} 
+                    values={result.distance_histogram}/>
                 
             </Box>
         </Modal>

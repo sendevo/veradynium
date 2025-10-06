@@ -1,0 +1,10 @@
+.recharts-tooltip-wrapper {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.recharts-tooltip-cursor {
+  fill: none !important;
+  stroke: none !important;
+}
