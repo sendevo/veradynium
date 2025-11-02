@@ -54,7 +54,8 @@ const LOSResultsModal = props => {
                 <Typography sx={{mt:1}}><b>{t("line_of_sight_fresnel_60pct")}:</b> {result.line_of_sight_fresnel_60pct ? t("yes") : t("no")}</Typography>
 
                 <Typography sx={{fontWeight:"bold", mt:2, mb:3}}>{t("terrain_profile")} (m):</Typography>
-                <LineChart 
+                <LineChart
+                    observers_elev={[result.point1.height_m, result.point2.height_m]} 
                     elev_data={result.terrain_profile_elev_m} 
                     dist_data={result.terrain_profile_dist_m}/>
             </Box>

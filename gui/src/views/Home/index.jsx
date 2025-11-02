@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Grid } from "@mui/material";
 import MainView from "../../components/MainView";
 import Map from "../../components/Map";
+import FileStatusBox from "../../components/FileStatusBox";
 import Controls from "../../components/Controls";
 import LOSResultsModal from "./losResultsModal";
 import NetworkResultsModal from "./networkResultsModal";
@@ -69,6 +70,9 @@ const View = () => {
 
     return(
         <MainView background={background}>
+            
+            <FileStatusBox />
+            
             <Grid container spacing={2} direction="row" sx={{height:"75vh"}}>
                 <Grid size={3}>
                     <Grid container direction={"column"} spacing={2} sx={{height:"100%"}}>
@@ -78,7 +82,8 @@ const View = () => {
                                 handleComputeLOS={handleComputeLOS}
                                 evalNetworkAction={evalNetworkAction}
                                 runSolverAction={runSolverAction}
-                                points={points}/>
+                                points={points}
+                                setPoints={setPoints}/>
                         </Grid>
 
                         <LOSResultsModal result={losResult} open={losResultModalOpen} onClose={() => setLosResultModalOpen(false)}/>

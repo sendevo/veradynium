@@ -44,7 +44,7 @@ const theme = createTheme({
         fontFamily: "Montserrat, Open Sans, sans-serif",
     },
     palette: {
-        mode: "light",
+        mode: "dark",
         primary: {
             main: "#393939",
             contrastText: "#FFFFFF"

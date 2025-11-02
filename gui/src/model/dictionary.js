@@ -147,11 +147,13 @@ const translations = {
             remove_features: "Remove features",
             remove_elevation: "Remove elevation",
             evaluate_network: "Evaluate network",
-            run_solver: "Run solver"
+            run_solver: "Run solver",
+            point: "Point",
+            elevation: "Elevation"
         },
         es: {
             dropzone_text: "Arrastrar y soltar archivos aquí o seleccione desde su directorio",
-            files_status: "Estado de los archivos:",
+            files_status: "Estado de los archivos",
             elevation_map_uploaded: "Mapa de elevación cargado",
             elevation_map_local: "Mapa de elevación en modo local",
             features_uploaded: "Geometrías cargadas",
@@ -164,7 +166,9 @@ const translations = {
             remove_features: "Quitar geometrías",
             remove_elevation: "Quitar altimetría",
             evaluate_network: "Evaluar red",
-            run_solver: "Ejecutar solver"
+            run_solver: "Ejecutar solver",
+            point: "Punto",
+            elevation: "Elevación"
         }
     },
     map: {

@@ -12,7 +12,7 @@ import { US915_LORA_LAMBDA, FRESNEL_ZONE_CLEARANCE } from "../../model/constants
 
 const toolTipStyle = { backgroundColor: "#333", border: "1px solid #ccc" };
 
-const LineChart = ({elev_data, dist_data}) => {
+const LineChart = ({observers_elev, elev_data, dist_data}) => {
     if(!Array.isArray(elev_data) || !Array.isArray(dist_data)){
         console.warn("LineChart: Invalid or missing elev_data or dist_data prop");
         return null;
@@ -20,12 +20,12 @@ const LineChart = ({elev_data, dist_data}) => {
 
     const { t } = useTranslation("charts");
     
-    const firstPoint = { distance: dist_data[0], altura: elev_data[0] };
-    const lastPoint = { distance: dist_data[dist_data.length - 1], altura: elev_data[elev_data.length - 1] };
+    const firstPoint = { distance: dist_data[0], elevation: elev_data[0]+observers_elev[0] };
+    const lastPoint = { distance: dist_data[dist_data.length - 1], elevation: elev_data[elev_data.length - 1]+observers_elev[1] };
   
     const values = elev_data.map((_, i) => {
         const progress = (dist_data[i] - firstPoint.distance) / (lastPoint.distance - firstPoint.distance);
-        const referenceValue = firstPoint.altura + progress * (lastPoint.altura - firstPoint.altura);
+        const referenceValue = firstPoint.elevation + progress * (lastPoint.elevation - firstPoint.elevation);
 
         // distances from point to each end
         const d1 = dist_data[i] - firstPoint.distance;

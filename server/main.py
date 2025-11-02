@@ -118,6 +118,8 @@ async def compute_los(data: dict):
 
     p1, p2 = data["p1"], data["p2"]
 
+    print(f"Computing LOS between {p1} and {p2} using elevation map {em_file_path}")
+
     cmd = [
         "../solver/bin/los",
         "-f", em_file_path,

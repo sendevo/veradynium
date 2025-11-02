@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import ZoomWatcher from './zoomWatcher';
 import HeatMapLayer from './heatmapLayer';
 import { pointToLayer } from './icons';
+import "./index.css"
 
 
 const GeoJSONLayer = ({ data, pointToLayer }) => {
@@ -81,6 +82,7 @@ const Map = props => {
     return (
         <Box sx={{ height: "100%", width: "100%", m: 0 }}>
             <MapContainer 
+                attributionControl={false}
                 center={mapCenter} 
                 zoom={zoom} 
                 style={{ height: "100%", width: "100%" }}>

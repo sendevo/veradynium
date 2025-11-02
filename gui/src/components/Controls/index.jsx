@@ -3,6 +3,7 @@ import { Grid, Box, Typography } from '@mui/material';
 import { useTranslation } from "react-i18next";
 import { useDropzone } from 'react-dropzone';
 import MenuButtons from "./menuButtons";
+import PointsConfig from "./pointsConfig";
 import { useModelContext } from "../../context/Model";
 
 const dropzoneStyle = {
@@ -57,7 +58,8 @@ const Controls = ({
     handleComputeLOS,
     evalNetworkAction,
     runSolverAction,
-    points
+    points,
+    setPoints
 }) => {
 
     const { t } = useTranslation("controls");
@@ -90,30 +92,10 @@ const Controls = ({
                     onDrop={handleUploadFile} 
                     onError={message => toast(message, "error")}/>
             </Grid>
-            {(hasElevation || hasFeatures) && 
-                <Grid>
-                    <Typography>{t("files_status")}:</Typography>
-                
-                    {hasElevation && 
-                        <>
-                            {model.elevation_map.id ? 
-                                <Typography sx={{fontSize: 12}}>{t("elevation_map_uploaded")}</Typography>
-                                :
-                                <Typography sx={{fontSize: 12}}>{t("elevation_map_local")}</Typography>
-                            }
-                        </>
-                    }
-                    {hasFeatures &&  
-                        <>
-                            {model.features.id ?
-                                <Typography sx={{fontSize: 12}}>{t("features_uploaded")}</Typography>
-                                :
-                                <Typography sx={{fontSize: 12}}>{t("features_local")}</Typography>
-                            }
-                        </>
-                    }
-                </Grid>
-            }
+
+            <PointsConfig 
+                points={points}
+                setPoints={setPoints}/>
 
             <MenuButtons
                 hasFeatures={hasFeatures}

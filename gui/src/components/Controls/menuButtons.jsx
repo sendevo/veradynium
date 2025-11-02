@@ -17,7 +17,7 @@ const MenuButtons = ({
     const { t } = useTranslation("controls");
 
     return (
-        <>
+        <Grid container direction={"column"} spacing={1}>
             {hasFeatures && hasElevation && hasUploadedFiles && typeof evalNetworkAction === "function" &&
                 <Grid>
                     <Button 
@@ -40,31 +40,31 @@ const MenuButtons = ({
                 </Grid>
             }
 
-            {points?.length === 2 &&
-                <>
-                    {hasElevation && typeof handleComputeLOS === "function" &&
-                        <Grid>
-                            <Button 
-                                fullWidth
-                                onClick={handleComputeLOS}
-                                variant="contained">
-                                    {t("compute_los")}
-                            </Button>
-                        </Grid>
-                    }
-                    { typeof handleResetPoints === "function" &&
-                        <Grid>
-                            <Button 
-                                fullWidth
-                                color="secondary"
-                                onClick={handleResetPoints}
-                                variant="contained">
-                                    {t("reset_points")}
-                            </Button>
-                        </Grid>
-                    }
-                </>
+            
+            {points?.length === 2 && hasElevation && typeof handleComputeLOS === "function" &&
+                <Grid>
+                    <Button 
+                        fullWidth
+                        onClick={handleComputeLOS}
+                        variant="contained">
+                            {t("compute_los")}
+                    </Button>
+                </Grid>
             }
+            
+            { points?.length > 0 && typeof handleResetPoints === "function" &&
+                <Grid>
+                    <Button 
+                        fullWidth
+                        color="secondary"
+                        onClick={handleResetPoints}
+                        variant="contained">
+                            {t("reset_points")}
+                    </Button>
+                </Grid>
+            }
+            
+            
             {hasFeatures > 0 && typeof handleRemoveFeatures === "function" &&
                 <Grid>
                     <Button 
@@ -88,7 +88,7 @@ const MenuButtons = ({
                     </Button>
                 </Grid>
             }
-        </>
+        </Grid>
     );
 };
 
