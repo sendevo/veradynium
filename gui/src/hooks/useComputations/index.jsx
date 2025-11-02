@@ -99,7 +99,29 @@ const useComputations = () => {
         const data = await res.json();
         /* output format:
         {
-            
+            bbox: [minLng, minLat, maxLng, maxLat],
+            features: GeoJSON FeatureCollection,
+            properties: {
+                connected_end_devices: number,
+                disconnected_end_devices: number,
+                distance_histogram: [],
+                distance_histogram_bin_size: number,
+                elevation_grid: {
+                    altitude_range: [minAltitude, maxAltitude],
+                    bounding_box: {
+                        bottom_left: [lng, lat],
+                        upper_right: [lng, lat]
+                    }
+                },
+                max_connection_distance: number,
+                network_bbox: {
+                    bottom_left: [lng, lat],
+                    upper_right: [lng, lat]
+                },
+                num_end_devices: number,
+                num_gateways: number,
+                total_distance: number
+            }
         }
         */
         return data;

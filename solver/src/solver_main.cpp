@@ -8,6 +8,7 @@
 #include "../include/terrain.hpp"
 #include "../include/network.hpp"
 #include "../include/attractor_optimizer.h"
+#include "../include/attractor_optimizer_claude.h"
 
 
 int main(int argc, char **argv) {
@@ -83,7 +84,8 @@ int main(int argc, char **argv) {
     auto network = network::Network::fromGeoJSON(nw_filename);
     network.setElevationGrid(grid);
 
-    AttractorOptimizer(network).optimize(max_iterations);
+    //AttractorOptimizer(network).optimize(max_iterations);
+    AttractorOptimizerClaude(network).optimize(max_iterations);
 
     network.print(outputFormat);
 
