@@ -151,6 +151,8 @@ async def solve(data: dict):
     em_file_id = data.get("em_file_id") # Elevation map file ID
     geojson_file_id = data.get("features_file_id") # GeoJSON features file ID
 
+    # Get other optimization parameters if needed
+
     em_file_path = get_uploaded_file(em_file_id, ".csv")
     geojson_file_path = get_uploaded_file(geojson_file_id, ".json")
 
@@ -158,7 +160,6 @@ async def solve(data: dict):
         "../solver/bin/solver",
         "-f", em_file_path,
         "-g", geojson_file_path,
-        "-i", "5000",
         "-o", "json"
     ]
 

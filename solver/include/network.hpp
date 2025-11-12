@@ -24,6 +24,15 @@ constexpr double MAX_RANGE_SQUARED = // Precomputed squared range for distance c
     (MAX_RANGE * MAX_RANGE) / (terrain::EARTH_RADIUS * terrain::EARTH_RADIUS); 
 constexpr int DISTANCE_HISTOGRAM_BIN_SIZE = 100; // Bin size for distance histogram in meters
 
+enum SPREAD_FACTOR {
+    SF7 = 7,
+    SF8 = 8,
+    SF9 = 9,
+    SF10 = 10,
+    SF11 = 11,
+    SF12 = 12
+};
+
 class Node {
 public:
     Node() = default;
@@ -69,6 +78,7 @@ public:
         terrain::LatLngAlt pos, 
         const terrain::ElevationGrid* grid) : Node(id, pos, grid) {}
     Gateway* assigned_gateway = nullptr; // Pointer to assigned gateway
+    SPREAD_FACTOR getSpreadFactor() const;
 };
 
 
@@ -121,6 +131,7 @@ public:
 
     double computeTotalDistance() const;
     std::vector<size_t> computeDistanceHistogram() const;
+    std::vector<size_t> computeSFHistogram() const;
 
 private:
     std::vector<Gateway> gateways;

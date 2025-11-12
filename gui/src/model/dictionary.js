@@ -118,7 +118,8 @@ const translations = {
             disconnected_devices: "Disconnected devices",
             connectivity_percentage: "Connectivity percentage",
             total_link_distance: "Total link distance",
-            distance_histogram: "Distance histogram"
+            distance_histogram: "Distance histogram",
+            sf_histogram: "SF histogram"
         },
         es: {
             title: "Test de conectividad",
@@ -128,7 +129,8 @@ const translations = {
             disconnected_devices: "Dispositivos no conectados",
             connectivity_percentage: "Porcentaje de conectividad",
             total_link_distance: "Distancia total de enlaces",
-            distance_histogram: "Histograma de distancias"
+            distance_histogram: "Histograma de distancias",
+            sf_histogram: "Histograma de SF"
         }
     },
     controls: {
@@ -183,20 +185,26 @@ const translations = {
         en: {
             type: "Type",
             end_device: "End device",
+            end_devices: "End Devices",
             gateway: "Gateway",
-            id: "Id",
-            position: "Pos.",
+            gateways: "Gateways",
+            id: "ID",
+            position: "Location (lat, lng, alt)",
             connections: "Connections",
+            sf: "SF",
             empty_table_1: "No nodes to display.",
             empty_table_2: "Upload a points file or add nodes on the map."
         },
         es: {
             type: "Tipo",
             end_device: "Disp. final",
+            end_devices: "Disp. finales", 
             gateway: "Gateway",
-            id: "Id",
-            position: "Pos.",
+            gateways: "Gateways",
+            id: "ID",
+            position: "Posición (lat, lng, alt)",
             connections: "Conexiones",
+            sf: "SF",
             empty_table_1: "No hay nodos para mostrar.",
             empty_table_2: "Cargue un archivo de puntos o agregue nodos en el mapa."
         }
@@ -217,6 +225,16 @@ const translations = {
             help: "Ayuda",
             switch_language: "Idioma cambiado a Español",
             alt: "Bandera de Argentina"
+        }
+    },
+    data_view: {
+        en: {
+            distance_histogram: "Link length histogram",
+            sf_histogram: "SF histogram"
+        },
+        es: {
+            distance_histogram: "Histograma de long. de enlaces",
+            sf_histogram: "Histograma de SF"
         }
     }
 };

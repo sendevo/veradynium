@@ -1,6 +1,6 @@
 import { Typography, Modal, Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import BarChart from "./barChart";
+import Histogram from "../../components/Charts/barChart.jsx";
 
 const style = {
   position: 'absolute',
@@ -37,6 +37,22 @@ const NetworkResultsModal = props => {
         ? (result.connected_end_devices / result.num_end_devices) * 100 
         : 0).toFixed(2);
 
+    /*
+    const distHistogramBinSize =result.distance_histogram_bin_size || 1;
+    const distHistogramValues = result.distance_histogram || [];
+    const distData = distHistogramValues.map((count, i) => ({
+        range: `${(i * distHistogramBinSize)}–${((i + 1) * distHistogramBinSize)} m`,
+        count,
+    }));
+    */
+
+    const sfHistogramBinSize = result.sf_histogram_bin_size || 1;
+    const sfHistogramValues = result.sf_histogram || [];
+    const sfData = sfHistogramValues.map((count, i) => ({
+        range: `SF ${(i * sfHistogramBinSize+7)}`,
+        count,
+    }));
+
     return (
         <Modal open={open} onClose={onClose} aria-labelledby="modal-title" aria-describedby="modal-description">
             <Box sx={style}>
@@ -48,11 +64,12 @@ const NetworkResultsModal = props => {
                 <Typography>{t("disconnected_devices")}: {result.disconnected_end_devices}</Typography>
                 <Typography>{t("connectivity_percentage")}: {connectivityProportion} %</Typography>
                 <Typography>{t("total_link_distance")}: {result.total_distance.toFixed(2)} m</Typography>
-                <Typography sx={{fontWeight:"bold", mt:2, mb:3}}>{t("distance_histogram")}:</Typography>
-                <BarChart 
-                    binSize={result.distance_histogram_bin_size} 
-                    values={result.distance_histogram}/>
-                
+                <Typography sx={{fontWeight:"bold", mt:2, mb:3}}>{t("sf_histogram")}:</Typography>
+                {result.distance_histogram.length > 0 && 
+                    <Histogram 
+                        binSize={sfHistogramBinSize} 
+                        data={sfData}/>
+                }
             </Box>
         </Modal>
     );

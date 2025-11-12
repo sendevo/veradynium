@@ -2,6 +2,25 @@
 
 namespace network {
 
+SPREAD_FACTOR EndDevice::getSpreadFactor() const {
+    double distance = assigned_gateway ? distanceTo(*assigned_gateway) : DBL_MAX;
+
+    // Simple mapping based on distance thresholds
+    // This function must be implemented based on real time data or link budget calculations
+    if (distance <= 200) {
+        return SF7;
+    } else if (distance <= 400) {
+        return SF8;
+    } else if (distance <= 800) {
+        return SF9;
+    } else if (distance <= 1200) {
+        return SF10;
+    } else if (distance <= 1600) {
+        return SF11;
+    } else {
+        return SF12;
+    }
+}
 
 
 Network Network::fromFeatureCollection(const geojson::FeatureCollection& fc) {
@@ -146,6 +165,21 @@ std::vector<size_t> Network::computeDistanceHistogram() const {
     return histogram;
 };
 
+std::vector<size_t> Network::computeSFHistogram() const {
+    std::vector<size_t> histogram(6, 0); // SF7 to SF12
+
+    for (const auto& ed : end_devices) {
+        if (ed.assigned_gateway) {
+            SPREAD_FACTOR sf = ed.getSpreadFactor();
+            size_t bin = static_cast<size_t>(sf) - 7; // SF7 maps to index 0
+            if (bin < histogram.size()) {
+                histogram[bin] += 1;
+            }
+        }
+    }
+    return histogram;
+};
+
 geojson::FeatureCollection Network::toFeatureCollection() const {
     geojson::FeatureCollection feature_collection = geojson::FeatureCollection(); 
 
@@ -195,7 +229,8 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
                 {"type", "connection"},
                 {"from", ed.id},
                 {"to", ed.assigned_gateway->id},
-                {"distance", ed.distanceTo(*ed.assigned_gateway)}
+                {"distance", ed.distanceTo(*ed.assigned_gateway)},
+                {"spread_factor", static_cast<int>(ed.getSpreadFactor())}
             };
             connection.coords = geojson::LineString{
                 geojson::Position{ed.location.lng, ed.location.lat}, 
@@ -217,11 +252,23 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
     feature_collection.setProperties({
         {"num_gateways", gateways.size()},
         {"num_end_devices", end_devices.size()},
+        
         {"total_distance", computeTotalDistance()},
+        
         {"distance_histogram_bin_size", DISTANCE_HISTOGRAM_BIN_SIZE},
         {"distance_histogram", computeDistanceHistogram()},
-        {"connected_end_devices", static_cast<int>(end_devices.size() - std::count_if(end_devices.begin(), end_devices.end(), [](const EndDevice& ed){ return ed.assigned_gateway == nullptr; }))},
-        {"disconnected_end_devices", static_cast<int>(std::count_if(end_devices.begin(), end_devices.end(), [](const EndDevice& ed){ return ed.assigned_gateway == nullptr; }))},
+        
+        {"sf_histogram_bin_size", 1},
+        {"sf_histogram", computeSFHistogram()},
+        
+        {"connected_end_devices", 
+            static_cast<int>(end_devices.size() - std::count_if(end_devices.begin(), 
+            end_devices.end(), 
+            [](const EndDevice& ed){ return ed.assigned_gateway == nullptr; }))},
+        {"disconnected_end_devices", 
+            static_cast<int>(std::count_if(end_devices.begin(), 
+            end_devices.end(), 
+            [](const EndDevice& ed){ return ed.assigned_gateway == nullptr; }))},
         {"elevation_grid", {
             {"bounding_box", {
                 {"upper_right", {elevation_grid.getBoundingBox()[0].lat, elevation_grid.getBoundingBox()[0].lng}},

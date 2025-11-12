@@ -17,16 +17,10 @@ const toolTipStyle = {
     color: "#fff" 
 };
 
-const Histogram = ({ binSize, values }) => {
-    if (!Array.isArray(values) || typeof binSize !== "number") return null;
+const Histogram = ({ binSize, data }) => {
+    if (!Array.isArray(data) || typeof binSize !== "number") return null;
 
     const { t } = useTranslation("charts");
-
-    // Convert histogram array to data points
-    const data = values.map((count, i) => ({
-        range: `${(i * binSize)}–${((i + 1) * binSize)} m`,
-        count,
-    }));
 
     return (
         <ResponsiveContainer width="100%" height={300}>

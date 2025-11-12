@@ -160,3 +160,54 @@ uvicorn main:app --reload
 deactivate
 ```
 The GUI will be available at ```localhost:8080``` or ```localhost:5173``` (depending on configuration, if previously compiled).  
+
+
+### Data
+
+#### Terrain elevation files
+Terrain elevation files must be in CSV format, with the following structure:
+```latitude,longitude,elevation
+36.733780,-91.237743,150
+36.734780,-91.237743,152
+...
+```
+Alternatively, NetCDF (.nc) files can be uploaded, which will be converted to CSV format by the server. The ```nc_to_csv``` method in the [utils](server/util.py) module can be used for this conversion.
+
+### Data source
+Terrain elevation data can be obtained from various sources, such as:
+- [NASA](https://www.earthdata.nasa.gov/data/catalog)
+- [USGS Earth Explorer](https://earthexplorer.usgs.gov/)
+- [OpenTopography](https://opentopography.org/) (Requires registration)
+
+
+#### Network topology files
+Network topology files must be in GeoJSON format, with a FeatureCollection containing Point features for gateways and end-devices. Each feature must have properties indicating its type (gateway or end-device) and identifier. Example:
+```json
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-91.237743, 36.733780]
+      },
+      "properties": {
+        "id": "gateway_1",
+        "type": "gateway"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-91.221097, 36.712818]
+      },
+      "properties": {
+        "id": "end_device_1",
+        "type": "end_device"
+      }
+    }
+  ]
+}
+```

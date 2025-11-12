@@ -1,4 +1,4 @@
-#include "../include/attractor_optimizer_claude.h"
+#include "attractor_optimizer_claude.h"
 
 bool AttractorOptimizerClaude::isValidGatewayPosition(const terrain::LatLngAlt& pos) {
     // Check if position is too close to existing gateways

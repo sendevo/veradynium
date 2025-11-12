@@ -1,6 +1,6 @@
 import { Typography, Modal, Box } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import LineChart from "./lineChart";
+import LineChart from "../../components/Charts/lineChart.jsx";
 
 const style = {
   position: 'absolute',

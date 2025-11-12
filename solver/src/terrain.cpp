@@ -200,6 +200,7 @@ bool ElevationGrid::lineOfSight(const LatLngAlt pos1, const LatLngAlt pos2, bool
 };
 
 double ElevationGrid::haversineDistance(double lat1, double lng1, double lat2, double lng2) const {
+    // Returns distance in meters between two lat/lng points using Haversine formula
     const double dlat = global::toRadians(lat2 - lat1);
     const double dlon = global::toRadians(lng2 - lng1);
     const double a = std::sin(dlat/2) * std::sin(dlat/2) +

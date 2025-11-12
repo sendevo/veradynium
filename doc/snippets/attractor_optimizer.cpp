@@ -1,4 +1,4 @@
-#include "../include/attractor_optimizer.h"
+#include "attractor_optimizer.h"
 
 terrain::LatLngAlt AttractorOptimizer::findOptimalGatewayPosition() {
     // Find centroid of unconnected devices
