@@ -41,10 +41,18 @@ const View = () => {
                         <Grid item size={3}>    
                             <Controls />
                         </Grid>
-                        <Grid item size={9}>
-                            <EDTable featureCollection={featureCollection}/>
-                            <GWTable featureCollection={featureCollection}/>
-                        </Grid>
+                        {Array.isArray(featureCollection.features) && featureCollection.features.length > 0 ? 
+                            <Grid item size={9}>
+                                <EDTable featureCollection={featureCollection}/>
+                                <GWTable featureCollection={featureCollection}/>
+                            </Grid>
+                            :
+                            <Box sx={{height:"65vh", display:"flex", justifyContent:"center", alignItems:"center"}}>
+                                <Typography variant="h6" align="center" color="white" sx={{mt:2}}>
+                                    {t("empty_table_1")} <br/> {t("empty_table_2")}
+                                </Typography>
+                            </Box>
+                        }
                     </Grid>
                 </Grid>
                 {distHistogramValues.length > 0 &&

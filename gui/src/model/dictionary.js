@@ -191,9 +191,7 @@ const translations = {
             id: "ID",
             position: "Location (lat, lng, alt)",
             connections: "Connections",
-            sf: "SF",
-            empty_table_1: "No nodes to display.",
-            empty_table_2: "Upload a points file or add nodes on the map."
+            sf: "SF"
         },
         es: {
             type: "Tipo",
@@ -204,9 +202,7 @@ const translations = {
             id: "ID",
             position: "Posición (lat, lng, alt)",
             connections: "Conexiones",
-            sf: "SF",
-            empty_table_1: "No hay nodos para mostrar.",
-            empty_table_2: "Cargue un archivo de puntos o agregue nodos en el mapa."
+            sf: "SF"
         }
     },
     navigation: {
@@ -230,11 +226,15 @@ const translations = {
     data_view: {
         en: {
             distance_histogram: "Link length histogram",
-            sf_histogram: "SF histogram"
+            sf_histogram: "SF histogram",
+            empty_table_1: "No nodes to display.",
+            empty_table_2: "Please upload a points file or add nodes on the map."
         },
         es: {
             distance_histogram: "Histograma de long. de enlaces",
-            sf_histogram: "Histograma de SF"
+            sf_histogram: "Histograma de SF",
+            empty_table_1: "No hay nodos para mostrar.",
+            empty_table_2: "Cargue un archivo de puntos o agregue nodos en el mapa."
         }
     }
 };

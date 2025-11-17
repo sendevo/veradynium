@@ -36,13 +36,14 @@ export const EDTable = ({ featureCollection }) => {
 
     const { t } = useTranslation("nodes_table");
 
-    const hasFeatures = Array.isArray(featureCollection.features) && featureCollection.features.length > 0;
+    const nodes = featureCollection.features.filter(feature => feature.geometry.type === "Point" && feature.properties.type === "end_device");
+    const hasFeatures = nodes.length > 0;
 
     return (
-        <Box>
-            <Typography sx={{fontWeight:"bold", mb:2, mt:2}}>{t("end_devices")}:</Typography>
-            <Box style={tableContainerStyle}>
-                {hasFeatures ?
+        hasFeatures &&
+            <Box>
+                <Typography sx={{fontWeight:"bold", mb:2, mt:2}}>{t("end_devices")}:</Typography>
+                <Box style={tableContainerStyle}>
                     <table style={tableStyle}>
                         <thead>
                             <tr>
@@ -53,9 +54,8 @@ export const EDTable = ({ featureCollection }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {featureCollection.features
-                                .filter(feature => feature.geometry.type === "Point" && feature.properties.type === "end_device")
-                                .map((feature, index) => (
+                            {
+                                nodes.map((feature, index) => (
                                     <tr key={index} style={feature.properties.selected ? highlightedRowStyle : {}}>
                                         <Cell content={feature.properties.id}/>
                                         <Cell content={`(${getCoordinate(feature, "lat")}, ${getCoordinate(feature, "lng")}, ${feature.properties.height}m)`}/>
@@ -68,28 +68,22 @@ export const EDTable = ({ featureCollection }) => {
                             )}
                         </tbody>
                     </table>
-                    :
-                    <Box sx={{height:"65vh", display:"flex", justifyContent:"center", alignItems:"center"}}>
-                        <Typography variant="h6" align="center" color="white" sx={{mt:2}}>
-                            {t("empty_table_1")} <br/> {t("empty_table_2")}
-                        </Typography>
-                    </Box>
-                }
+                </Box>
             </Box>
-        </Box>
     );
 };
 
 export const GWTable = ({ featureCollection }) => {
     const { t } = useTranslation("nodes_table");
 
-    const hasFeatures = Array.isArray(featureCollection.features) && featureCollection.features.length > 0;
+    const gateways = featureCollection.features.filter(feature => feature.geometry.type === "Point" && feature.properties.type === "gateway");
+    const hasFeatures = gateways.length > 0;
 
     return (
-        <Box>
-            <Typography sx={{fontWeight:"bold", mb:2, mt:2}}>{t("gateways")}:</Typography>
-            <Box style={{...tableContainerStyle}}>
-                {hasFeatures ?
+        hasFeatures && 
+            <Box>
+                <Typography sx={{fontWeight:"bold", mb:2, mt:2}}>{t("gateways")}:</Typography>
+                <Box style={{...tableContainerStyle}}>
                     <table style={tableStyle}>
                         <thead>
                             <tr>
@@ -99,9 +93,8 @@ export const GWTable = ({ featureCollection }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {featureCollection.features
-                                .filter(feature => feature.geometry.type === "Point" && feature.properties.type === "gateway")
-                                .map((feature, index) => (
+                            {
+                                gateways.map((feature, index) => (
                                     <tr key={index} style={feature.properties.selected ? highlightedRowStyle : {}}>
                                         <Cell content={feature.properties.id}/>
                                         <Cell content={`(${getCoordinate(feature, "lat")}, ${getCoordinate(feature, "lng")}, ${feature.properties.height}m)`}/>
@@ -116,14 +109,7 @@ export const GWTable = ({ featureCollection }) => {
                             )}
                         </tbody>
                     </table>
-                    :
-                    <Box sx={{height:"65vh", display:"flex", justifyContent:"center", alignItems:"center"}}>
-                        <Typography variant="h6" align="center" color="white" sx={{mt:2}}>
-                            {t("empty_table_1")} <br/> {t("empty_table_2")}
-                        </Typography>
-                    </Box>
-                }
+                </Box>
             </Box>
-        </Box>
     );
 }
