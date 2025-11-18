@@ -16,6 +16,7 @@ OPTIONS:
    -h, --help     Display this help message.  
    -f, --em_file  File with terrain elevation data. Must be in CSV format (lat, lng, alt).  
    -g, --nw_file  File with the current network's nodes locations. Must be in JSON (GeoJSON) format.  
+   -s, --solver   Solver method. Available models are greedy_random and ga.
    -o, --output   (optional) Output format. Must be "json" or "text". Default value is "text".  
 
 EXAMPLES:  

@@ -16,10 +16,28 @@ int main(int argc, char **argv) {
     std::string nw_filename; // Network file (geojson)
 
     global::PRINT_TYPE outputFormat = global::PLAIN_TEXT;
+    gpp::GPP_METHOD method = gpp::GPP_METHOD::GREEDY_RANDOM;
 
     for(int i = 0; i < argc; i++) {    
         if(strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0 || argc == 1)
             global::printHelp(MANUAL);
+
+        if(strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--solver") == 0) {
+            if(i+1 < argc) {
+                const char* mth = argv[i+1];
+                if(strcmp(mth, "greedy_random") == 0) {
+                    method = gpp::GPP_METHOD::GREEDY_RANDOM;
+                } else if(strcmp(mth, "greedy_deterministic") == 0) {
+                    method = gpp::GPP_METHOD::GREEDY_DETERMINISTIC;
+                } else if(strcmp(mth, "ga") == 0) {
+                    method = gpp::GPP_METHOD::GA;
+                } else {
+                    global::printHelp(MANUAL, "Error in argument -s (--solver). Supported methods: greedy_random, greedy_deterministic, ga");
+                }
+            } else {
+                global::printHelp(MANUAL, "Error in argument -s (--solver)");
+            }
+        }
 
         if(strcmp(argv[i], "-f") == 0 || strcmp(argv[i], "--em_file") == 0) {
             if(i+1 < argc) {
@@ -73,7 +91,7 @@ int main(int argc, char **argv) {
     auto network = network::Network::fromGeoJSON(nw_filename);
     network.setElevationGrid(grid);
 
-    gpp::GPP(network).solve(gpp::GPP_METHOD::GREEDY_RANDOM);
+    gpp::GPP(network).solve(method);
 
     network.print(outputFormat);
 

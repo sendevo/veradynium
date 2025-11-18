@@ -33,10 +33,6 @@ const NetworkResultsModal = props => {
         }
     }
 
-    const connectivityProportion = (result.num_end_devices > 0 
-        ? (result.connected_end_devices / result.num_end_devices) * 100 
-        : 0).toFixed(2);
-
     /*
     const distHistogramBinSize =result.distance_histogram_bin_size || 1;
     const distHistogramValues = result.distance_histogram || [];
@@ -62,8 +58,9 @@ const NetworkResultsModal = props => {
                 <Typography>{t("gateways")}: {result.num_gateways}</Typography>
                 <Typography>{t("connected_devices")}: {result.connected_end_devices}</Typography>
                 <Typography>{t("disconnected_devices")}: {result.disconnected_end_devices}</Typography>
-                <Typography>{t("connectivity_percentage")}: {connectivityProportion} %</Typography>
-                <Typography>{t("total_link_distance")}: {result.total_distance.toFixed(2)} m</Typography>
+                <Typography>{t("connectivity_percentage")}: {result.coverage} %</Typography>
+                {/*<Typography>{t("total_link_distance")}: {result.total_distance.toFixed(2)} m</Typography>*/}
+                <Typography>{t("energy_consumption_estimate")}: {result.total_energy_consumption ? result.total_energy_consumption.toFixed(2) + " Wh" : t("not_available")}</Typography>
                 <Typography sx={{fontWeight:"bold", mt:2, mb:3}}>{t("sf_histogram")}:</Typography>
                 {result.distance_histogram.length > 0 && 
                     <Histogram 

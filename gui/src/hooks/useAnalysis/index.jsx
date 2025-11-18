@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import useComputations from "../useComputations";
 import useToast from "../useToast";
 import usePreloader from "../usePreloader";
@@ -9,6 +10,8 @@ const useAnalysis = () => {
     const toast = useToast();
     const preloader = usePreloader();
     
+    const { t } = useTranslation("use_analysis");
+
     const [losResult, setLosResult] = useState(null);
     
     const { computeLOS, evalNetwork, runSolver } = useComputations();
@@ -17,13 +20,13 @@ const useAnalysis = () => {
     // setModel is used to set the result of computations in the features content
     const { model, setModel } = useModelContext();
 
-    const computeLOSAction = async (points) => {
+    const computeLOSAction = async points => {
         if (points.length < 2) {
-            toast("Coordenadas de prueba no definidas", "error");
+            toast(t("los_coordinates_undefined"), "error");
             return;
         }
         if (!model.elevation_map.id) {
-            toast("El mapa de elevación no está disponible", "error");
+            toast(t("elevation_map_unavailable"), "error");
             return;
         }
 
@@ -45,22 +48,24 @@ const useAnalysis = () => {
         preloader(false);
     };
 
-    const solverAction = async solver => {
+    const solverAction = async (solver, args={}) => {
         if (!model.elevation_map.id) {
-            toast("El mapa de elevación no está disponible", "error");
+            toast(t("elevation_map_unavailable"), "error");
             return;
         }
         if (!model.features.id) {
-            toast("El archivo de geometrías no está disponible", "error");
+            toast(t("geometries_file_unavailable"), "error");
             return;
         }
 
         const params = {
             em_file_id: model.elevation_map.id,
-            features_file_id: model.features.id
+            features_file_id: model.features.id,
+            ...args
         };
 
         preloader(true);
+        console.log("Running solver with params:", params);
         const result = await solver(params);
         if(!result.error){
             const nextModel = {
@@ -81,8 +86,8 @@ const useAnalysis = () => {
         await solverAction(evalNetwork);
     };
 
-    const runSolverAction = async () => {
-        await solverAction(runSolver);
+    const runSolverAction = async method => {
+        await solverAction(runSolver, {method});
     };
 
     const resetLOS = () => setLosResult(null);

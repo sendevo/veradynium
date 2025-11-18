@@ -7,7 +7,8 @@ namespace gpp {
 
 enum GPP_METHOD {
     GREEDY_RANDOM,
-    GREEDY_DETERMINISTIC
+    GREEDY_DETERMINISTIC,
+    GA
 };
 
 class GPP {

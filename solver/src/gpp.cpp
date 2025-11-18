@@ -16,6 +16,7 @@ void GPP::solve(GPP_METHOD method) {
 
 void GPP::greedyRandom() {
     // Add gateways at random position inside bounding box until all end devices are connected
+    // This method do not minimize energy consumption, only ensures full connectivity with a reasonable number of gateways
     const auto bbox = network.getBoundingBox();
     std::mt19937 rng(std::random_device{}());
     std::uniform_real_distribution<double> lat_dist(bbox[1], bbox[3]);

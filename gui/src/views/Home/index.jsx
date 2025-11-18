@@ -68,6 +68,10 @@ const View = () => {
         setPoints([]); 
     };
 
+    const handleRunSolver = () => {
+        runSolverAction("greedy_random");
+    };
+
     return(
         <MainView background={background}>
             
@@ -81,14 +85,20 @@ const View = () => {
                                 handleResetPoints={handleResetPoints}
                                 handleComputeLOS={handleComputeLOS}
                                 evalNetworkAction={evalNetworkAction}
-                                runSolverAction={runSolverAction}
+                                runSolverAction={handleRunSolver}
                                 points={points}
                                 setPoints={setPoints}/>
                         </Grid>
 
-                        <LOSResultsModal result={losResult} open={losResultModalOpen} onClose={() => setLosResultModalOpen(false)}/>
+                        <LOSResultsModal 
+                            result={losResult} 
+                            open={losResultModalOpen} 
+                            onClose={() => setLosResultModalOpen(false)}/>
 
-                        <NetworkResultsModal result={featureCollection.properties} open={networkResultModalOpen} onClose={() => setNetworkResultModalOpen(false)}/>
+                        <NetworkResultsModal 
+                            result={featureCollection.properties} 
+                            open={networkResultModalOpen} 
+                            onClose={() => setNetworkResultModalOpen(false)}/>
                         
                     </Grid>
                 </Grid>

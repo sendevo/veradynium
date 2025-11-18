@@ -29,6 +29,7 @@ all: check-versions solver gui server
 # Build the solver binaries
 solver:
 	@echo "Building solver..."
+	cd $(SOLVER_DIR) && make clean 
 	cd $(SOLVER_DIR) && make
 
 # -------------------------

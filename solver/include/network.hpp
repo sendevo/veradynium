@@ -25,12 +25,21 @@ constexpr double MAX_RANGE_SQUARED = // Precomputed squared range for distance c
 constexpr int DISTANCE_HISTOGRAM_BIN_SIZE = 100; // Bin size for distance histogram in meters
 
 enum SPREAD_FACTOR {
-    SF7 = 7,
-    SF8 = 8,
-    SF9 = 9,
-    SF10 = 10,
-    SF11 = 11,
-    SF12 = 12
+    SF7 = 0,
+    SF8 = 1,
+    SF9 = 2,
+    SF10 = 3,
+    SF11 = 4,
+    SF12 = 5
+};
+
+static constexpr double energyPerSF[6] = {
+    0.5, // SF7
+    0.75, // SF8
+    1.0, // SF9
+    1.5, // SF10
+    2.0, // SF11
+    3.0  // SF12
 };
 
 class Node {
@@ -111,6 +120,8 @@ public:
     void connect();
     void disconnect();
     inline const std::size_t getConnectedEdCount() const { return connected_eds_cnt; };
+    double computeTotalDistance() const;
+    double computeEnergyConsumption() const;
 
     void print(global::PRINT_TYPE format = global::PLAIN_TEXT);
 
@@ -130,7 +141,6 @@ public:
     inline void translateEndDevice(size_t index, terrain::LatLngAlt delta) { end_devices[index].location += delta; }
     inline void translateGateway(size_t index, terrain::LatLngAlt delta) { gateways[index].location += delta; }
 
-    double computeTotalDistance() const;
     std::vector<size_t> computeDistanceHistogram() const;
     std::vector<size_t> computeSFHistogram() const;
 

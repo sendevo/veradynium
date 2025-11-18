@@ -18,6 +18,7 @@ const View = () => {
     const { t } = useTranslation("data_view");
 
     const featureCollection = model.features.content || { features: [] };
+    const result = featureCollection.properties || null;
 
     const distHistogramBinSize = model.features?.content?.properties?.distance_histogram_bin_size || 1;
     const distHistogramValues = model.features?.content?.properties?.distance_histogram || [];
@@ -33,6 +34,8 @@ const View = () => {
         count,
     }));
 
+    const enableData = Array.isArray(featureCollection.features) && featureCollection.features.length > 0;
+
     return (
         <MainView background={background}>
             <Grid container spacing={2} direction="column">
@@ -41,7 +44,7 @@ const View = () => {
                         <Grid item size={3}>    
                             <Controls />
                         </Grid>
-                        {Array.isArray(featureCollection.features) && featureCollection.features.length > 0 ? 
+                        {enableData ? 
                             <Grid item size={9}>
                                 <EDTable featureCollection={featureCollection}/>
                                 <GWTable featureCollection={featureCollection}/>
@@ -55,6 +58,17 @@ const View = () => {
                         }
                     </Grid>
                 </Grid>
+                {enableData && result &&
+                    <Grid item >
+                        <Typography sx={{fontWeight:"bold"}}>{t("network_statistics")}:</Typography>
+                        <Typography>{t("total_devices")}: {result.num_end_devices}</Typography>
+                        <Typography>{t("gateways")}: {result.num_gateways}</Typography>
+                        <Typography>{t("connected_devices")}: {result.connected_end_devices}</Typography>
+                        <Typography>{t("disconnected_devices")}: {result.disconnected_end_devices}</Typography>
+                        <Typography>{t("connectivity_percentage")}: {result.coverage} %</Typography>
+                        <Typography>{t("energy_consumption_estimate")}: {result.total_energy_consumption ? result.total_energy_consumption.toFixed(2) + " Wh" : t("not_available")}</Typography>
+                    </Grid>
+                }
                 {distHistogramValues.length > 0 &&
                     <Grid item sx={{mt:2}}>
                         <Typography sx={{fontWeight:"bold"}}>{t("distance_histogram")}:</Typography>

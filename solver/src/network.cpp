@@ -162,6 +162,18 @@ double Network::computeTotalDistance() const {
     return total_distance;
 };
 
+double Network::computeEnergyConsumption() const {
+    // Simple model: sum energy consumption based on spread factor of each connected end device
+    double total_energy = 0.0;
+    for (const auto& ed : end_devices) {
+        if (ed.assigned_gateway) {
+            SPREAD_FACTOR sf = ed.getSpreadFactor();
+            total_energy += energyPerSF[static_cast<size_t>(sf)];
+        }
+    }
+    return total_energy;
+};
+
 std::vector<size_t> Network::computeDistanceHistogram() const {
     std::vector<size_t> histogram((MAX_RANGE / DISTANCE_HISTOGRAM_BIN_SIZE) + 1, 0);
     for (const auto& ed : end_devices) {
@@ -182,7 +194,7 @@ std::vector<size_t> Network::computeSFHistogram() const {
     for (const auto& ed : end_devices) {
         if (ed.assigned_gateway) {
             SPREAD_FACTOR sf = ed.getSpreadFactor();
-            size_t bin = static_cast<size_t>(sf) - 7; // SF7 maps to index 0
+            size_t bin = static_cast<size_t>(sf);
             if (bin < histogram.size()) {
                 histogram[bin] += 1;
             }
@@ -263,8 +275,11 @@ geojson::FeatureCollection Network::toFeatureCollection() const {
     feature_collection.setProperties({
         {"num_gateways", gateways.size()},
         {"num_end_devices", end_devices.size()},
+        {"coverage", end_devices.size() > 0 ? (static_cast<double>(connected_eds_cnt) / static_cast<double>(end_devices.size())) * 100.0 : 0.0},
         
         {"total_distance", computeTotalDistance()},
+
+        {"total_energy_consumption", computeEnergyConsumption()},
         
         {"distance_histogram_bin_size", DISTANCE_HISTOGRAM_BIN_SIZE},
         {"distance_histogram", computeDistanceHistogram()},

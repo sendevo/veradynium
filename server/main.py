@@ -150,6 +150,7 @@ async def compute_los(data: dict):
 async def solve(data: dict):
     em_file_id = data.get("em_file_id") # Elevation map file ID
     geojson_file_id = data.get("features_file_id") # GeoJSON features file ID
+    method = data.get("method", "greedy_random")  # Optimization method
 
     # Get other optimization parameters if needed
 
@@ -158,6 +159,7 @@ async def solve(data: dict):
 
     cmd = [
         "../solver/bin/solver",
+        "-s", method,
         "-f", em_file_path,
         "-g", geojson_file_path,
         "-o", "json"

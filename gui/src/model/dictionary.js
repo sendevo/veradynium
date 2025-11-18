@@ -118,6 +118,8 @@ const translations = {
             disconnected_devices: "Disconnected devices",
             connectivity_percentage: "Connectivity percentage",
             total_link_distance: "Total link distance",
+            energy_consumption_estimate: "Energy consumption estimate",
+            not_available: "Not available",
             distance_histogram: "Distance histogram",
             sf_histogram: "SF histogram"
         },
@@ -129,6 +131,8 @@ const translations = {
             disconnected_devices: "Dispositivos no conectados",
             connectivity_percentage: "Porcentaje de conectividad",
             total_link_distance: "Distancia total de enlaces",
+            energy_consumption_estimate: "Estimación de consumo energético",
+            not_available: "No disponible",
             distance_histogram: "Histograma de distancias",
             sf_histogram: "Histograma de SF"
         }
@@ -227,14 +231,42 @@ const translations = {
         en: {
             distance_histogram: "Link length histogram",
             sf_histogram: "SF histogram",
+            network_statistics: "Network statistics",
+            total_devices: "Total devices",
+            gateways: "Gateways",
+            connected_devices: "Connected devices",
+            disconnected_devices: "Disconnected devices",
+            connectivity_percentage: "Connectivity percentage",
+            total_link_distance: "Total link distance",
+            energy_consumption_estimate: "Energy consumption estimate",
             empty_table_1: "No nodes to display.",
             empty_table_2: "Please upload a points file or add nodes on the map."
         },
         es: {
             distance_histogram: "Histograma de long. de enlaces",
             sf_histogram: "Histograma de SF",
+            network_statistics: "Estadísticas de la red",
+            total_devices: "Dispositivos totales",
+            gateways: "Gateways",
+            connected_devices: "Dispositivos conectados",
+            disconnected_devices: "Dispositivos no conectados",
+            connectivity_percentage: "Porcentaje de conectividad",
+            total_link_distance: "Distancia total de enlaces",
+            energy_consumption_estimate: "Estimación de consumo energético",
             empty_table_1: "No hay nodos para mostrar.",
             empty_table_2: "Cargue un archivo de puntos o agregue nodos en el mapa."
+        }
+    },
+    use_analysis: {
+        en: {
+            los_coordinates_undefined: "Test coordinates not defined",
+            elevation_map_unavailable: "Elevation map is not available",
+            geometries_file_unavailable: "Geometries file is not available"
+        },
+        es: {
+            los_coordinates_undefined: "Coordenadas de prueba no definidas",
+            elevation_map_unavailable: "El mapa de elevación no está disponible",
+            geometries_file_unavailable: "El archivo de geometrías no está disponible"
         }
     }
 };
