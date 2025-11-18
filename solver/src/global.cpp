@@ -18,37 +18,15 @@ std::string getExecutableDir() {
 }
 
 std::string generate_uuid() {
-    static std::random_device              rd;
-    static std::mt19937                    gen(rd());
-    static std::uniform_int_distribution<> dis(0, 15);
-    static std::uniform_int_distribution<> dis2(8, 11);
-
     std::stringstream ss;
-    int i;
     ss << std::hex;
-    for (i = 0; i < 8; i++) {
+    static std::uniform_int_distribution<> dis(0, 15);  // hex digit: 0–F
+
+    for (std::size_t i = 0; i < 8; ++i)
         ss << dis(gen);
-    }
-    ss << "-";
-    for (i = 0; i < 4; i++) {
-        ss << dis(gen);
-    }
-    ss << "-4";
-    for (i = 0; i < 3; i++) {
-        ss << dis(gen);
-    }
-    ss << "-";
-    ss << dis2(gen);
-    for (i = 0; i < 3; i++) {
-        ss << dis(gen);
-    }
-    ss << "-";
-    for (i = 0; i < 12; i++) {
-        ss << dis(gen);
-    }
+
     return ss.str();
 }
-
 
 void printHelp(const char* file, const char* message) { // Open readme file with manual and print on terminal   
     std::cerr << std::endl << message << std::endl << std::endl;

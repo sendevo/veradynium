@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
     auto network = network::Network::fromGeoJSON(nw_filename);
     network.setElevationGrid(grid);
 
-    GPP(network).solve();
+    gpp::GPP(network).solve(gpp::GPP_METHOD::GREEDY_RANDOM);
 
     network.print(outputFormat);
 

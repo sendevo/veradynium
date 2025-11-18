@@ -117,7 +117,8 @@ public:
     inline std::vector<Gateway>& getGateways() { return gateways; };
     inline const std::vector<EndDevice>& getEndDevices() const { return end_devices; };
 
-    void addGateway(terrain::LatLngAlt pos);
+    Gateway& addGateway(terrain::LatLngAlt pos);
+    void removeGateway(const std::string& gw_id);
     
     inline const terrain::ElevationGrid& getElevationGrid() const { return elevation_grid; };
 
@@ -138,7 +139,7 @@ private:
     std::vector<EndDevice> end_devices;
     terrain::ElevationGrid elevation_grid;
 
-    std::size_t connected_eds_cnt;
+    std::size_t connected_eds_cnt = 0; // Number of connected end devices
     
     std::vector<double> bbox; // Bbox of network
     

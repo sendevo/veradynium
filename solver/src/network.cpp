@@ -71,9 +71,20 @@ Network Network::fromGeoJSON(const std::string& filepath) {
     return network;
 };
 
-void Network::addGateway(terrain::LatLngAlt pos) {
+Gateway& Network::addGateway(terrain::LatLngAlt pos) {
     std::string new_id = global::generate_uuid();
     gateways.push_back(Gateway(new_id, pos, &elevation_grid));
+    return gateways.back();
+};
+
+void Network::removeGateway(const std::string& gw_id) {
+    auto it = std::remove_if(gateways.begin(), gateways.end(),
+                             [&gw_id](const Gateway& gw) { return gw.id == gw_id; });
+    if (it != gateways.end()) {
+        gateways.erase(it, gateways.end());
+    } else {
+        throw std::runtime_error("Gateway with ID '" + gw_id + "' not found.");
+    }
 };
 
 void Network::connect() {

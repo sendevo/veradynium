@@ -1,0 +1,539 @@
+GPP: Added gateway at (-45.8712, -67.5282) and connected network.
+GPP: Connected end devices: 31 / 60
+GPP: Added gateway at (-45.8776, -67.5013) and connected network.
+GPP: Connected end devices: 48 / 60
+GPP: Added gateway at (-45.8819, -67.538) and connected network.
+GPP: Connected end devices: 48 / 60
+GPP: Added gateway at (-45.8629, -67.5289) and connected network.
+GPP: Connected end devices: 49 / 60
+GPP: Added gateway at (-45.8582, -67.5208) and connected network.
+GPP: Connected end devices: 49 / 60
+GPP: Added gateway at (-45.8666, -67.4864) and connected network.
+GPP: Connected end devices: 53 / 60
+GPP: Added gateway at (-45.8635, -67.5239) and connected network.
+GPP: Connected end devices: 53 / 60
+GPP: Added gateway at (-45.8816, -67.5155) and connected network.
+GPP: Connected end devices: 54 / 60
+GPP: Added gateway at (-45.8584, -67.4896) and connected network.
+GPP: Connected end devices: 56 / 60
+GPP: Added gateway at (-45.8699, -67.5244) and connected network.
+GPP: Connected end devices: 56 / 60
+GPP: Added gateway at (-45.8697, -67.4956) and connected network.
+GPP: Connected end devices: 59 / 60
+GPP: Added gateway at (-45.8653, -67.5307) and connected network.
+GPP: Connected end devices: 59 / 60
+GPP: Added gateway at (-45.8584, -67.4993) and connected network.
+GPP: Connected end devices: 59 / 60
+GPP: Added gateway at (-45.8787, -67.5242) and connected network.
+GPP: Connected end devices: 59 / 60
+GPP: Added gateway at (-45.8787, -67.513) and connected network.
+GPP: Connected end devices: 60 / 60
+
+Network Information:
+----------------------------------------
+Number of Gateways: 15
+  Gateway ID: 3971e89b
+    Lat: -45.8712
+    Lng: -67.5282
+    Height: 15m
+    Connected End Devices: 5
+  Gateway ID: 735e0a00
+    Lat: -45.8776
+    Lng: -67.5013
+    Height: 15m
+    Connected End Devices: 4
+  Gateway ID: ce10cb93
+    Lat: -45.8819
+    Lng: -67.538
+    Height: 15m
+    Connected End Devices: 7
+  Gateway ID: c5f67f14
+    Lat: -45.8629
+    Lng: -67.5289
+    Height: 15m
+    Connected End Devices: 1
+  Gateway ID: 8c14b0d6
+    Lat: -45.8582
+    Lng: -67.5208
+    Height: 15m
+    Connected End Devices: 0
+  Gateway ID: 80b8a6f9
+    Lat: -45.8666
+    Lng: -67.4864
+    Height: 15m
+    Connected End Devices: 4
+  Gateway ID: 479097d7
+    Lat: -45.8635
+    Lng: -67.5239
+    Height: 15m
+    Connected End Devices: 4
+  Gateway ID: 3e2a4d52
+    Lat: -45.8816
+    Lng: -67.5155
+    Height: 15m
+    Connected End Devices: 3
+  Gateway ID: 59490d55
+    Lat: -45.8584
+    Lng: -67.4896
+    Height: 15m
+    Connected End Devices: 4
+  Gateway ID: dbb18b89
+    Lat: -45.8699
+    Lng: -67.5244
+    Height: 15m
+    Connected End Devices: 4
+  Gateway ID: 122a491a
+    Lat: -45.8697
+    Lng: -67.4956
+    Height: 15m
+    Connected End Devices: 9
+  Gateway ID: 96efe28b
+    Lat: -45.8653
+    Lng: -67.5307
+    Height: 15m
+    Connected End Devices: 1
+  Gateway ID: f9c1d462
+    Lat: -45.8584
+    Lng: -67.4993
+    Height: 15m
+    Connected End Devices: 6
+  Gateway ID: 9d041837
+    Lat: -45.8787
+    Lng: -67.5242
+    Height: 15m
+    Connected End Devices: 3
+  Gateway ID: eb2d3a93
+    Lat: -45.8787
+    Lng: -67.513
+    Height: 15m
+    Connected End Devices: 5
+Number of End Devices: 60
+  End Device ID: ed_1d8bcf21
+    Lat: -45.861
+    Lng: -67.4799
+    Height: 1.5m
+    Assigned Gateway: 80b8a6f9
+    Distance to Gateway: 798.754198 meters
+  End Device ID: ed_f968f823
+    Lat: -45.861
+    Lng: -67.4847
+    Height: 1.5m
+    Assigned Gateway: 59490d55
+    Distance to Gateway: 478.484023 meters
+  End Device ID: ed_2da09985
+    Lat: -45.861
+    Lng: -67.4893
+    Height: 1.5m
+    Assigned Gateway: 59490d55
+    Distance to Gateway: 291.631427 meters
+  End Device ID: ed_e227f0c4
+    Lat: -45.861
+    Lng: -67.4938
+    Height: 1.5m
+    Assigned Gateway: 59490d55
+    Distance to Gateway: 432.144588 meters
+  End Device ID: ed_a14d0ff5
+    Lat: -45.861
+    Lng: -67.4989
+    Height: 1.5m
+    Assigned Gateway: f9c1d462
+    Distance to Gateway: 286.992172 meters
+  End Device ID: ed_a4fab1e8
+    Lat: -45.8588
+    Lng: -67.4988
+    Height: 1.5m
+    Assigned Gateway: f9c1d462
+    Distance to Gateway: 56.578521 meters
+  End Device ID: ed_483c448e
+    Lat: -45.8567
+    Lng: -67.4988
+    Height: 1.5m
+    Assigned Gateway: f9c1d462
+    Distance to Gateway: 199.422099 meters
+  End Device ID: ed_d6894c2b
+    Lat: -45.861
+    Lng: -67.5019
+    Height: 1.5m
+    Assigned Gateway: f9c1d462
+    Distance to Gateway: 353.711170 meters
+  End Device ID: ed_d4069e3c
+    Lat: -45.8588
+    Lng: -67.5019
+    Height: 1.5m
+    Assigned Gateway: f9c1d462
+    Distance to Gateway: 207.049010 meters
+  End Device ID: ed_a2b8a1d4
+    Lat: -45.8637
+    Lng: -67.48
+    Height: 1.5m
+    Assigned Gateway: 80b8a6f9
+    Distance to Gateway: 594.824742 meters
+  End Device ID: ed_6959f571
+    Lat: -45.8645
+    Lng: -67.4829
+    Height: 1.5m
+    Assigned Gateway: 80b8a6f9
+    Distance to Gateway: 359.970159 meters
+  End Device ID: ed_5894fd28
+    Lat: -45.8645
+    Lng: -67.4877
+    Height: 1.5m
+    Assigned Gateway: 59490d55
+    Distance to Gateway: 689.674017 meters
+  End Device ID: ed_2527f6c9
+    Lat: -45.8645
+    Lng: -67.4922
+    Height: 1.5m
+    Assigned Gateway: 122a491a
+    Distance to Gateway: 624.616386 meters
+  End Device ID: ed_37d3fe73
+    Lat: -45.8645
+    Lng: -67.4973
+    Height: 1.5m
+    Assigned Gateway: 122a491a
+    Distance to Gateway: 585.026401 meters
+  End Device ID: ed_607c322f
+    Lat: -45.8645
+    Lng: -67.502
+    Height: 1.5m
+    Assigned Gateway: 735e0a00
+    Distance to Gateway: 1459.680534 meters
+  End Device ID: ed_3d70316b
+    Lat: -45.8678
+    Lng: -67.5019
+    Height: 1.5m
+    Assigned Gateway: 122a491a
+    Distance to Gateway: 532.130099 meters
+  End Device ID: ed_9991f7b7
+    Lat: -45.8678
+    Lng: -67.4974
+    Height: 1.5m
+    Assigned Gateway: 122a491a
+    Distance to Gateway: 249.280154 meters
+  End Device ID: ed_4245d742
+    Lat: -45.8678
+    Lng: -67.4923
+    Height: 1.5m
+    Assigned Gateway: 122a491a
+    Distance to Gateway: 328.145795 meters
+  End Device ID: ed_bee7a4b1
+    Lat: -45.8675
+    Lng: -67.4876
+    Height: 1.5m
+    Assigned Gateway: 80b8a6f9
+    Distance to Gateway: 128.114211 meters
+  End Device ID: ed_ba9eb955
+    Lat: -45.8709
+    Lng: -67.4921
+    Height: 1.5m
+    Assigned Gateway: 122a491a
+    Distance to Gateway: 296.637281 meters
+  End Device ID: ed_041287d4
+    Lat: -45.871
+    Lng: -67.4974
+    Height: 1.5m
+    Assigned Gateway: 122a491a
+    Distance to Gateway: 208.940278 meters
+  End Device ID: ed_0509cba0
+    Lat: -45.871
+    Lng: -67.502
+    Height: 1.5m
+    Assigned Gateway: 122a491a
+    Distance to Gateway: 518.337908 meters
+  End Device ID: ed_c1bf221a
+    Lat: -45.8761
+    Lng: -67.5018
+    Height: 1.5m
+    Assigned Gateway: 735e0a00
+    Distance to Gateway: 171.180441 meters
+  End Device ID: ed_1e568bd2
+    Lat: -45.8731
+    Lng: -67.5018
+    Height: 1.5m
+    Assigned Gateway: 735e0a00
+    Distance to Gateway: 494.306316 meters
+  End Device ID: ed_0aa8513c
+    Lat: -45.8652
+    Lng: -67.5258
+    Height: 1.5m
+    Assigned Gateway: c5f67f14
+    Distance to Gateway: 349.093350 meters
+  End Device ID: ed_d60a1d6f
+    Lat: -45.8677
+    Lng: -67.5291
+    Height: 1.5m
+    Assigned Gateway: 96efe28b
+    Distance to Gateway: 296.401783 meters
+  End Device ID: ed_7fc6d7c6
+    Lat: -45.87
+    Lng: -67.5321
+    Height: 1.5m
+    Assigned Gateway: 3971e89b
+    Distance to Gateway: 332.174648 meters
+  End Device ID: ed_32497196
+    Lat: -45.873
+    Lng: -67.5362
+    Height: 1.5m
+    Assigned Gateway: 3971e89b
+    Distance to Gateway: 647.704372 meters
+  End Device ID: ed_0647f475
+    Lat: -45.8766
+    Lng: -67.5409
+    Height: 1.5m
+    Assigned Gateway: ce10cb93
+    Distance to Gateway: 628.941133 meters
+  End Device ID: ed_35e11cc9
+    Lat: -45.8792
+    Lng: -67.5367
+    Height: 1.5m
+    Assigned Gateway: ce10cb93
+    Distance to Gateway: 312.121594 meters
+  End Device ID: ed_884a5f0b
+    Lat: -45.8757
+    Lng: -67.5321
+    Height: 1.5m
+    Assigned Gateway: 3971e89b
+    Distance to Gateway: 586.336775 meters
+  End Device ID: ed_78dfa3a5
+    Lat: -45.8726
+    Lng: -67.528
+    Height: 1.5m
+    Assigned Gateway: 3971e89b
+    Distance to Gateway: 158.059842 meters
+  End Device ID: ed_5f205cb9
+    Lat: -45.8701
+    Lng: -67.5249
+    Height: 1.5m
+    Assigned Gateway: dbb18b89
+    Distance to Gateway: 51.795010 meters
+  End Device ID: ed_922f3cb1
+    Lat: -45.8679
+    Lng: -67.5218
+    Height: 1.5m
+    Assigned Gateway: dbb18b89
+    Distance to Gateway: 297.879952 meters
+  End Device ID: ed_cfc4b886
+    Lat: -45.8708
+    Lng: -67.5172
+    Height: 1.5m
+    Assigned Gateway: dbb18b89
+    Distance to Gateway: 567.226616 meters
+  End Device ID: ed_29f71d2d
+    Lat: -45.8729
+    Lng: -67.52
+    Height: 1.5m
+    Assigned Gateway: dbb18b89
+    Distance to Gateway: 480.191293 meters
+  End Device ID: ed_e075f3b1
+    Lat: -45.8757
+    Lng: -67.5236
+    Height: 1.5m
+    Assigned Gateway: 9d041837
+    Distance to Gateway: 340.741535 meters
+  End Device ID: ed_fc07d637
+    Lat: -45.8787
+    Lng: -67.5274
+    Height: 1.5m
+    Assigned Gateway: 9d041837
+    Distance to Gateway: 243.998024 meters
+  End Device ID: ed_63fb2307
+    Lat: -45.8823
+    Lng: -67.5217
+    Height: 1.5m
+    Assigned Gateway: 9d041837
+    Distance to Gateway: 444.313014 meters
+  End Device ID: ed_baf5c3d0
+    Lat: -45.8793
+    Lng: -67.5179
+    Height: 1.5m
+    Assigned Gateway: 3e2a4d52
+    Distance to Gateway: 315.697081 meters
+  End Device ID: ed_268d6ff3
+    Lat: -45.8765
+    Lng: -67.5146
+    Height: 1.5m
+    Assigned Gateway: eb2d3a93
+    Distance to Gateway: 272.738615 meters
+  End Device ID: ed_6abe70b6
+    Lat: -45.8743
+    Lng: -67.5118
+    Height: 1.5m
+    Assigned Gateway: eb2d3a93
+    Distance to Gateway: 492.550251 meters
+  End Device ID: ed_0cd67eec
+    Lat: -45.8767
+    Lng: -67.5082
+    Height: 1.5m
+    Assigned Gateway: eb2d3a93
+    Distance to Gateway: 425.391628 meters
+  End Device ID: ed_dec41135
+    Lat: -45.879
+    Lng: -67.5105
+    Height: 1.5m
+    Assigned Gateway: eb2d3a93
+    Distance to Gateway: 197.126613 meters
+  End Device ID: ed_8289aa40
+    Lat: -45.8777
+    Lng: -67.5058
+    Height: 1.5m
+    Assigned Gateway: 735e0a00
+    Distance to Gateway: 352.384704 meters
+  End Device ID: ed_5ed4ca89
+    Lat: -45.8817
+    Lng: -67.5139
+    Height: 1.5m
+    Assigned Gateway: 3e2a4d52
+    Distance to Gateway: 123.462174 meters
+  End Device ID: ed_23fd1b32
+    Lat: -45.8846
+    Lng: -67.5182
+    Height: 1.5m
+    Assigned Gateway: 3e2a4d52
+    Distance to Gateway: 397.364678 meters
+  End Device ID: ed_5db6dc17
+    Lat: -45.879
+    Lng: -67.5318
+    Height: 1.5m
+    Assigned Gateway: ce10cb93
+    Distance to Gateway: 573.911059 meters
+  End Device ID: ed_506aace2
+    Lat: -45.8829
+    Lng: -67.5314
+    Height: 1.5m
+    Assigned Gateway: ce10cb93
+    Distance to Gateway: 521.372442 meters
+  End Device ID: ed_2a5c276c
+    Lat: -45.8833
+    Lng: -67.5421
+    Height: 1.5m
+    Assigned Gateway: ce10cb93
+    Distance to Gateway: 356.296150 meters
+  End Device ID: ed_11f53bb8
+    Lat: -45.8808
+    Lng: -67.5464
+    Height: 1.5m
+    Assigned Gateway: ce10cb93
+    Distance to Gateway: 659.841582 meters
+  End Device ID: ed_5c661a36
+    Lat: -45.8668
+    Lng: -67.5096
+    Height: 1.5m
+    Assigned Gateway: 122a491a
+    Distance to Gateway: 1134.454087 meters
+  End Device ID: ed_ebc97338
+    Lat: -45.8634
+    Lng: -67.5165
+    Height: 1.5m
+    Assigned Gateway: 479097d7
+    Distance to Gateway: 575.063496 meters
+  End Device ID: ed_5546ac61
+    Lat: -45.8624
+    Lng: -67.5097
+    Height: 1.5m
+    Assigned Gateway: f9c1d462
+    Distance to Gateway: 918.797319 meters
+  End Device ID: ed_6b969877
+    Lat: -45.8589
+    Lng: -67.5099
+    Height: 1.5m
+    Assigned Gateway: 479097d7
+    Distance to Gateway: 1195.125986 meters
+  End Device ID: ed_96de3788
+    Lat: -45.8589
+    Lng: -67.5141
+    Height: 1.5m
+    Assigned Gateway: 479097d7
+    Distance to Gateway: 914.019465 meters
+  End Device ID: ed_95a07a14
+    Lat: -45.8623
+    Lng: -67.5228
+    Height: 1.5m
+    Assigned Gateway: 479097d7
+    Distance to Gateway: 156.612253 meters
+  End Device ID: ed_ee404c61
+    Lat: -45.8864
+    Lng: -67.5314
+    Height: 1.5m
+    Assigned Gateway: 3971e89b
+    Distance to Gateway: 1709.345670 meters
+  End Device ID: ed_9e5647b7
+    Lat: -45.8892
+    Lng: -67.531
+    Height: 1.5m
+    Assigned Gateway: eb2d3a93
+    Distance to Gateway: 1822.020664 meters
+  End Device ID: ed_89ae466b
+    Lat: -45.886
+    Lng: -67.5416
+    Height: 1.5m
+    Assigned Gateway: ce10cb93
+    Distance to Gateway: 535.488989 meters
+Terrain Elevation Grid:
+   Bounding Box:
+      Upper right position: [-45.965, -67.6]
+      Bottom left position: [-45.7553, -67.35]
+      Altitude range: [-14, 426] meters
+Total distance from end devices to assigned gateways: 29731.7 meters
+----------------------------------------
+Distance Matrix (meters):
+end-device-id,3971e89b,735e0a00,ce10cb93,c5f67f14,8c14b0d6,80b8a6f9,479097d7,3e2a4d52,59490d55,dbb18b89,122a491a,96efe28b,f9c1d462,9d041837,eb2d3a93
+ed_1d8bcf21,-1,2472.76,-1,-1,-1,798.754,-1,-1,804.428,-1,-1,-1,-1,-1,-1
+ed_f968f823,-1,-1,-1,-1,-1,642.269,-1,-1,478.484,-1,-1,-1,-1,-1,-1
+ed_2da09985,-1,-1,-1,-1,-1,-1,-1,-1,291.631,-1,-1,-1,-1,-1,-1
+ed_e227f0c4,-1,1931.27,4132.92,-1,-1,-1,-1,2840.05,432.145,-1,970.599,-1,-1,3069.34,2459.52
+ed_a14d0ff5,-1,1851.55,3814.54,-1,-1,-1,-1,2626.73,-1,-1,994.442,-1,286.992,2779.58,2244.78
+ed_a4fab1e8,-1,2094.63,-1,-1,-1,-1,-1,2844.18,-1,-1,1230.27,-1,56.5785,-1,2463.17
+ed_483c448e,-1,2331.18,4126.97,-1,-1,-1,-1,3056.43,-1,-1,1464.35,-1,199.422,3140.48,2676.87
+ed_d6894c2b,2327.11,1839.62,3626.72,-1,-1,-1,-1,2515.77,-1,1994.55,1077.65,-1,353.711,2614.75,2136.55
+ed_d4069e3c,-1,2083.13,-1,-1,-1,-1,-1,2740.1,-1,-1,1297.93,-1,207.049,-1,2362.97
+ed_a2b8a1d4,-1,2258.33,-1,-1,-1,594.825,-1,-1,950.566,-1,-1,-1,-1,-1,-1
+ed_6959f571,-1,-1,-1,-1,-1,359.97,-1,-1,850.139,-1,-1,-1,-1,-1,-1
+ed_5894fd28,-1,-1,-1,-1,-1,-1,-1,-1,689.674,-1,-1,-1,-1,-1,-1
+ed_2527f6c9,-1,1610.92,4033.01,-1,-1,-1,2456.32,2617.21,-1,2557.56,624.616,-1,870.368,2936.17,2245.17
+ed_37d3fe73,-1,1481.93,-1,-1,-1,-1,-1,2362.16,-1,-1,585.026,-1,694.06,2611.22,1981.9
+ed_607c322f,-1,1459.68,-1,-1,-1,-1,-1,2173.32,-1,-1,-1,-1,-1,-1,1791.57
+ed_3d70316b,-1,1088.23,-1,-1,-1,-1,-1,1861.55,-1,-1,532.13,-1,1059.3,-1,1480.1
+ed_9991f7b7,2417.16,1129.03,3512.47,-1,2105.67,-1,2111.08,2080.52,-1,2102.49,249.28,-1,1050.36,2407.53,1707.2
+ed_4245d742,-1,1292.78,-1,-1,-1,-1,2497.41,2365.61,-1,-1,328.146,-1,1173.33,-1,2006.23
+ed_bee7a4b1,-1,1547.61,-1,-1,-1,128.114,-1,-1,-1,-1,-1,-1,-1,-1,-1
+ed_ba9eb955,-1,1028.95,-1,-1,-1,646.747,-1,-1,-1,-1,296.637,-1,-1,-1,-1
+ed_041287d4,2384.43,788.309,3365.51,-1,2305.37,-1,2218.12,1830.04,-1,2091.06,208.94,2652.57,1406.25,2245.8,1473.23
+ed_0509cba0,-1,733.201,3039.2,-1,2036.6,-1,1894.43,1577.53,-1,-1,518.338,-1,1411.13,1924.76,1203.57
+ed_c1bf221a,2111.74,171.18,2872.11,-1,2470.01,-1,2211.63,1224.28,-1,1875.92,864.474,-1,1971,1758.49,907.65
+ed_1e568bd2,-1,494.306,-1,-1,-1,-1,-1,1418.39,-1,-1,619.663,-1,1645.85,-1,1059.38
+ed_0aa8513c,693.965,-1,2078.28,349.093,-1,-1,-1,1989.63,-1,531.861,-1,373.676,-1,1506.47,-1
+ed_d60a1d6f,395.542,-1,1718.88,534.913,1228.76,-1,617.483,-1,-1,-1,-1,296.402,-1,-1,-1
+ed_7fc6d7c6,332.175,-1,1393.97,-1,1571.99,-1,966.18,1818.95,-1,601.248,-1,536.918,-1,1143.15,1767.64
+ed_32497196,647.704,-1,992.26,-1,2025.72,-1,1424.29,1858.64,-1,978.102,3164.94,-1,-1,1117.32,1900.99
+ed_0647f475,1146.08,-1,628.941,1778.87,2558.49,-1,1960.16,2038.53,-1,1478.17,3589.93,1481.67,3796.78,1308.21,2171.71
+ed_35e11cc9,1104.4,2744.62,312.122,1910.39,2632.67,-1,2009.99,1657.82,-1,1409.5,3355.37,1616.25,3702.13,964.232,1836.35
+ed_884a5f0b,586.337,2394.15,819.597,1448.4,2130.49,-1,1504.54,1438.98,-1,885.974,2909.11,1166.85,3186.08,692.775,1517.16
+ed_78dfa3a5,158.06,2142.38,1283.05,1084.4,1693.5,-1,1068.47,1389.14,-1,419.18,2536.48,841.475,2728.43,735.974,1345.6
+ed_5f205cb9,282.038,-1,1650.52,-1,1359.58,-1,747.061,1464.32,-1,51.795,-1,700.697,-1,952.219,1322.08
+ed_922f3cb1,619.932,-1,1997.93,-1,1072.87,-1,517.405,-1,-1,297.88,2040.35,744.507,-1,1218.3,-1
+ed_cfc4b886,855.759,1440.18,2027.11,-1,1426.29,-1,970.367,1204.52,-1,567.227,-1,-1,-1,1033.59,930.061
+ed_29f71d2d,664.563,1535.9,1713.06,-1,1632.79,-1,1094.89,1023.39,-1,480.191,1924.67,1185.17,2270.44,722.357,837.122
+ed_e075f3b1,611.843,1736.76,1312.3,1479.18,1948.51,-1,1357.6,905.284,-1,648.155,2268.77,1278.57,2683.23,340.742,884.928
+ed_fc07d637,835.944,2023.99,892.561,1762.25,2331.01,-1,1716.77,972.089,-1,1010.98,2662.09,1514.03,3132.28,243.998,1116.76
+ed_63fb2307,1329.43,1662.76,1263.54,2226.14,2672.64,-1,2099.11,482.525,-1,1395.33,2461.95,2012.85,3166.76,444.313,786.33
+ed_baf5c3d0,1200.26,1295.72,1585.6,2010.02,2347.46,-1,1817.64,315.697,-1,1159.05,2029.85,1842.5,2724.21,497.754,384.784
+ed_268d6ff3,1206.95,1033.89,1911.31,-1,2083.31,-1,1617.03,574.819,-1,1055.63,1654.08,1760.36,2326.07,789.719,272.739
+ed_6abe70b6,-1,891.471,2195.14,-1,1917.13,-1,1526.56,860.587,-1,1089.87,-1,-1,2011.26,1079.87,492.55
+ed_0cd67eec,1664.98,543.329,-1,-1,2276.79,-1,1912.14,782.666,-1,1465.2,-1,-1,2147.63,1259.91,425.392
+ed_dec41135,1624.86,729.695,-1,-1,2448.13,-1,2020.96,482.349,-1,1482.05,1557.44,-1,2449.1,-1,197.127
+ed_8289aa40,1873.71,352.385,2532.11,-1,2452.47,-1,2110.22,867.129,-1,1675.67,1195.43,2363.63,2197.16,1428.4,561.77
+ed_5ed4ca89,-1,-1,-1,-1,-1,-1,-1,123.462,-1,-1,-1,-1,2824.41,-1,348.072
+ed_23fd1b32,1682.3,1525.95,1564.1,2556.34,2942.3,-1,2396.52,397.365,-1,1711.09,2418.37,2358.86,3260.01,810.058,779.57
+ed_5db6dc17,908.986,2369.35,573.911,1803.41,2457.93,-1,1832,1294.72,-1,1167.61,2993.98,1526.23,3400.98,588.968,1461.3
+ed_506aace2,1323.84,2407.08,521.372,2233.31,2861.55,-1,2238.94,1239.61,-1,1549.73,3143.89,1960.05,3686.51,727.438,1505.9
+ed_2a5c276c,1723.19,3221.9,356.296,2490.14,3237.1,-1,2618.75,2064.79,-1,2030.49,3909.71,2192.36,4316.61,1474.53,2313.65
+ed_11f53bb8,1765.75,3508.88,659.842,2406.98,3193.16,-1,2596.76,2390,-1,2094.04,4125.33,2111.43,4412.94,1730.34,2598.21
+ed_5c661a36,1521.5,1363.48,2764.58,-1,1286.34,-1,1166.52,1710.3,-1,1192.54,1134.45,-1,-1,1743.86,1346.56
+ed_ebc97338,1255.8,1966.53,2642.72,963.275,-1,-1,575.063,2023.45,-1,942.525,1763.03,-1,-1,1803.47,1717.44
+ed_5546ac61,-1,1804.95,-1,-1,-1,-1,-1,2177.73,-1,-1,1356.68,-1,918.797,2131.04,1821.48
+ed_6b969877,1968.25,2181.64,3351.81,-1,-1,-1,1195.13,2559.48,-1,1653.43,1633.49,-1,-1,2463.95,2208.58
+ed_96de3788,1751.42,2300.68,3152.78,-1,-1,-1,914.019,2524.94,-1,1455.53,1867.56,1466,-1,2337.05,2197.76
+ed_95a07a14,-1,-1,-1,474.698,472.812,-1,156.612,2221.63,-1,-1,-1,691.954,-1,-1,1975.89
+ed_ee404c61,1709.35,-1,-1,2623.31,3237.58,-1,2618.07,-1,-1,1919.81,3341.62,2351.4,3981.38,-1,-1
+ed_9e5647b7,2012.17,-1,-1,2929.84,3530.5,-1,2914.32,-1,-1,2210.54,3498.7,2660,4208.87,-1,1822.02
+ed_89ae466b,1940.93,-1,535.489,2747.1,3475.78,-1,2852.58,-1,-1,2232.96,3999.08,2450.79,4482.72,1568.22,-1
