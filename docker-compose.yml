@@ -1,0 +1,13 @@
+services:
+  veradynium:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - veradynium_uploads:/app/server/uploads
+    restart: unless-stopped
+
+volumes:
+  veradynium_uploads:

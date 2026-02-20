@@ -98,6 +98,28 @@ The [GUI](GUI) was implemented with React.js, MUI and Leaflet.js, between other 
 ## Installation
 Run ```build.sh``` or ```make all``` to set up the project.  
 
+### Docker
+Build and run everything (solver binaries + API + GUI static files):
+
+```bash
+docker compose up --build
+```
+
+The application will be available at ```http://localhost:8000```. A named Docker volume is used to persist uploaded files (```/app/server/uploads```) between container restarts.
+
+Useful commands:
+
+```bash
+# Start in detached mode
+docker compose up -d --build
+
+# Stop services
+docker compose down
+
+# Stop and remove persisted uploads volume
+docker compose down -v
+```
+
 ### System Requirements
 
 - **C++17 compliant compiler** (GCC ≥ 7, Clang ≥ 5, MSVC ≥ 2017)  

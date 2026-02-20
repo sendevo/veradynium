@@ -5,6 +5,7 @@ SERVER_DIR=server
 VENV_DIR=$(SERVER_DIR)/venv
 PYTHON=python3
 PIP=pip
+DOCKER_COMPOSE?=docker-compose
 
 # -------------------------
 # Version checks (Python, pip, GCC, Node.js, npm)
@@ -62,6 +63,24 @@ run:
 	$(VENV_DIR)/bin/uvicorn main:app --reload
 
 # -------------------------
+# Docker shortcuts
+docker-up:
+	@echo "Building and starting Docker services..."
+	$(DOCKER_COMPOSE) up --build
+
+docker-up-d:
+	@echo "Building and starting Docker services in detached mode..."
+	$(DOCKER_COMPOSE) up -d --build
+
+docker-down:
+	@echo "Stopping Docker services..."
+	$(DOCKER_COMPOSE) down
+
+docker-down-v:
+	@echo "Stopping Docker services and removing volumes..."
+	$(DOCKER_COMPOSE) down -v
+
+# -------------------------
 # Clean targets
 clean:
 	@echo "Cleaning solver..."
@@ -71,4 +90,4 @@ clean:
 	@echo "Cleaning backend..."
 	rm -rf $(VENV_DIR)
 
-.PHONY: all solver gui server venv install-deps run clean
+.PHONY: all solver gui server venv install-deps run docker-up docker-up-d docker-down docker-down-v clean

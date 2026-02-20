@@ -8,7 +8,6 @@ from pathlib import Path
 from util import nc_to_csv
 
 
-
 app = FastAPI(title="Veradynium API")
 
 # Frontend build
